@@ -8,20 +8,6 @@ class LevelSelection {
    * Set up level selection event listeners
    */
   setupEventListeners() {
-    // Level selection buttons
-    document.querySelectorAll(".level-option").forEach((option) => {
-      option.addEventListener("click", (e) => {
-        this.game.initializeAudio();
-        const levelNumber = parseInt(e.currentTarget.dataset.level);
-        this.game.playSound("buttonClick");
-        this.selectLevel(levelNumber);
-      });
-
-      option.addEventListener("mouseenter", () => {
-        this.game.playSound("buttonHover");
-      });
-    });
-
     // Back to fighter selection button
     const backToFighters = document.getElementById("back-to-fighters");
     if (backToFighters) {
@@ -30,6 +16,9 @@ class LevelSelection {
         this.game.showScreen("fighter-select-screen");
       });
     }
+
+    // Note: Level option event listeners are set up dynamically in setupLevelEventListeners()
+    // after the levels are populated, since they don't exist at initial page load
   }
 
   /**
@@ -41,6 +30,39 @@ class LevelSelection {
     if (this.game.gameState.currentScreen !== "level-select-screen") {
       this.game.showScreen("level-select-screen");
     }
+    // Set up event listeners AFTER populating levels
+    this.setupLevelEventListeners();
+  }
+
+  /**
+   * Set up event listeners for dynamically created level options
+   */
+  setupLevelEventListeners() {
+    // Remove any existing listeners first
+    document.querySelectorAll(".level-option").forEach((option) => {
+      option.replaceWith(option.cloneNode(true));
+    });
+
+    // Add event listeners to level options
+    document.querySelectorAll(".level-option").forEach((option) => {
+      option.addEventListener("click", (e) => {
+        this.game.initializeAudio();
+        const levelNumber = parseInt(e.currentTarget.dataset.level);
+        console.log(`Level ${levelNumber} clicked!`);
+        this.game.playSound("buttonClick");
+        this.selectLevel(levelNumber);
+      });
+
+      option.addEventListener("mouseenter", () => {
+        this.game.playSound("buttonHover");
+      });
+    });
+
+    console.log(
+      `Set up event listeners for ${
+        document.querySelectorAll(".level-option").length
+      } level options`
+    );
   }
 
   /**
@@ -119,6 +141,8 @@ class LevelSelection {
    * Select a level and proceed to fighter selection for that level
    */
   selectLevel(levelNumber) {
+    console.log(`Selecting level ${levelNumber}...`);
+
     if (levelNumber < 1 || levelNumber > GAME_CONFIG.TOTAL_LEVELS) {
       console.error(`Invalid level number: ${levelNumber}`);
       this.game.showError("Invalid level selection");
@@ -131,14 +155,19 @@ class LevelSelection {
         throw new Error(`Level ${levelNumber} configuration not found`);
       }
 
+      console.log(`Level config found:`, levelConfig);
+
       // Store selected level in game state
       this.game.gameState.selectedLevel = levelNumber;
       this.game.gameState.levelConfig = levelConfig;
+
+      console.log(`Stored level ${levelNumber} in game state`);
 
       // Update fighter selection screen to show only available fighters for this level
       this.updateFighterSelectionForLevel(levelConfig);
 
       // Go back to fighter selection, but now filtered for this level
+      console.log(`Switching to fighter selection screen...`);
       this.game.showScreen("fighter-select-screen");
     } catch (error) {
       console.error("Failed to select level:", error);
