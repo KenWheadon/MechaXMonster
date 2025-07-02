@@ -1,6 +1,6 @@
 // Enhanced Game Configuration and Constants with Level System
 const GAME_CONFIG = {
-  TOTAL_BATTLES: 3,
+  TOTAL_BATTLES: 5,
   TOTAL_LEVELS: 5,
   TRAINING_TIME: 20, // Increased from 15 for better scoring
   ANIMATION_DURATION: 1000,
@@ -24,9 +24,9 @@ const GAME_CONFIG = {
 // Expanded Fighter Templates with 5 fighters total
 const FIGHTER_TEMPLATES = {
   vanilla: {
-    name: "PinkMecha",
+    name: "Vanilla",
     sprite: "🍦",
-    image: "images/mecha-green.png",
+    image: "images/vanilla_fighter.png",
     hp: 100,
     maxHp: 100,
     attack: 15,
@@ -57,9 +57,9 @@ const FIGHTER_TEMPLATES = {
     },
   },
   chocolate: {
-    name: "YellowMecha",
+    name: "Chocolate",
     sprite: "🍫",
-    image: "images/mecha-yellow.png",
+    image: "images/chocolate_fighter.png",
     hp: 90,
     maxHp: 90,
     attack: 22, // Higher attack for glass cannon
@@ -90,9 +90,9 @@ const FIGHTER_TEMPLATES = {
     },
   },
   strawberry: {
-    name: "RedMecha",
+    name: "Strawberry",
     sprite: "🍓",
-    image: "images/mecha-red.png",
+    image: "images/strawberry_fighter.png",
     hp: 120, // Higher HP for tank
     maxHp: 120,
     attack: 12,
@@ -120,9 +120,9 @@ const FIGHTER_TEMPLATES = {
   },
   // NEW: Mint Ice Cream Fighter
   mint: {
-    name: "BlueMecha",
+    name: "Mint Chip",
     sprite: "🍃",
-    image: "images/mecha-blue.png",
+    image: "images/mint_fighter.png",
     hp: 110,
     maxHp: 110,
     attack: 18,
@@ -152,11 +152,11 @@ const FIGHTER_TEMPLATES = {
       },
     },
   },
-  // NEW: PinkMecha Ice Cream Fighter
-  pinkmecha: {
-    name: "Pink Mecha",
+  // NEW: Neapolitan Ice Cream Fighter
+  neapolitan: {
+    name: "Neapolitan",
     sprite: "🎭",
-    image: "images/mecha-pink.png",
+    image: "images/neapolitan_fighter.png",
     hp: 105,
     maxHp: 105,
     attack: 16,
@@ -192,7 +192,7 @@ const FIGHTER_TEMPLATES = {
 const LEVEL_CONFIG = {
   1: {
     name: "Beginner's Freeze",
-    description: "Start your monster fight",
+    description: "Start your ice cream fighting journey",
     difficulty: "Easy",
     availableFighters: ["vanilla", "chocolate"],
     enemyMultiplier: 0.8, // Easier enemies
@@ -223,7 +223,7 @@ const LEVEL_CONFIG = {
       "chocolate",
       "strawberry",
       "mint",
-      "pinkmecha",
+      "neapolitan",
     ],
     enemyMultiplier: 1.1,
     background: "level_4_bg.png",
@@ -237,7 +237,7 @@ const LEVEL_CONFIG = {
       "chocolate",
       "strawberry",
       "mint",
-      "pinkmecha",
+      "neapolitan",
     ],
     enemyMultiplier: 1.3, // Much harder
     background: "level_5_bg.png",
@@ -399,7 +399,7 @@ const FIGHTER_STATEMENTS = {
     "My refreshing spirit is fading!",
     "I need to stay chill!",
   ],
-  pinkmecha: [
+  neapolitan: [
     "My layers are falling apart!",
     "I can't keep my flavors together!",
     "Unity is harder than it looks!",
@@ -635,32 +635,32 @@ const ACHIEVEMENTS = {
   // Character victory achievements - updated for all 5 fighters
   vanilla_victory: {
     icon: "🍦",
-    name: "PinkMecha Champion",
-    description: "Beat the game with PinkMecha",
+    name: "Vanilla Champion",
+    description: "Beat the game with Vanilla",
     unlocked: false,
   },
   chocolate_victory: {
     icon: "🍫",
-    name: "YellowMecha Champion",
-    description: "Beat the game with YellowMecha",
+    name: "Chocolate Champion",
+    description: "Beat the game with Chocolate",
     unlocked: false,
   },
   strawberry_victory: {
     icon: "🍓",
-    name: "RedMecha Champion",
-    description: "Beat the game with RedMecha",
+    name: "Strawberry Champion",
+    description: "Beat the game with Strawberry",
     unlocked: false,
   },
   mint_victory: {
     icon: "🍃",
     name: "Mint Champion",
-    description: "Beat the game with BlueMecha",
+    description: "Beat the game with Mint Chip",
     unlocked: false,
   },
-  pinkmecha_victory: {
+  neapolitan_victory: {
     icon: "🎭",
-    name: "PinkMecha Champion",
-    description: "Beat the game with PinkMecha",
+    name: "Neapolitan Champion",
+    description: "Beat the game with Neapolitan",
     unlocked: false,
   },
 
@@ -751,20 +751,20 @@ const ACHIEVEMENTS = {
   // Slot machine achievements
   slot_vanilla: {
     icon: "🍦",
-    name: "PinkMecha Slots",
-    description: "Win PinkMecha jackpot",
+    name: "Vanilla Slots",
+    description: "Win Vanilla jackpot",
     unlocked: false,
   },
   slot_chocolate: {
     icon: "🍫",
-    name: "YellowMecha Slots",
-    description: "Win YellowMecha jackpot",
+    name: "Chocolate Slots",
+    description: "Win Chocolate jackpot",
     unlocked: false,
   },
   slot_strawberry: {
     icon: "🍓",
-    name: "RedMecha Slots",
-    description: "Win RedMecha jackpot",
+    name: "Strawberry Slots",
+    description: "Win Strawberry jackpot",
     unlocked: false,
   },
   slot_soft: {

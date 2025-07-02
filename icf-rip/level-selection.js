@@ -37,7 +37,10 @@ class LevelSelection {
    */
   showLevelSelection() {
     this.populateLevelOptions();
-    this.game.showScreen("level-select-screen");
+    // Only show screen if it's not already active
+    if (this.game.gameState.currentScreen !== "level-select-screen") {
+      this.game.showScreen("level-select-screen");
+    }
   }
 
   /**
@@ -45,13 +48,27 @@ class LevelSelection {
    */
   populateLevelOptions() {
     const levelGrid = document.getElementById("level-grid");
-    if (!levelGrid) return;
+    if (!levelGrid) {
+      console.error("Level grid not found!");
+      return;
+    }
 
+    console.log("Populating level options...");
+    console.log("GAME_CONFIG.TOTAL_LEVELS:", GAME_CONFIG.TOTAL_LEVELS);
+    console.log("LEVEL_CONFIG:", LEVEL_CONFIG);
     levelGrid.innerHTML = "";
 
     for (let levelNum = 1; levelNum <= GAME_CONFIG.TOTAL_LEVELS; levelNum++) {
+      console.log(`Trying to get level config for level ${levelNum}`);
       const levelConfig = CONFIG_UTILS.getLevelConfig(levelNum);
-      if (!levelConfig) continue;
+      console.log(`Level ${levelNum} config:`, levelConfig);
+
+      if (!levelConfig) {
+        console.error(`Level config not found for level ${levelNum}`);
+        continue;
+      }
+
+      console.log(`Creating level ${levelNum}:`, levelConfig);
 
       const levelOption = document.createElement("div");
       levelOption.className = "level-option";
@@ -61,6 +78,10 @@ class LevelSelection {
       const fighterThumbnails = levelConfig.availableFighters
         .map((fighterType) => {
           const fighter = FIGHTER_TEMPLATES[fighterType];
+          if (!fighter) {
+            console.warn(`Fighter template not found: ${fighterType}`);
+            return "";
+          }
           return `<img src="${fighter.image}" alt="${fighter.name}" class="fighter-thumbnail" title="${fighter.name}">`;
         })
         .join("");
@@ -88,7 +109,10 @@ class LevelSelection {
       `;
 
       levelGrid.appendChild(levelOption);
+      console.log(`Added level ${levelNum} to grid`);
     }
+
+    console.log(`Total levels created: ${levelGrid.children.length}`);
   }
 
   /**

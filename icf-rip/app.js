@@ -1,8 +1,10 @@
-// Enhanced Ice Cream Fighter - Main Application Controller with Achievements and Victory Popup
+// Enhanced Ice Cream Fighter - Main Application Controller with Level Selection System
 class IceCreamFighter {
   constructor() {
     this.gameState = {
       currentBattle: 1,
+      selectedLevel: null,
+      levelConfig: null,
       player: null,
       enemy: null,
       playerBoost: false,
@@ -18,7 +20,7 @@ class IceCreamFighter {
       slotSpins: 0,
       trainingPurchases: 0,
       slotConsecutiveLosses: 0,
-      currentScreen: "fighter-select-screen",
+      currentScreen: "level-select-screen", // UPDATED: Start with level selection
       selectedFighterType: null,
       malfunctionedMove: null, // Track which move is malfunctioning
     };
@@ -36,6 +38,7 @@ class IceCreamFighter {
     this.achievements = CONFIG_UTILS.loadAchievements();
 
     // Initialize module instances
+    this.levelSelection = new LevelSelection(this); // NEW: Level selection module
     this.fighterSelection = new FighterSelection(this);
     this.training = new Training(this);
     this.combat = new Combat(this);
@@ -52,7 +55,14 @@ class IceCreamFighter {
     try {
       this.setupEventListeners();
       this.setupAchievementSystem();
-      this.showScreen("fighter-select-screen");
+
+      console.log("Showing level select screen...");
+      this.showScreen("level-select-screen"); // UPDATED: Start with level selection
+
+      console.log("Initializing level selection...");
+      // Initialize level selection screen with populated levels
+      this.levelSelection.showLevelSelection();
+
       console.log("Ice Cream Fighter initialized successfully");
       console.log("Audio will be enabled after first user interaction");
     } catch (error) {
@@ -78,6 +88,7 @@ class IceCreamFighter {
    */
   setupEventListeners() {
     // Initialize module event listeners
+    this.levelSelection.setupEventListeners();
     this.fighterSelection.setupEventListeners();
     this.training.setupEventListeners();
     this.combat.setupEventListeners();
@@ -211,6 +222,12 @@ class IceCreamFighter {
    * Show victory popup instead of full screen
    */
   showVictoryPopup() {
+    // Unlock level completion achievement
+    if (this.gameState.selectedLevel) {
+      const levelAchievementKey = `level_${this.gameState.selectedLevel}_complete`;
+      this.unlockAchievement(levelAchievementKey);
+    }
+
     // Create victory popup
     const popup = document.createElement("div");
     popup.id = "victory-popup";
@@ -232,14 +249,18 @@ class IceCreamFighter {
       max-width: 500px;
     `;
 
+    const levelInfo = this.gameState.levelConfig
+      ? `${this.gameState.levelConfig.name} (Level ${this.gameState.selectedLevel})`
+      : "Unknown Level";
+
     popup.innerHTML = `
       <img src="images/victory.png" alt="Victory" style="width: 100%; height: auto; object-fit: contain; margin-bottom: 20px;" />
       <div style="font-size: 36px; margin-bottom: 20px;">🎉 VICTORY! 🎉</div>
       <div style="font-size: 20px; margin-bottom: 10px; font-weight: bold;">
-        You conquered all 5 battles!
+        You conquered ${levelInfo}!
       </div>
       <div style="font-size: 16px; margin-bottom: 30px;">
-        Your Mecha beat the boss!
+        Your ice cream fighter is the ultimate champion!
       </div>
       <button id="victory-play-again" style="
         background: rgba(255,255,255,0.3);

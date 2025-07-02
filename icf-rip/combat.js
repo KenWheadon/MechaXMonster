@@ -1,4 +1,4 @@
-// Enhanced Combat System Module with Achievement Integration, Fixed Power-ups, and Attack Malfunction
+// Enhanced Combat System Module with Achievement Integration, Fixed Power-ups, and Level Support
 class Combat {
   constructor(game) {
     this.game = game;
@@ -52,13 +52,16 @@ class Combat {
   }
 
   /**
-   * Start a battle
+   * Start a battle with level-scaled enemies
    */
   startBattle() {
     try {
+      // Use level-scaled enemy template
       const enemyTemplate = CONFIG_UTILS.getEnemyTemplate(
-        this.game.gameState.currentBattle
+        this.game.gameState.currentBattle,
+        this.game.gameState.selectedLevel || 1
       );
+
       if (!enemyTemplate) {
         this.game.gameOverScreen.gameOver("No more enemies to fight!");
         return;
@@ -89,8 +92,14 @@ class Combat {
 
       this.updateBattleUI();
       this.updateMoveButtonDamage();
+
+      // Show level info in battle log
+      const levelInfo = this.game.gameState.levelConfig
+        ? ` (${this.game.gameState.levelConfig.name})`
+        : "";
+
       this.game.addBattleLog(
-        `Battle ${this.game.gameState.currentBattle} begins!`
+        `Battle ${this.game.gameState.currentBattle} begins${levelInfo}!`
       );
       this.game.addBattleLog(`${this.game.gameState.enemy.name} appears!`);
       this.game.playSound("battleStart");
@@ -447,7 +456,7 @@ class Combat {
         this.game.gameState.playerBoostTurns = 3; // Set to 3 turns
         this.game.addAnimationClass(playerSprite, "boost-animation");
         this.game.addBattleLog(
-          `${this.game.gameState.player.name} powers up! Next 3 attacks will deal +50% damage!`
+          `${this.game.gameState.player.name} powers up! Next 3 attacks will deal +100% damage!`
         );
         break;
 
@@ -767,7 +776,7 @@ class Combat {
 
       html += `<div style="margin-top: 8px;"><strong>Damage Calculation:</strong></div>`;
       if (this.game.gameState.playerBoost) {
-        html += `<div>${baseDamage} (base) + ${playerAttack} (attack) × 1.5 (boost) - ${enemyDefense} (enemy def) = ${finalDamage}</div>`;
+        html += `<div>${baseDamage} (base) + ${playerAttack} (attack) × 2.0 (boost) - ${enemyDefense} (enemy def) = ${finalDamage}</div>`;
         html += `<div style="color: #f5576c; font-weight: bold;">BOOSTED: ${finalDamage} damage! (${this.game.gameState.playerBoostTurns} turns left)</div>`;
       } else {
         html += `<div>${baseDamage} (base) + ${playerAttack} (attack) - ${enemyDefense} (enemy def) = ${finalDamage}</div>`;
