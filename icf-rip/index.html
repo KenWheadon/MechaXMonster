@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ice Cream Fighter</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Achievement Toggle Button -->
+    <button class="achievement-toggle" onclick="toggleAchievements()">
+      🏆 Achievements
+    </button>
+
+    <!-- Achievement Drawer -->
+    <div class="achievement-drawer" id="achievement-drawer">
+      <div class="achievement-header">
+        <div class="achievement-title">🏆 Achievements</div>
+        <button class="achievement-close" onclick="toggleAchievements()">
+          Close
+        </button>
+      </div>
+      <div class="achievement-grid" id="achievement-grid">
+        <!-- Achievements will be dynamically populated -->
+      </div>
+    </div>
+
+    <div class="game-container">
+      <!-- Fighter Selection Screen -->
+      <div class="screen" id="fighter-select-screen">
+        <h1>YOU READY TO FIGHT MONSTERS?</h1>
+        <h2>🤖Which Mecha?🤖</h2>
+        <div class="fighter-select">
+          <div class="fighter-option" data-fighter="greenmecha">
+            <div class="fighter-sprite">
+              <img
+                src="images/mecha-green.png"
+                alt="GreenMecha Fighter"
+                class="fighter-image"
+              />
+            </div>
+            <h3>GreenMecha</h3>
+            <p>The Versatile</p>
+            <div class="fighter-stats">
+              <div class="stat-row">HP: 100</div>
+              <div class="stat-row">Attack: 15</div>
+              <div class="stat-row">Defense: 10</div>
+              <div class="stat-row">Sanity: 12</div>
+              <div class="stat-row">Moves: Heal + Boost</div>
+            </div>
+          </div>
+          <div class="fighter-option" data-fighter="yellowmecha">
+            <div class="fighter-sprite">
+              <img
+                src="images/mecha-yellow.png"
+                alt="YellowMecha Fighter"
+                class="fighter-image"
+              />
+            </div>
+            <h3>YellowMecha</h3>
+            <p>The Strong</p>
+            <div class="fighter-stats">
+              <div class="stat-row">HP: 90</div>
+              <div class="stat-row">Attack: 22</div>
+              <div class="stat-row">Defense: 8</div>
+              <div class="stat-row">Sanity: 10</div>
+              <div class="stat-row">Moves: Defend + Boost</div>
+            </div>
+          </div>
+          <div class="fighter-option" data-fighter="redmecha">
+            <div class="fighter-sprite">
+              <img
+                src="images/mecha-red.png"
+                alt="RedMecha Fighter"
+                class="fighter-image"
+              />
+            </div>
+            <h3>RedMecha</h3>
+            <p>The Tank</p>
+            <div class="fighter-stats">
+              <div class="stat-row">HP: 120</div>
+              <div class="stat-row">Attack: 12</div>
+              <div class="stat-row">Defense: 18</div>
+              <div class="stat-row">Sanity: 14</div>
+              <div class="stat-row">Moves: Heal + Boost</div>
+            </div>
+          </div>
+          <div class="fighter-option" data-fighter="bluemecha">
+            <div class="fighter-sprite">
+              <img
+                src="images/mecha-blue.png"
+                alt="Blue Mecha"
+                class="fighter-image"
+              />
+            </div>
+            <h3>BlueMecha</h3>
+            <p>The Cool</p>
+            <div class="fighter-stats">
+              <div class="stat-row">HP: 110</div>
+              <div class="stat-row">Attack: 18</div>
+              <div class="stat-row">Defense: 12</div>
+              <div class="stat-row">Sanity: 16</div>
+              <div class="stat-row">Moves: Defend + Boost</div>
+            </div>
+          </div>
+          <div class="fighter-option" data-fighter="pinkmecha">
+            <div class="fighter-sprite">
+              <img
+                src="images/mecha-pink.png"
+                alt="PinkMecha Fighter"
+                class="fighter-image"
+              />
+            </div>
+            <h3>PinkMecha</h3>
+            <p>The Balanced</p>
+            <div class="fighter-stats">
+              <div class="stat-row">HP: 105</div>
+              <div class="stat-row">Attack: 16</div>
+              <div class="stat-row">Defense: 14</div>
+              <div class="stat-row">Sanity: 11</div>
+              <div class="stat-row">Moves: Heal + Defend</div>
+            </div>
+          </div>
+        </div>
+        <div class="fighter-select">
+          <p>Also save Frank and Tim I guess?</p>
+        </div>
+      </div>
+
+      <!-- NEW: Level Selection Screen -->
+      <div class="screen" id="level-select-screen">
+        <h1>🏔️ SELECT YOUR CHALLENGE 🏔️</h1>
+        <h2>Choose a level to begin your ice cream fighting journey!</h2>
+
+        <div class="level-grid" id="level-grid">
+          <!-- Level options will be dynamically populated -->
+        </div>
+
+        <div class="level-selection-footer">
+          <button
+            class="continue-btn"
+            id="back-to-fighters"
+            style="display: none"
+          >
+            ← Back to Fighter Selection
+          </button>
+          <p class="level-hint">
+            Each level has different available fighters and difficulty!
+          </p>
+        </div>
+      </div>
+
+      <!-- Battle Screen -->
+      <div class="screen" id="battle-screen">
+        <div class="battle-background"></div>
+        <h2>Battle <span id="battle-number">1</span> of 5</h2>
+        <div class="battle-arena">
+          <div class="fighter-card">
+            <h3 id="player-name">Your Fighter</h3>
+            <div class="fighter-sprite" id="player-sprite">
+              <img
+                src="images/mecha-green.png"
+                alt="Player Fighter"
+                class="fighter-image"
+                id="player-image"
+              />
+            </div>
+            <div class="stats">
+              <div>
+                HP: <span id="player-hp">100</span>/<span id="player-max-hp"
+                  >100</span
+                >
+              </div>
+              <div class="stat-bar">
+                <div class="stat-fill hp-fill" id="player-hp-bar"></div>
+              </div>
+              <div>
+                Sanity: <span id="player-sanity">10</span>/<span
+                  id="player-max-sanity"
+                  >10</span
+                >
+              </div>
+              <div class="stat-bar">
+                <div class="stat-fill sanity-fill" id="player-sanity-bar"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fighter-card">
+            <h3 id="enemy-name">Enemy</h3>
+            <div class="fighter-sprite" id="enemy-sprite">
+              <img
+                src="images/enemy_1.png"
+                alt="Enemy Fighter"
+                class="fighter-image enemy-image"
+                id="enemy-image"
+              />
+            </div>
+            <div class="stats">
+              <div>
+                HP: <span id="enemy-hp">100</span>/<span id="enemy-max-hp"
+                  >100</span
+                >
+              </div>
+              <div class="stat-bar">
+                <div class="stat-fill hp-fill" id="enemy-hp-bar"></div>
+              </div>
+              <div>
+                Sanity: <span id="enemy-sanity">10</span>/<span
+                  id="enemy-max-sanity"
+                  >10</span
+                >
+              </div>
+              <div class="stat-bar">
+                <div class="stat-fill sanity-fill" id="enemy-sanity-bar"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="move-buttons" id="move-buttons">
+          <button class="move-btn" data-move="light" id="btn-light">
+            <img
+              src="images/attack_light_icon.png"
+              alt="Light Attack"
+              class="move-icon"
+            />
+            <div class="attack-text">
+              <span class="move-name" id="light-move-name">Scoop Slam</span>
+              <div class="move-cost" id="light-damage-display">
+                Cost: 2 | DMG: 15
+              </div>
+            </div>
+            <div class="move-tooltip" id="tooltip-light"></div>
+          </button>
+          <button class="move-btn" data-move="heavy" id="btn-heavy">
+            <img
+              src="images/attack_heavy_icon.png"
+              alt="Heavy Attack"
+              class="move-icon"
+            />
+            <div class="attack-text">
+              <span class="move-name" id="heavy-move-name">Sprinkle Blast</span>
+              <div class="move-cost" id="heavy-damage-display">
+                Cost: 5 | DMG: 35
+              </div>
+            </div>
+            <div class="move-tooltip" id="tooltip-heavy"></div>
+          </button>
+          <!-- Defend Button - will be hidden for fighters without defend -->
+          <button
+            class="move-btn"
+            data-move="defend"
+            id="btn-defend"
+            style="display: none"
+          >
+            <img src="images/defend_icon.png" alt="Defend" class="move-icon" />
+            <div class="attack-text">
+              <span class="move-name" id="defend-move-name">Ice Shield</span>
+              <div class="move-cost">Cost: 1 | Block damage</div>
+            </div>
+            <div class="move-tooltip" id="tooltip-defend"></div>
+          </button>
+          <!-- Heal Button - will be shown for fighters with heal -->
+          <button
+            class="move-btn"
+            data-move="heal"
+            id="btn-heal"
+            style="display: none"
+          >
+            <img src="images/heal_icon.png" alt="Heal" class="move-icon" />
+            <div class="attack-text">
+              <span class="move-name" id="heal-move-name">Heal</span>
+              <div class="move-cost">Cost: 3 | Restore 30% HP</div>
+            </div>
+            <div class="move-tooltip" id="tooltip-heal"></div>
+          </button>
+          <button class="move-btn" data-move="boost" id="btn-boost">
+            <img src="images/boost_icon.png" alt="Boost" class="move-icon" />
+            <div class="attack-text">
+              <span class="move-name" id="boost-move-name">Sugar Rush</span>
+              <div class="move-cost">Cost: 3 | +100% damage</div>
+            </div>
+            <div class="move-tooltip" id="tooltip-boost"></div>
+          </button>
+        </div>
+
+        <div
+          class="battle-log"
+          id="battle-log"
+          role="log"
+          aria-live="polite"
+        ></div>
+      </div>
+
+      <!-- Training Screen -->
+      <div class="screen" id="training-screen">
+        <h2>Training Time!</h2>
+        <p id="training-instructions">
+          Click the floating bubbles for points! Different sizes = different
+          points! Don't click the background!
+        </p>
+
+        <!-- Player Stats Display -->
+        <div
+          class="player-stats-display"
+          id="player-stats-display"
+          style="display: none"
+        >
+          <h3>Your Fighter Stats</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-label">HP</div>
+              <div class="stat-value">
+                <span id="training-current-hp">100</span>/<span
+                  id="training-max-hp"
+                  >100</span
+                >
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Attack</div>
+              <div class="stat-value" id="training-attack">15</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Defense</div>
+              <div class="stat-value" id="training-defense">10</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Sanity</div>
+              <div class="stat-value">
+                <span id="training-current-sanity">12</span>/<span
+                  id="training-max-sanity"
+                  >12</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Training Game Elements - Hidden by default -->
+        <div class="training-combo" id="training-combo">
+          Combo: <span id="combo-counter">0</span>x
+        </div>
+        <div class="training-score-time" id="training-score-time">
+          Score: <span id="training-score">0</span> | Time:
+          <span id="training-timer">20</span>s
+        </div>
+
+        <div
+          class="training-target"
+          id="training-target"
+          role="button"
+          tabindex="0"
+        ></div>
+
+        <div id="training-choices">
+          <h3>Choose your training reward:</h3>
+          <p>Your score: <span id="final-score">0</span> points</p>
+          <div id="training-btns">
+            <button class="move-btn" data-training="attack">
+              <img
+                src="images/upgrade_attack.png"
+                alt="Attack Upgrade"
+                class="upgrade-icon"
+              />
+              <div class="btn-text">+5 Attack Power</div>
+            </button>
+            <button class="move-btn" data-training="defense">
+              <img
+                src="images/upgrade_defense.png"
+                alt="Defense Upgrade"
+                class="upgrade-icon"
+              />
+              <div class="btn-text">+5 Defense Power</div>
+            </button>
+            <button class="move-btn" data-training="sanity">
+              <img
+                src="images/upgrade_sanity.png"
+                alt="Sanity Upgrade"
+                class="upgrade-icon"
+              />
+              <div class="btn-text">+2 Max Sanity</div>
+            </button>
+            <button class="move-btn" id="bonus-reward" data-training="health">
+              <img
+                src="images/upgrade_health.png"
+                alt="Health Upgrade"
+                class="upgrade-icon"
+              />
+              <div class="btn-text">+25 Max HP (Score 200+)</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="slot-machine-container">
+          <div class="slot-machine" id="slot-machine">
+            <h3>🎰 Risky Slots 🎰</h3>
+            <p>
+              Risk points for rewards! (Cost:
+              <span id="slot-cost">1</span> Points)
+            </p>
+            <div class="slot-reels">
+              <div class="slot-reel" id="reel1">
+                <img
+                  src="images/slot_vanilla.png"
+                  alt="GreenMecha"
+                  class="slot-symbol"
+                />
+              </div>
+              <div class="slot-reel" id="reel2">
+                <img
+                  src="images/slot_vanilla.png"
+                  alt="GreenMecha"
+                  class="slot-symbol"
+                />
+              </div>
+              <div class="slot-reel" id="reel3">
+                <img
+                  src="images/slot_vanilla.png"
+                  alt="GreenMecha"
+                  class="slot-symbol"
+                />
+              </div>
+            </div>
+            <!-- Slot Win/Lose Message will be inserted here dynamically -->
+            <button class="move-btn" id="spin-btn">
+              <img
+                src="images/slot_spin_icon.png"
+                alt="Spin"
+                class="move-icon"
+              />
+              <div class="slot-btn-text">
+                <span id="spin-cost">1</span> Points
+              </div>
+              <img
+                src="images/slot_spin_icon.png"
+                alt="Spin"
+                class="move-icon"
+              />
+            </button>
+            <div id="slot-result" role="status" aria-live="polite"></div>
+            <p class="slot-warning">Cost increases by 15 points each spin!</p>
+            <p class="slot-note">
+              <strong>Need 3 matching symbols to win!</strong>
+            </p>
+          </div>
+
+          <div class="slot-paytable" id="slot-paytable">
+            <h4>🏆 Paytable</h4>
+            <p class="paytable-note">3 matching symbols required:</p>
+            <div class="paytable-grid">
+              <div class="paytable-row">
+                <div class="paytable-symbols">
+                  <img
+                    src="images/slot_vanilla.png"
+                    alt="GreenMecha"
+                    class="paytable-symbol"
+                  />
+                  <img
+                    src="images/slot_vanilla.png"
+                    alt="GreenMecha"
+                    class="paytable-symbol"
+                  />
+                  <img
+                    src="images/slot_vanilla.png"
+                    alt="GreenMecha"
+                    class="paytable-symbol"
+                  />
+                </div>
+                <span class="reward">+3 Attack</span>
+              </div>
+              <div class="paytable-row">
+                <div class="paytable-symbols">
+                  <img
+                    src="images/slot_chocolate.png"
+                    alt="YellowMecha"
+                    class="paytable-symbol"
+                  />
+                  <img
+                    src="images/slot_chocolate.png"
+                    alt="YellowMecha"
+                    class="paytable-symbol"
+                  />
+                  <img
+                    src="images/slot_chocolate.png"
+                    alt="YellowMecha"
+                    class="paytable-symbol"
+                  />
+                </div>
+                <span class="reward">+3 Defense</span>
+              </div>
+              <div class="paytable-row">
+                <div class="paytable-symbols">
+                  <img
+                    src="images/slot_strawberry.png"
+                    alt="RedMecha"
+                    class="paytable-symbol"
+                  />
+                  <img
+                    src="images/slot_strawberry.png"
+                    alt="RedMecha"
+                    class="paytable-symbol"
+                  />
+                  <img
+                    src="images/slot_strawberry.png"
+                    alt="RedMecha"
+                    class="paytable-symbol"
+                  />
+                </div>
+                <span class="reward">+25 HP</span>
+              </div>
+              <div class="paytable-row">
+                <div class="paytable-symbols">
+                  <img
+                    src="images/slot_soft.png"
+                    alt="Soft Serve"
+                    class="paytable-symbol"
+                  />
+                  <img
+                    src="images/slot_soft.png"
+                    alt="Soft Serve"
+                    class="paytable-symbol"
+                  />
+                  <img
+                    src="images/slot_soft.png"
+                    alt="Soft Serve"
+                    class="paytable-symbol"
+                  />
+                </div>
+                <span class="reward">+3 Max Sanity</span>
+              </div>
+              <div class="paytable-row">
+                <div class="paytable-symbols">
+                  <img
+                    src="images/slot_ice.png"
+                    alt="Ice"
+                    class="paytable-symbol"
+                  />
+                  <img
+                    src="images/slot_ice.png"
+                    alt="Ice"
+                    class="paytable-symbol"
+                  />
+                  <img
+                    src="images/slot_ice.png"
+                    alt="Ice"
+                    class="paytable-symbol"
+                  />
+                </div>
+                <span class="reward">+2 All Stats & +20 HP</span>
+              </div>
+              <div class="paytable-row jackpot">
+                <div class="paytable-symbols">
+                  <img
+                    src="images/slot_coin.png"
+                    alt="Coin"
+                    class="paytable-symbol"
+                  />
+                  <img
+                    src="images/slot_coin.png"
+                    alt="Coin"
+                    class="paytable-symbol"
+                  />
+                  <img
+                    src="images/slot_coin.png"
+                    alt="Coin"
+                    class="paytable-symbol"
+                  />
+                </div>
+                <span class="reward">+50 Training Points</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="continue-btn" id="continue-training">
+          Continue to Next Battle
+        </button>
+      </div>
+
+      <!-- Talk-Down Screen -->
+      <div class="screen" id="talkdown-screen">
+        <h2>🌀 Sanity Crisis! 🌀</h2>
+        <div class="malfunction-visual">
+          <img
+            src="images/malfunction_effect.png"
+            alt="Malfunction Effect"
+            class="malfunction-image"
+          />
+        </div>
+        <p class="malfunction-text" id="malfunction-text">
+          Your fighter is having a meltdown!
+        </p>
+        <p>Choose the right words to calm them down:</p>
+        <div class="dialogue-options" id="dialogue-options"></div>
+      </div>
+
+      <!-- Game Over Screen -->
+      <div class="screen" id="game-over-screen">
+        <img src="images/game_over.png" alt="Game Over" class="screen-image" />
+        <p class="final-score">
+          You reached Battle <span id="final-battle">1</span> of 5
+        </p>
+        <p id="game-over-reason"></p>
+        <button class="continue-btn" id="restart-game">Try Again</button>
+      </div>
+
+      <!-- Victory Screen -->
+      <div class="screen" id="victory-screen">
+        <img src="images/victory.png" alt="Victory" class="screen-image" />
+        <h1>🎉 Victory! 🎉</h1>
+        <p class="final-score">You conquered all 5 battles!</p>
+        <p>Your ice mecha beat the boss!</p>
+        <button class="continue-btn" id="play-again">Play Again</button>
+      </div>
+    </div>
+
+    <!-- Talk Dialog Modal -->
+    <div
+      class="dialogue-screen"
+      id="talk-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="talk-dialog-title"
+    >
+      <h3 id="talk-dialog-title">Your Fighter Says:</h3>
+      <div class="fighter-dialogue-portrait">
+        <img
+          src="images/mecha-green.png"
+          alt="Fighter Portrait"
+          class="dialogue-portrait"
+          id="dialogue-portrait"
+        />
+      </div>
+      <p id="fighter-statement" role="status"></p>
+      <div class="dialogue-options" id="talk-options"></div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="level-selection.js"></script>
+    <script src="fighter-selection.js"></script>
+    <script src="combat.js"></script>
+    <script src="training.js"></script>
+    <script src="victory-screen.js"></script>
+    <script src="game-over-screen.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
