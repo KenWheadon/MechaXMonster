@@ -8,6 +8,7 @@ class Screen {
     this.particleSystem = null;
     this.intervals = [];
     this.timeouts = [];
+    this.isShaking = false; // Track shake state
 
     // Get config data if available
     this.config = GAME_CONFIG?.screens?.[screenName] || {};
@@ -343,16 +344,26 @@ class Screen {
     this.timeouts.push(timeout);
   }
 
-  // Screen shake utility - Fixed to prevent scroll bars
+  // Screen shake utility - Improved to prevent duplicate classes and multiple shakes
   triggerScreenShake(duration = 300) {
-    // Add class to body to prevent scroll
-    document.body.classList.add("shaking");
+    // Prevent multiple simultaneous shakes
+    if (this.isShaking) return;
 
-    this.container.classList.add("screen-shake");
+    this.isShaking = true;
+
+    // Add classes only if not already present
+    if (!document.body.classList.contains("shaking")) {
+      document.body.classList.add("shaking");
+    }
+
+    if (!this.container.classList.contains("screen-shake")) {
+      this.container.classList.add("screen-shake");
+    }
 
     const timeout = setTimeout(() => {
       this.container.classList.remove("screen-shake");
       document.body.classList.remove("shaking");
+      this.isShaking = false;
     }, duration);
 
     this.timeouts.push(timeout);
@@ -497,8 +508,12 @@ class Screen {
     );
     tempMessages.forEach((msg) => msg.remove());
 
-    // Remove shaking class if present
-    document.body.classList.remove("shaking");
+    // Clean up shake state
+    if (this.isShaking) {
+      document.body.classList.remove("shaking");
+      this.container.classList.remove("screen-shake");
+      this.isShaking = false;
+    }
 
     // Reset state
     this.isActive = false;
@@ -524,6 +539,7 @@ class Screen {
   debug() {
     console.log(`📊 ${this.screenName} Screen Debug Info:`, {
       isActive: this.isActive,
+      isShaking: this.isShaking,
       intervals: this.intervals.length,
       timeouts: this.timeouts.length,
       particles: this.particleSystem?.particles?.length || 0,

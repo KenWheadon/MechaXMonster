@@ -12,12 +12,16 @@ class StartScreen extends Screen {
     this.isCharging = false;
     this.typingInterval = null;
 
+    // DOM element cache - populated after render()
+    this.elements = {};
+
     console.log("🚀 StartScreen with Mini-Clicker Game created");
   }
 
   // Override init to add StartScreen specific initialization
   init() {
     this.render();
+    this.cacheElements();
     this.setupEventListeners();
     this.startAnimations();
     this.initializeAudio();
@@ -26,6 +30,33 @@ class StartScreen extends Screen {
     this.isActive = true;
 
     console.log("✅ StartScreen with Mini-Clicker initialized");
+  }
+
+  // Cache frequently accessed DOM elements
+  cacheElements() {
+    this.elements = {
+      clickButton: this.container.querySelector(".click-button"),
+      progressContainer: this.container.querySelector(
+        ".click-progress-container"
+      ),
+      progressFill: this.container.querySelector(".click-progress-fill"),
+      clickCountElement: this.container.querySelector(".click-count"),
+      startButton: this.container.querySelector(".start-button"),
+      energyFill: this.container.querySelector(".energy-fill"),
+      energyValue: this.container.querySelector(".energy-value"),
+      buttonEnergyFill: this.container.querySelector(".button-energy-fill"),
+      clickerSection: this.container.querySelector(".clicker-game-section"),
+      taglineContainer: this.container.querySelector(".tagline-container"),
+      buttonSection: this.container.querySelector(".button-section"),
+      uiOverlay: this.container.querySelector(".ui-overlay"),
+      settingsBtn: this.container.querySelector(".settings-btn"),
+      logo: this.container.querySelector(".game-logo"),
+      energyCore: this.container.querySelector(".energy-core"),
+      logoBurst: this.container.querySelector(".logo-burst-effect"),
+      logoGlow: this.container.querySelector(".logo-glow"),
+      logoParticles: this.container.querySelector(".logo-particles"),
+      taglineElement: this.container.querySelector(".typing-text"),
+    };
   }
 
   // Override render method
@@ -133,9 +164,6 @@ class StartScreen extends Screen {
 
     // Clear container and add our screen
     this.container.innerHTML = html;
-
-    // Inject screen-specific styles
-    this.injectCSS("startscreen-styles", this.getStartScreenCSS());
   }
 
   // Override setupEventListeners to add StartScreen specific events
@@ -143,32 +171,29 @@ class StartScreen extends Screen {
     // Call parent method for common event listeners
     super.setupEventListeners();
 
-    // StartScreen specific event listeners
-    const clickButton = this.container.querySelector(".click-button");
-    if (clickButton) {
-      clickButton.addEventListener("click", (e) => {
+    // StartScreen specific event listeners using cached elements
+    if (this.elements.clickButton) {
+      this.elements.clickButton.addEventListener("click", (e) => {
         this.handleClickButtonClick(e);
       });
     }
 
-    const startButton = this.container.querySelector(".start-button");
-    if (startButton) {
-      startButton.addEventListener("click", (e) => {
+    if (this.elements.startButton) {
+      this.elements.startButton.addEventListener("click", (e) => {
         this.handleStartClick();
       });
 
-      startButton.addEventListener("mouseenter", () => {
+      this.elements.startButton.addEventListener("mouseenter", () => {
         this.startEnergyCharging();
       });
 
-      startButton.addEventListener("mouseleave", () => {
+      this.elements.startButton.addEventListener("mouseleave", () => {
         this.stopEnergyCharging();
       });
     }
 
-    const settingsBtn = this.container.querySelector(".settings-btn");
-    if (settingsBtn) {
-      settingsBtn.addEventListener("click", (e) => {
+    if (this.elements.settingsBtn) {
+      this.elements.settingsBtn.addEventListener("click", (e) => {
         this.handleSettingsClick();
       });
     }
@@ -181,11 +206,9 @@ class StartScreen extends Screen {
     if (e.code === "Space") {
       e.preventDefault();
       if (this.gamePhase === "click-game") {
-        const clickButton = this.container.querySelector(".click-button");
-        clickButton?.click();
+        this.elements.clickButton?.click();
       } else if (this.gamePhase === "main-screen") {
-        const startButton = this.container.querySelector(".start-button");
-        startButton?.click();
+        this.elements.startButton?.click();
       }
     }
   }
@@ -224,12 +247,7 @@ class StartScreen extends Screen {
   startLogoIntroSequence() {
     console.log("🎬 Starting dramatic logo intro sequence...");
 
-    const logo = this.container.querySelector(".game-logo");
-    const energyCore = this.container.querySelector(".energy-core");
-    const logoBurst = this.container.querySelector(".logo-burst-effect");
-    const logoGlow = this.container.querySelector(".logo-glow");
-
-    if (!logo) return;
+    if (!this.elements.logo) return;
 
     // Play intro music
     if (this.audioManager) {
@@ -238,24 +256,27 @@ class StartScreen extends Screen {
 
     // Step 1: Dramatic logo entrance
     this.setManagedTimeout(() => {
-      logo.classList.add("logo-intro-animation");
-      logo.classList.remove("logo-hidden");
+      this.elements.logo.classList.add("logo-intro-animation");
+      this.elements.logo.classList.remove("logo-hidden");
 
       // Activate energy core
       this.setManagedTimeout(() => {
-        if (energyCore) energyCore.style.opacity = "1";
+        if (this.elements.energyCore)
+          this.elements.energyCore.style.opacity = "1";
       }, 500);
 
       // Burst effect
       this.setManagedTimeout(() => {
-        if (logoBurst) logoBurst.classList.add("logo-burst-active");
+        if (this.elements.logoBurst)
+          this.elements.logoBurst.classList.add("logo-burst-active");
         this.createLogoParticles();
         this.triggerScreenShake();
       }, 800);
 
       // Glow activation
       this.setManagedTimeout(() => {
-        if (logoGlow) logoGlow.classList.add("logo-glow-active");
+        if (this.elements.logoGlow)
+          this.elements.logoGlow.classList.add("logo-glow-active");
       }, 1200);
     }, 200);
 
@@ -266,8 +287,7 @@ class StartScreen extends Screen {
   }
 
   createLogoParticles() {
-    const logoParticles = this.container.querySelector(".logo-particles");
-    if (!logoParticles) return;
+    if (!this.elements.logoParticles) return;
 
     // Create burst of particles
     for (let i = 0; i < 12; i++) {
@@ -290,7 +310,7 @@ class StartScreen extends Screen {
       particle.style.setProperty("--x", x + "px");
       particle.style.setProperty("--y", y + "px");
 
-      logoParticles.appendChild(particle);
+      this.elements.logoParticles.appendChild(particle);
 
       // Remove particle after animation
       this.setManagedTimeout(() => {
@@ -306,14 +326,11 @@ class StartScreen extends Screen {
     console.log("🎮 Starting mini-clicker game phase...");
 
     this.gamePhase = "click-game";
-    const clickerSection = this.container.querySelector(
-      ".clicker-game-section"
-    );
 
-    if (clickerSection) {
-      clickerSection.classList.remove("hidden");
+    if (this.elements.clickerSection) {
+      this.elements.clickerSection.classList.remove("hidden");
       this.setManagedTimeout(() => {
-        clickerSection.classList.add("show");
+        this.elements.clickerSection.classList.add("show");
       }, 100);
     }
 
@@ -329,41 +346,34 @@ class StartScreen extends Screen {
     this.clickCount++;
     console.log(`🖱️ Click ${this.clickCount}/${this.maxClicks}`);
 
-    const clickButton = this.container.querySelector(".click-button");
-    const progressContainer = this.container.querySelector(
-      ".click-progress-container"
-    );
-    const progressFill = this.container.querySelector(".click-progress-fill");
-    const clickCountElement = this.container.querySelector(".click-count");
-
-    // Visual feedback
-    clickButton.classList.add("clicked");
+    // Visual feedback using cached elements
+    this.elements.clickButton.classList.add("clicked");
     this.setManagedTimeout(() => {
-      clickButton.classList.remove("clicked");
+      this.elements.clickButton.classList.remove("clicked");
     }, 300);
 
     // Show progress bar on first click
-    if (this.clickCount === 1 && progressContainer) {
-      progressContainer.classList.remove("hidden");
+    if (this.clickCount === 1 && this.elements.progressContainer) {
+      this.elements.progressContainer.classList.remove("hidden");
       this.setManagedTimeout(() => {
-        progressContainer.classList.add("show");
+        this.elements.progressContainer.classList.add("show");
       }, 100);
     }
 
     // Update progress bar
     const progressPercent = (this.clickCount / this.maxClicks) * 100;
-    if (progressFill) {
-      progressFill.style.width = progressPercent + "%";
+    if (this.elements.progressFill) {
+      this.elements.progressFill.style.width = progressPercent + "%";
     }
-    if (clickCountElement) {
-      clickCountElement.textContent = this.clickCount;
+    if (this.elements.clickCountElement) {
+      this.elements.clickCountElement.textContent = this.clickCount;
     }
 
     // Create ripple effect using parent method
-    this.createRippleEffect(clickButton, event);
+    this.createRippleEffect(this.elements.clickButton, event);
 
     // Create click particles using parent method
-    const rect = clickButton.getBoundingClientRect();
+    const rect = this.elements.clickButton.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     this.createParticleBurst(centerX, centerY, 6);
@@ -393,10 +403,6 @@ class StartScreen extends Screen {
   completeClickGame() {
     console.log("🎉 Mini-clicker game completed!");
 
-    const clickerSection = this.container.querySelector(
-      ".clicker-game-section"
-    );
-
     // Play completion sound
     if (this.audioManager) {
       this.audioManager.playSound("game-complete");
@@ -406,8 +412,8 @@ class StartScreen extends Screen {
     this.createCompletionEffect();
 
     // Hide clicker game elements
-    if (clickerSection) {
-      clickerSection.style.animation =
+    if (this.elements.clickerSection) {
+      this.elements.clickerSection.style.animation =
         "fadeOutUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards";
     }
 
@@ -419,10 +425,9 @@ class StartScreen extends Screen {
 
   createCompletionEffect() {
     // Create burst of completion particles
-    const button = this.container.querySelector(".click-button");
-    if (!button) return;
+    if (!this.elements.clickButton) return;
 
-    const rect = button.getBoundingClientRect();
+    const rect = this.elements.clickButton.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
 
@@ -458,61 +463,55 @@ class StartScreen extends Screen {
     this.gamePhase = "main-screen";
 
     // Hide clicker game section
-    const clickerSection = this.container.querySelector(
-      ".clicker-game-section"
-    );
-    if (clickerSection) {
-      clickerSection.classList.add("hidden");
+    if (this.elements.clickerSection) {
+      this.elements.clickerSection.classList.add("hidden");
     }
 
     // Show tagline container
-    const taglineContainer = this.container.querySelector(".tagline-container");
-    if (taglineContainer) {
-      taglineContainer.classList.remove("hidden");
+    if (this.elements.taglineContainer) {
+      this.elements.taglineContainer.classList.remove("hidden");
       this.setManagedTimeout(() => {
-        taglineContainer.classList.add("show");
+        this.elements.taglineContainer.classList.add("show");
         this.startTypingEffect();
       }, 200);
     }
 
     // Show button section
     this.setManagedTimeout(() => {
-      const buttonSection = this.container.querySelector(".button-section");
-      if (buttonSection) {
-        buttonSection.classList.remove("hidden");
+      if (this.elements.buttonSection) {
+        this.elements.buttonSection.classList.remove("hidden");
         this.setManagedTimeout(() => {
-          buttonSection.classList.add("show");
+          this.elements.buttonSection.classList.add("show");
         }, 100);
       }
     }, 1000);
 
     // Show UI overlay
     this.setManagedTimeout(() => {
-      const uiOverlay = this.container.querySelector(".ui-overlay");
-      if (uiOverlay) {
-        uiOverlay.classList.remove("hidden");
+      if (this.elements.uiOverlay) {
+        this.elements.uiOverlay.classList.remove("hidden");
         this.setManagedTimeout(() => {
-          uiOverlay.classList.add("show");
+          this.elements.uiOverlay.classList.add("show");
         }, 100);
       }
     }, 1500);
   }
 
   startTypingEffect() {
-    const taglineElement = this.container.querySelector(".typing-text");
-    if (!taglineElement) return;
+    if (!this.elements.taglineElement) return;
 
     const text =
-      taglineElement.getAttribute("data-text") || this.config.tagline;
+      this.elements.taglineElement.getAttribute("data-text") ||
+      this.config.tagline;
     let currentText = "";
     let index = 0;
 
-    taglineElement.textContent = "";
+    this.elements.taglineElement.textContent = "";
 
     this.typingInterval = this.setManagedInterval(() => {
       if (index < text.length) {
         currentText += text[index];
-        taglineElement.textContent = currentText;
+        this.elements.taglineElement.textContent = currentText;
         index++;
 
         // Play typing sound
@@ -523,7 +522,7 @@ class StartScreen extends Screen {
         clearInterval(this.typingInterval);
         // Remove cursor after typing is complete
         this.setManagedTimeout(() => {
-          taglineElement.style.setProperty("--cursor", "none");
+          this.elements.taglineElement.style.setProperty("--cursor", "none");
         }, 2000);
       }
     }, 100);
@@ -533,14 +532,8 @@ class StartScreen extends Screen {
     if (this.isCharging || this.gamePhase !== "main-screen") return;
 
     this.isCharging = true;
-    const button = this.container.querySelector(".start-button");
-    const energyFill = this.container.querySelector(".energy-fill");
-    const energyValue = this.container.querySelector(".energy-value");
-    const buttonEnergyFill = this.container.querySelector(
-      ".button-energy-fill"
-    );
-
-    if (button) button.classList.add("charging");
+    if (this.elements.startButton)
+      this.elements.startButton.classList.add("charging");
 
     const chargeInterval = this.setManagedInterval(() => {
       if (!this.isCharging) {
@@ -550,14 +543,17 @@ class StartScreen extends Screen {
 
       this.energyLevel = Math.min(this.energyLevel + 2, 100);
 
-      if (energyFill) {
-        energyFill.style.width = this.energyLevel + "%";
+      if (this.elements.energyFill) {
+        this.elements.energyFill.style.width = this.energyLevel + "%";
       }
-      if (energyValue) {
-        energyValue.textContent = this.energyLevel;
+      if (this.elements.energyValue) {
+        this.elements.energyValue.textContent = this.energyLevel;
       }
-      if (buttonEnergyFill) {
-        buttonEnergyFill.style.setProperty("--energy", this.energyLevel + "%");
+      if (this.elements.buttonEnergyFill) {
+        this.elements.buttonEnergyFill.style.setProperty(
+          "--energy",
+          this.energyLevel + "%"
+        );
       }
 
       // Play charging sound periodically
@@ -581,8 +577,8 @@ class StartScreen extends Screen {
     if (this.gamePhase !== "main-screen") return;
 
     this.isCharging = false;
-    const button = this.container.querySelector(".start-button");
-    if (button) button.classList.remove("charging");
+    if (this.elements.startButton)
+      this.elements.startButton.classList.remove("charging");
 
     // Slowly drain energy when not charging
     const drainInterval = this.setManagedInterval(() => {
@@ -593,20 +589,17 @@ class StartScreen extends Screen {
 
       this.energyLevel = Math.max(this.energyLevel - 1, 0);
 
-      const energyFill = this.container.querySelector(".energy-fill");
-      const energyValue = this.container.querySelector(".energy-value");
-      const buttonEnergyFill = this.container.querySelector(
-        ".button-energy-fill"
-      );
-
-      if (energyFill) {
-        energyFill.style.width = this.energyLevel + "%";
+      if (this.elements.energyFill) {
+        this.elements.energyFill.style.width = this.energyLevel + "%";
       }
-      if (energyValue) {
-        energyValue.textContent = this.energyLevel;
+      if (this.elements.energyValue) {
+        this.elements.energyValue.textContent = this.energyLevel;
       }
-      if (buttonEnergyFill) {
-        buttonEnergyFill.style.setProperty("--energy", this.energyLevel + "%");
+      if (this.elements.buttonEnergyFill) {
+        this.elements.buttonEnergyFill.style.setProperty(
+          "--energy",
+          this.energyLevel + "%"
+        );
       }
 
       if (this.energyLevel <= 0) {
@@ -664,6 +657,9 @@ class StartScreen extends Screen {
       clearInterval(this.typingInterval);
     }
 
+    // Clear cached elements
+    this.elements = {};
+
     // Reset StartScreen specific state
     this.clickCount = 0;
     this.gamePhase = "logo-intro";
@@ -692,28 +688,14 @@ class StartScreen extends Screen {
 
   setClickCount(count) {
     this.clickCount = Math.min(count, this.maxClicks);
-    const progressFill = this.container.querySelector(".click-progress-fill");
-    const clickCountElement = this.container.querySelector(".click-count");
 
-    if (progressFill) {
+    if (this.elements.progressFill) {
       const progressPercent = (this.clickCount / this.maxClicks) * 100;
-      progressFill.style.width = progressPercent + "%";
+      this.elements.progressFill.style.width = progressPercent + "%";
     }
-    if (clickCountElement) {
-      clickCountElement.textContent = this.clickCount;
+    if (this.elements.clickCountElement) {
+      this.elements.clickCountElement.textContent = this.clickCount;
     }
-  }
-
-  // Get StartScreen specific CSS (this replaces the large injectStyles method)
-  getStartScreenCSS() {
-    return `
-      /* This method would return the CSS content from startscreen.css */
-      /* In a real implementation, you'd either: */
-      /* 1. Load the startscreen.css file separately, or */
-      /* 2. Return the CSS content as a string here */
-      /* For now, returning empty string since CSS is in separate file */
-      .startscreen-loaded { display: block; }
-    `;
   }
 }
 
