@@ -1,0 +1,753 @@
+/* MapScreen Specific Styles */
+
+/* Map screen base */
+.map-screen {
+  background: radial-gradient(ellipse at center, #0f1419 0%, #000000 100%);
+  overflow-y: auto;
+}
+
+/* HEADER SECTION */
+.map-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(0, 255, 136, 0.4);
+  border-radius: 8px;
+  color: var(--primary-color);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-button img {
+  width: 20px;
+  height: 20px;
+  filter: invert(1);
+}
+
+.back-button:hover {
+  background: rgba(0, 255, 136, 0.2);
+  border-color: var(--glow-bright);
+  transform: translateX(-3px);
+}
+
+.back-button:active {
+  transform: translateX(0);
+}
+
+/* Currency Display */
+.currency-display {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 10px;
+  padding: 15px;
+  backdrop-filter: blur(10px);
+}
+
+.currency-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 10px;
+  max-width: 500px;
+}
+
+.currency-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.currency-item:hover {
+  background: rgba(0, 255, 136, 0.1);
+  border-color: rgba(0, 255, 136, 0.4);
+}
+
+.currency-icon {
+  width: 20px;
+  height: 20px;
+  filter: drop-shadow(0 0 5px rgba(0, 255, 136, 0.5));
+}
+
+.currency-value {
+  color: var(--primary-color);
+  font-weight: bold;
+  font-family: "Courier New", monospace;
+  min-width: 40px;
+  text-align: right;
+}
+
+.currency-updated {
+  animation: currencyPulse 0.5s ease-out;
+}
+
+@keyframes currencyPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+    color: #00ff88;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* MAIN MAP CONTENT */
+.map-content {
+  position: relative;
+  z-index: 5;
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.map-title {
+  text-align: center;
+  margin-bottom: 50px;
+  opacity: 0;
+  animation: fadeInUp 1s ease-out 0.5s forwards;
+}
+
+.map-title h1 {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.map-title p {
+  font-size: 1.2rem;
+  color: #aaa;
+  margin: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* MINE LOCATIONS */
+.mine-locations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.mine-location {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  border-radius: 15px;
+  padding: 25px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  backdrop-filter: blur(5px);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(50px);
+  animation: mineLocationAppear 0.8s ease-out forwards;
+  animation-delay: calc(var(--mine-index) * 0.1s + 0.8s);
+}
+
+@keyframes mineLocationAppear {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.mine-location::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(0, 255, 136, 0.3),
+    transparent
+  );
+  border-radius: 15px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mine-location:hover::before {
+  opacity: 1;
+}
+
+.mine-location.unlocked {
+  border-color: rgba(0, 255, 136, 0.6);
+}
+
+.mine-location.unlocked:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+}
+
+.mine-location.active {
+  border-color: var(--glow-bright);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 136, 0.1) 0%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+}
+
+.mine-location.active .mine-pulse {
+  animation: activeMineGlow 2s ease-in-out infinite;
+}
+
+@keyframes activeMineGlow {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+.mine-location.locked {
+  border-color: rgba(100, 100, 100, 0.5);
+  background: linear-gradient(
+    135deg,
+    rgba(50, 50, 50, 0.3) 0%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+  cursor: not-allowed;
+}
+
+.mine-location.locked .mine-info {
+  opacity: 0.5;
+}
+
+/* Mine Visual Elements */
+.mine-visual {
+  position: relative;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.mine-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 15px rgba(0, 255, 136, 0.4));
+  transition: all 0.3s ease;
+}
+
+.mine-location:hover .mine-image {
+  transform: scale(1.1);
+  filter: drop-shadow(0 8px 20px rgba(0, 255, 136, 0.6));
+}
+
+.mine-location.locked .mine-image {
+  filter: grayscale(1) opacity(0.5);
+}
+
+.mine-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 136, 0.2) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mine-location:hover .mine-glow {
+  opacity: 1;
+}
+
+.mine-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  border: 2px solid rgba(0, 255, 136, 0.5);
+  border-radius: 50%;
+  opacity: 0;
+  animation: minePulse 3s ease-in-out infinite;
+}
+
+@keyframes minePulse {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+/* Mine Info */
+.mine-info {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.mine-name {
+  font-size: 1.3rem;
+  color: var(--primary-color);
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.mine-currency {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.currency-icon-small {
+  width: 16px;
+  height: 16px;
+  filter: drop-shadow(0 0 3px rgba(0, 255, 136, 0.4));
+}
+
+.mine-status {
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.status-locked {
+  color: #999;
+}
+
+.status-available {
+  color: #ffaa00;
+}
+
+.status-active {
+  color: var(--primary-color);
+  text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+}
+
+/* Mine Buttons */
+.mine-button {
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+.mine-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.mine-button:hover::before {
+  left: 100%;
+}
+
+.btn-unlock {
+  background: linear-gradient(135deg, #ffaa00 0%, #ff6600 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(255, 170, 0, 0.4);
+}
+
+.btn-unlock:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 170, 0, 0.6);
+}
+
+.btn-unlock:active {
+  transform: translateY(0);
+}
+
+.mine-button:disabled {
+  background: rgba(100, 100, 100, 0.3);
+  color: #666;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Unlock Overlay */
+.unlock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  backdrop-filter: blur(2px);
+}
+
+.unlock-cost {
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid rgba(255, 170, 0, 0.8);
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+}
+
+.cost-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 5px 0;
+  color: #ffaa00;
+  font-weight: bold;
+}
+
+.cost-item img {
+  width: 20px;
+  height: 20px;
+  filter: drop-shadow(0 0 5px rgba(255, 170, 0, 0.5));
+}
+
+/* Mine Tooltip */
+.mine-tooltip {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.95);
+  border: 2px solid rgba(0, 255, 136, 0.6);
+  border-radius: 10px;
+  padding: 15px;
+  max-width: 300px;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.mine-tooltip:not(.hidden) {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tooltip-title {
+  color: var(--primary-color);
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.tooltip-description {
+  color: #ccc;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.tooltip-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.stat-value {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .map-header {
+    flex-direction: column;
+    gap: 20px;
+    padding: 15px 20px;
+  }
+
+  .currency-grid {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 8px;
+  }
+
+  .currency-item {
+    padding: 6px 8px;
+  }
+
+  .currency-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .map-title h1 {
+    font-size: 2rem;
+  }
+
+  .map-title p {
+    font-size: 1rem;
+  }
+
+  .mine-locations {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 10px;
+  }
+
+  .mine-location {
+    padding: 20px;
+  }
+
+  .mine-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .mine-name {
+    font-size: 1.1rem;
+  }
+
+  .back-button {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
+  .back-button img {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-header {
+    padding: 10px 15px;
+  }
+
+  .currency-display {
+    padding: 10px;
+  }
+
+  .currency-grid {
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    gap: 6px;
+  }
+
+  .currency-item {
+    padding: 4px 6px;
+  }
+
+  .currency-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .map-content {
+    padding: 20px 15px;
+  }
+
+  .map-title h1 {
+    font-size: 1.6rem;
+  }
+
+  .map-title p {
+    font-size: 0.9rem;
+  }
+
+  .mine-locations {
+    gap: 15px;
+  }
+
+  .mine-location {
+    padding: 15px;
+  }
+
+  .mine-image {
+    width: 50px;
+    height: 50px;
+  }
+
+  .mine-name {
+    font-size: 1rem;
+  }
+
+  .mine-currency {
+    font-size: 0.8rem;
+  }
+
+  .mine-button {
+    padding: 10px 16px;
+    font-size: 0.8rem;
+  }
+
+  .unlock-cost {
+    padding: 10px;
+  }
+
+  .cost-item img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .mine-tooltip {
+    max-width: 250px;
+    padding: 12px;
+  }
+
+  .tooltip-title {
+    font-size: 1rem;
+  }
+
+  .tooltip-description {
+    font-size: 0.8rem;
+  }
+}
+
+/* ACCESSIBILITY */
+@media (prefers-reduced-motion: reduce) {
+  .mine-location,
+  .mine-image,
+  .mine-pulse,
+  .mine-glow {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* HIGH CONTRAST MODE */
+@media (prefers-contrast: high) {
+  .mine-location {
+    border-width: 3px;
+  }
+
+  .mine-location.unlocked {
+    border-color: #00ff88;
+  }
+
+  .mine-location.locked {
+    border-color: #999;
+  }
+
+  .mine-name,
+  .tooltip-title {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* FOCUS STATES */
+.mine-button:focus,
+.back-button:focus {
+  outline: 2px solid #00ff88;
+  outline-offset: 2px;
+}
+
+.mine-location:focus-within {
+  outline: 2px solid #00ff88;
+  outline-offset: 4px;
+}
+
+/* PRINT STYLES */
+@media print {
+  .map-screen {
+    background: white !important;
+    color: black !important;
+  }
+
+  .mine-location {
+    border: 2px solid black !important;
+    background: white !important;
+  }
+
+  .currency-display,
+  .mine-tooltip {
+    background: white !important;
+    border: 1px solid black !important;
+  }
+
+  .particles-layer,
+  .stars-layer,
+  .asteroids-layer {
+    display: none !important;
+  }
+}

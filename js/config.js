@@ -203,7 +203,156 @@ const GAME_CONFIG = {
         },
       ],
     },
-    // Add other monsters as needed
+    teal_slime: {
+      name: "Frost Slime",
+      battles: [
+        {
+          difficulty: "easy",
+          health: 35,
+          moves: ["ice_shard"],
+          ai: "simple",
+        },
+        {
+          difficulty: "easy",
+          health: 45,
+          moves: ["ice_shard", "freeze_blast"],
+          ai: "simple",
+        },
+        {
+          difficulty: "medium",
+          health: 65,
+          moves: ["ice_shard", "freeze_blast", "ice_armor"],
+          ai: "normal",
+        },
+        {
+          difficulty: "hard",
+          health: 85,
+          moves: ["ice_shard", "freeze_blast", "ice_armor", "blizzard"],
+          ai: "smart",
+        },
+        {
+          difficulty: "boss",
+          health: 130,
+          moves: ["ice_shard", "freeze_blast", "ice_armor", "blizzard"],
+          ai: "smart",
+        },
+      ],
+    },
+    blue_slime: {
+      name: "Crystal Slime",
+      battles: [
+        {
+          difficulty: "easy",
+          health: 40,
+          moves: ["crystal_spike"],
+          ai: "simple",
+        },
+        {
+          difficulty: "easy",
+          health: 50,
+          moves: ["crystal_spike", "gem_barrier"],
+          ai: "simple",
+        },
+        {
+          difficulty: "medium",
+          health: 70,
+          moves: ["crystal_spike", "gem_barrier", "crystal_heal"],
+          ai: "normal",
+        },
+        {
+          difficulty: "hard",
+          health: 90,
+          moves: [
+            "crystal_spike",
+            "gem_barrier",
+            "crystal_heal",
+            "shard_storm",
+          ],
+          ai: "smart",
+        },
+        {
+          difficulty: "boss",
+          health: 140,
+          moves: [
+            "crystal_spike",
+            "gem_barrier",
+            "crystal_heal",
+            "shard_storm",
+          ],
+          ai: "smart",
+        },
+      ],
+    },
+    orange_slime: {
+      name: "Plasma Slime",
+      battles: [
+        {
+          difficulty: "easy",
+          health: 45,
+          moves: ["plasma_burst"],
+          ai: "simple",
+        },
+        {
+          difficulty: "easy",
+          health: 55,
+          moves: ["plasma_burst", "energy_drain"],
+          ai: "simple",
+        },
+        {
+          difficulty: "medium",
+          health: 75,
+          moves: ["plasma_burst", "energy_drain", "plasma_shield"],
+          ai: "normal",
+        },
+        {
+          difficulty: "hard",
+          health: 95,
+          moves: ["plasma_burst", "energy_drain", "plasma_shield", "ion_storm"],
+          ai: "smart",
+        },
+        {
+          difficulty: "boss",
+          health: 150,
+          moves: ["plasma_burst", "energy_drain", "plasma_shield", "ion_storm"],
+          ai: "smart",
+        },
+      ],
+    },
+    black_slime: {
+      name: "Void Slime",
+      battles: [
+        {
+          difficulty: "easy",
+          health: 50,
+          moves: ["void_strike"],
+          ai: "simple",
+        },
+        {
+          difficulty: "easy",
+          health: 60,
+          moves: ["void_strike", "darkness"],
+          ai: "simple",
+        },
+        {
+          difficulty: "medium",
+          health: 80,
+          moves: ["void_strike", "darkness", "void_heal"],
+          ai: "normal",
+        },
+        {
+          difficulty: "hard",
+          health: 100,
+          moves: ["void_strike", "darkness", "void_heal", "black_hole"],
+          ai: "smart",
+        },
+        {
+          difficulty: "boss",
+          health: 160,
+          moves: ["void_strike", "darkness", "void_heal", "black_hole"],
+          ai: "smart",
+        },
+      ],
+    },
   },
 
   // Upgrade templates

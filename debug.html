@@ -8,6 +8,7 @@
     <!-- Load CSS Files -->
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/startscreen.css" />
+    <link rel="stylesheet" href="css/mapscreen.css" />
 
     <style>
       * {
@@ -266,6 +267,9 @@
       <button class="debug-btn" data-screen="start" data-file="StartScreen.js">
         🚀 Start Screen
       </button>
+      <button class="debug-btn" data-screen="map" data-file="MapScreen.js">
+        🗺️ Map Screen
+      </button>
       <button
         class="debug-btn"
         data-screen="mining"
@@ -295,7 +299,7 @@
       </div>
 
       <div class="debug-controls">
-        <h4>StartScreen Controls</h4>
+        <h4>Screen Controls</h4>
         <button class="debug-mini-btn" id="skip-to-click" disabled>
           Skip to Click
         </button>
@@ -307,6 +311,12 @@
         </button>
         <button class="debug-mini-btn" id="reset-screen" disabled>
           Reset Screen
+        </button>
+        <button class="debug-mini-btn" id="add-currency" disabled>
+          Add Currency
+        </button>
+        <button class="debug-mini-btn" id="unlock-mines" disabled>
+          Unlock All
         </button>
       </div>
     </div>
@@ -321,7 +331,8 @@
             Make sure you have the following files:
           </p>
           <p style="font-size: 0.8rem; color: #666">
-            js/Screen.js, js/StartScreen.js, css/styles.css, css/startscreen.css
+            js/Screen.js, js/StartScreen.js, js/MapScreen.js, css/styles.css,
+            css/startscreen.css, css/mapscreen.css
           </p>
         </div>
       </div>
@@ -401,6 +412,26 @@
             .addEventListener("click", () => {
               if (this.currentScreen) {
                 this.resetCurrentScreen();
+              }
+            });
+
+          // MapScreen specific controls
+          document
+            .getElementById("add-currency")
+            .addEventListener("click", () => {
+              if (this.currentScreen && this.currentScreen.addCurrency) {
+                this.currentScreen.addCurrency("shells", 100);
+                this.currentScreen.addCurrency("monster_shells", 10);
+                this.updateStatus("Added test currencies");
+              }
+            });
+
+          document
+            .getElementById("unlock-mines")
+            .addEventListener("click", () => {
+              if (this.currentScreen && this.currentScreen.unlockAllMines) {
+                this.currentScreen.unlockAllMines();
+                this.updateStatus("All mines unlocked");
               }
             });
         }
@@ -541,13 +572,28 @@
 
           if (screenName === "start") {
             // Enable StartScreen specific controls
-            controls.forEach((btn) => (btn.disabled = false));
-          } else {
-            // Disable StartScreen specific controls for other screens
+            document.getElementById("skip-to-click").disabled = false;
+            document.getElementById("skip-to-main").disabled = false;
+            document.getElementById("debug-info-btn").disabled = false;
+            document.getElementById("reset-screen").disabled = false;
+            document.getElementById("add-currency").disabled = true;
+            document.getElementById("unlock-mines").disabled = true;
+          } else if (screenName === "map") {
+            // Enable MapScreen specific controls
             document.getElementById("skip-to-click").disabled = true;
             document.getElementById("skip-to-main").disabled = true;
             document.getElementById("debug-info-btn").disabled = false;
             document.getElementById("reset-screen").disabled = false;
+            document.getElementById("add-currency").disabled = false;
+            document.getElementById("unlock-mines").disabled = false;
+          } else {
+            // Generic controls for other screens
+            document.getElementById("skip-to-click").disabled = true;
+            document.getElementById("skip-to-main").disabled = true;
+            document.getElementById("debug-info-btn").disabled = false;
+            document.getElementById("reset-screen").disabled = false;
+            document.getElementById("add-currency").disabled = true;
+            document.getElementById("unlock-mines").disabled = true;
           }
         }
 
@@ -624,6 +670,20 @@
               window.debugSystem.getCurrentScreen()?.skipToMainScreen(),
           },
           reset: () => window.debugSystem.resetCurrentScreen(),
+          map: {
+            addCurrency: (currency, amount) =>
+              window.debugSystem
+                .getCurrentScreen()
+                ?.addCurrency(currency, amount),
+            unlockMine: (mineId) =>
+              window.debugSystem.getCurrentScreen()?.unlockMine(mineId),
+            unlockAll: () =>
+              window.debugSystem.getCurrentScreen()?.unlockAllMines(),
+            setCurrency: (currency, amount) =>
+              window.debugSystem
+                .getCurrentScreen()
+                ?.setCurrency(currency, amount),
+          },
         };
 
         console.log(
