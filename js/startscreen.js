@@ -111,12 +111,6 @@ class StartScreen extends Screen {
                         <img src="images/icon-settings.png" alt="Settings" />
                     </button>
                     
-                    <!-- High score preview -->
-                    <div class="score-preview">
-                        <div class="score-label">BEST MINING RUN</div>
-                        <div class="score-value">1,247,850</div>
-                    </div>
-                    
                     <!-- Version info -->
                     <div class="version-info">v2.1.0</div>
                 </div>
@@ -626,14 +620,8 @@ class StartScreen extends Screen {
 
     console.log("🎮 Enhanced Start Mining button clicked!");
 
-    // Check if energy is sufficient (optional requirement)
-    if (this.energyLevel < 100) {
-      this.showTemporaryMessage(
-        "⚡ Charge energy to 100% for optimal mining!",
-        "warning"
-      );
-      return;
-    }
+    // Removed energy requirement - players can click anytime for the exciting animation
+    // Energy system is now purely visual/decorative
 
     // Play sound effect
     if (this.audioManager) {

@@ -353,6 +353,19 @@
   font-weight: bold;
   margin-bottom: 30px;
   text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  opacity: 0;
+  animation: loadingTextFadeIn 0.8s ease-out 0.5s forwards;
+}
+
+@keyframes loadingTextFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .loading-progress {
@@ -501,7 +514,7 @@
   border: 1px solid rgba(40, 167, 69, 0.5);
 }
 
-/* Screen shake effect */
+/* Screen shake effect - Fixed to prevent scroll bars */
 .screen-shake {
   animation: screenShake 0.3s ease-in-out;
 }
@@ -509,35 +522,40 @@
 @keyframes screenShake {
   0%,
   100% {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   10% {
-    transform: translateX(-2px) translateY(1px);
+    transform: translate3d(-1px, 0, 0);
   }
   20% {
-    transform: translateX(2px) translateY(-1px);
+    transform: translate3d(1px, 0, 0);
   }
   30% {
-    transform: translateX(-1px) translateY(2px);
+    transform: translate3d(-1px, 0, 0);
   }
   40% {
-    transform: translateX(1px) translateY(-2px);
+    transform: translate3d(1px, 0, 0);
   }
   50% {
-    transform: translateX(-2px) translateY(1px);
+    transform: translate3d(-1px, 0, 0);
   }
   60% {
-    transform: translateX(2px) translateY(-1px);
+    transform: translate3d(1px, 0, 0);
   }
   70% {
-    transform: translateX(-1px) translateY(2px);
+    transform: translate3d(-1px, 0, 0);
   }
   80% {
-    transform: translateX(1px) translateY(-2px);
+    transform: translate3d(1px, 0, 0);
   }
   90% {
-    transform: translateX(-1px) translateY(1px);
+    transform: translate3d(-1px, 0, 0);
   }
+}
+
+/* Ensure no scroll bars during shake */
+body.shaking {
+  overflow: hidden;
 }
 
 /* Generic ripple effect */

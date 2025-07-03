@@ -343,12 +343,18 @@ class Screen {
     this.timeouts.push(timeout);
   }
 
-  // Screen shake utility
+  // Screen shake utility - Fixed to prevent scroll bars
   triggerScreenShake(duration = 300) {
+    // Add class to body to prevent scroll
+    document.body.classList.add("shaking");
+
     this.container.classList.add("screen-shake");
+
     const timeout = setTimeout(() => {
       this.container.classList.remove("screen-shake");
+      document.body.classList.remove("shaking");
     }, duration);
+
     this.timeouts.push(timeout);
   }
 
@@ -490,6 +496,9 @@ class Screen {
       ".temporary-message, .success-message"
     );
     tempMessages.forEach((msg) => msg.remove());
+
+    // Remove shaking class if present
+    document.body.classList.remove("shaking");
 
     // Reset state
     this.isActive = false;
