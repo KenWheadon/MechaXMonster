@@ -1,0 +1,1053 @@
+/* StartScreen Specific Styles - Only for the start screen */
+
+/* Start screen base */
+.start-screen {
+  background: radial-gradient(ellipse at center, #0a0a1a 0%, #000000 100%);
+}
+
+/* LOGO AND BRANDING */
+.title-container {
+  text-align: center;
+  margin-bottom: 60px;
+  position: relative;
+}
+
+.logo-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 30px;
+}
+
+.energy-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 136, 0.3) 0%,
+    rgba(0, 255, 136, 0.1) 40%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  animation: energyPulse 3s ease-in-out infinite;
+  z-index: -1;
+  opacity: 0;
+}
+
+@keyframes energyPulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+/* Dramatic logo entrance */
+.game-logo {
+  max-width: 400px;
+  width: 80%;
+  height: auto;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 0 30px rgba(0, 255, 136, 0.6));
+  transition: all 0.5s ease;
+}
+
+.logo-hidden {
+  opacity: 0;
+  transform: scale(0.3) rotate(-45deg);
+  filter: drop-shadow(0 0 50px rgba(0, 255, 136, 0)) blur(10px);
+}
+
+.logo-intro-animation {
+  animation: dramaticLogoEntrance 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    forwards;
+}
+
+@keyframes dramaticLogoEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-45deg);
+    filter: drop-shadow(0 0 50px rgba(0, 255, 136, 0)) blur(10px);
+  }
+  20% {
+    opacity: 0.3;
+    transform: scale(0.6) rotate(-20deg);
+    filter: drop-shadow(0 0 40px rgba(0, 255, 136, 0.3)) blur(5px);
+  }
+  40% {
+    opacity: 0.7;
+    transform: scale(1.2) rotate(5deg);
+    filter: drop-shadow(0 0 60px rgba(0, 255, 136, 0.7)) blur(2px);
+  }
+  60% {
+    opacity: 0.9;
+    transform: scale(0.9) rotate(-2deg);
+    filter: drop-shadow(0 0 80px rgba(0, 255, 136, 0.9)) blur(1px);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1.05) rotate(1deg);
+    filter: drop-shadow(0 0 100px rgba(0, 255, 136, 1)) blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 0 30px rgba(0, 255, 136, 0.6)) blur(0px);
+  }
+}
+
+.logo-burst-effect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 136, 0.8) 0%,
+    rgba(0, 255, 136, 0.4) 30%,
+    transparent 60%
+  );
+  border-radius: 50%;
+  opacity: 0;
+  z-index: -2;
+}
+
+.logo-burst-active {
+  animation: logoBurstEffect 1s ease-out;
+}
+
+@keyframes logoBurstEffect {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3);
+  }
+}
+
+.logo-particles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.logo-particle {
+  position: absolute;
+  background: rgba(0, 255, 136, 0.8);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.logo-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 255, 136, 0.4) 0%,
+    transparent 60%
+  );
+  border-radius: 50%;
+  animation: glowPulse 2s ease-in-out infinite alternate;
+  z-index: -1;
+  opacity: 0;
+}
+
+.logo-glow-active {
+  opacity: 1;
+}
+
+@keyframes glowPulse {
+  0% {
+    opacity: 0.2;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+/* MINI-CLICKER GAME STYLES */
+.clicker-game-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.clicker-game-section.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Click progress bar */
+.click-progress-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.click-progress-container.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.click-progress-bar {
+  position: relative;
+  width: 300px;
+  height: 20px;
+  background: rgba(0, 255, 136, 0.2);
+  border: 3px solid rgba(0, 255, 136, 0.5);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3), inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.click-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff88 0%, #00ccff 50%, #00ff88 100%);
+  width: 0%;
+  transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  border-radius: 8px;
+  animation: progressGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes progressGlow {
+  0% {
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.8), 0 0 30px rgba(0, 255, 136, 0.4);
+  }
+}
+
+.click-progress-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: progressShimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes progressShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.click-progress-text {
+  color: #00ff88;
+  font-size: 1rem;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+  animation: textPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes textPulse {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.05);
+  }
+}
+
+/* Click button */
+.click-button-container {
+  position: relative;
+}
+
+.click-button {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: clickButtonFloat 3s ease-in-out infinite;
+  z-index: 5;
+}
+
+.click-button-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 136, 0.3) 0%,
+    rgba(0, 100, 50, 0.5) 50%,
+    rgba(0, 50, 25, 0.7) 100%
+  );
+  border: 4px solid rgba(0, 255, 136, 0.6);
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.4),
+    inset 0 0 20px rgba(0, 255, 136, 0.2);
+}
+
+.click-button-text {
+  position: relative;
+  color: #00ff88;
+  font-size: 2rem;
+  font-weight: bold;
+  text-shadow: 0 0 15px rgba(0, 255, 136, 1);
+  z-index: 2;
+  animation: clickTextPulse 2s ease-in-out infinite;
+}
+
+@keyframes clickButtonFloat {
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.02);
+  }
+}
+
+@keyframes clickTextPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    text-shadow: 0 0 15px rgba(0, 255, 136, 1);
+  }
+  50% {
+    transform: scale(1.1);
+    text-shadow: 0 0 25px rgba(0, 255, 136, 1), 0 0 35px rgba(0, 255, 136, 0.7);
+  }
+}
+
+.click-button:hover {
+  transform: scale(1.05);
+}
+
+.click-button:hover .click-button-bg {
+  border-color: rgba(0, 255, 136, 0.9);
+  box-shadow: 0 0 50px rgba(0, 255, 136, 0.6),
+    inset 0 0 30px rgba(0, 255, 136, 0.3);
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 136, 0.4) 0%,
+    rgba(0, 100, 50, 0.6) 50%,
+    rgba(0, 50, 25, 0.8) 100%
+  );
+}
+
+.click-button:active {
+  transform: scale(0.95);
+}
+
+.click-button.clicked {
+  animation: clickedEffect 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes clickedEffect {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Click ripple effects */
+.click-ripple-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.click-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 136, 0.6) 0%,
+    rgba(0, 255, 136, 0.2) 70%,
+    transparent 100%
+  );
+  animation: rippleEffect 0.6s ease-out forwards;
+  pointer-events: none;
+}
+
+/* MAIN SCREEN CONTENT (appears after clicker game) */
+.tagline-container {
+  position: relative;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.tagline-container.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.typing-text {
+  font-size: 1.5rem;
+  color: #00ccff;
+  margin-bottom: 15px;
+  text-shadow: 0 0 15px rgba(0, 204, 255, 0.8);
+  font-weight: bold;
+  min-height: 2em;
+  position: relative;
+}
+
+.typing-text::after {
+  content: "|";
+  animation: blink 1s infinite;
+  color: #00ff88;
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.fade-in-text {
+  font-size: 1rem;
+  color: #aaaaaa;
+  opacity: 0;
+  animation: fadeInDelayed 1s ease-out 3s forwards;
+}
+
+@keyframes fadeInDelayed {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced button section */
+.button-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.button-section.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.button-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.energy-ring {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  border-radius: 50%;
+  animation: ringRotate 10s linear infinite;
+  z-index: -1;
+}
+
+.energy-ring::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, #00ff88 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translateX(-50%);
+}
+
+@keyframes ringRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.start-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  animation: buttonHover 4s ease-in-out infinite;
+  z-index: 5;
+}
+
+.button-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 136, 0.2) 0%,
+    rgba(0, 100, 50, 0.4) 50%,
+    rgba(0, 50, 25, 0.6) 100%
+  );
+  border-radius: 50%;
+  border: 3px solid rgba(0, 255, 136, 0.5);
+  transition: all 0.3s ease;
+}
+
+.button-energy-fill {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(0, 255, 136, 0.6) var(--energy, 0%),
+    transparent var(--energy, 0%)
+  );
+  border-radius: 50%;
+  transition: all 0.5s ease;
+}
+
+.button-image {
+  position: relative;
+  max-width: 80px;
+  width: 40%;
+  height: auto;
+  z-index: 2;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 5px 15px rgba(0, 255, 136, 0.4));
+}
+
+.button-text {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #00ff88;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+  z-index: 2;
+}
+
+.energy-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+@keyframes buttonHover {
+  0%,
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.02);
+  }
+}
+
+.start-button:hover {
+  transform: scale(1.05) translateY(-8px);
+}
+
+.start-button:hover .button-bg {
+  border-color: rgba(0, 255, 136, 0.8);
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.5),
+    inset 0 0 20px rgba(0, 255, 136, 0.2);
+}
+
+.start-button:hover .button-image {
+  filter: drop-shadow(0 10px 25px rgba(0, 255, 136, 0.6)) brightness(1.2);
+  transform: scale(1.1);
+}
+
+.start-button:active {
+  transform: scale(1.02) translateY(-3px);
+}
+
+.start-button.charging {
+  animation: chargingPulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes chargingPulse {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.03);
+  }
+}
+
+.button-glow {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 136, 0.1) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  animation: glowRotate 8s linear infinite;
+  z-index: -1;
+}
+
+@keyframes glowRotate {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 0.3;
+  }
+}
+
+/* Energy meter */
+.energy-meter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.energy-bar {
+  width: 200px;
+  height: 8px;
+  background: rgba(0, 255, 136, 0.2);
+  border-radius: 4px;
+  border: 1px solid rgba(0, 255, 136, 0.4);
+  overflow: hidden;
+  position: relative;
+}
+
+.energy-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff88 0%, #00ccff 100%);
+  width: 0%;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.energy-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: energyShimmer 2s ease-in-out infinite;
+}
+
+@keyframes energyShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.energy-text {
+  color: #00ff88;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+}
+
+/* START SCREEN SPECIFIC UI ELEMENTS */
+.score-preview {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  animation: slideInLeft 1s ease-out 2s both;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.score-label {
+  color: #888;
+  font-size: 0.7rem;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.score-value {
+  color: #00ff88;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  font-family: "Courier New", monospace;
+}
+
+.version-info {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  color: #666;
+  font-size: 0.8rem;
+  opacity: 0;
+  animation: fadeIn 1s ease-out 5s forwards;
+  font-family: "Courier New", monospace;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* START SCREEN SPECIFIC ANIMATIONS */
+@keyframes fadeOutUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+}
+
+/* Logo particle blast animation */
+@keyframes logoParticleBlast {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(0);
+  }
+}
+
+/* START SCREEN RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .game-logo {
+    max-width: 300px;
+    width: 90%;
+  }
+
+  .typing-text {
+    font-size: 1.2rem;
+  }
+
+  .start-button {
+    width: 180px;
+    height: 180px;
+  }
+
+  .click-button {
+    width: 160px;
+    height: 160px;
+  }
+
+  .click-button-text {
+    font-size: 1.5rem;
+  }
+
+  .click-progress-bar {
+    width: 250px;
+  }
+
+  .energy-ring {
+    width: 240px;
+    height: 240px;
+  }
+
+  .button-glow {
+    width: 200px;
+    height: 200px;
+  }
+
+  .score-preview {
+    top: 10px;
+    left: 10px;
+    padding: 10px;
+  }
+
+  .score-label {
+    font-size: 0.6rem;
+  }
+
+  .score-value {
+    font-size: 1rem;
+  }
+
+  .version-info {
+    bottom: 10px;
+    right: 10px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-logo {
+    max-width: 250px;
+    width: 95%;
+  }
+
+  .typing-text {
+    font-size: 1rem;
+  }
+
+  .fade-in-text {
+    font-size: 0.9rem;
+  }
+
+  .start-button {
+    width: 150px;
+    height: 150px;
+  }
+
+  .click-button {
+    width: 140px;
+    height: 140px;
+  }
+
+  .click-button-text {
+    font-size: 1.2rem;
+  }
+
+  .click-progress-bar {
+    width: 200px;
+    height: 16px;
+  }
+
+  .click-progress-text {
+    font-size: 0.9rem;
+  }
+
+  .energy-ring {
+    width: 200px;
+    height: 200px;
+  }
+
+  .button-glow {
+    width: 170px;
+    height: 170px;
+  }
+
+  .energy-bar {
+    width: 150px;
+  }
+
+  .score-preview {
+    top: 5px;
+    left: 5px;
+    padding: 8px;
+  }
+
+  .score-label {
+    font-size: 0.5rem;
+  }
+
+  .score-value {
+    font-size: 0.9rem;
+  }
+
+  .version-info {
+    bottom: 5px;
+    right: 5px;
+    font-size: 0.6rem;
+  }
+
+  .button-text {
+    font-size: 0.8rem;
+  }
+
+  .energy-text {
+    font-size: 0.7rem;
+  }
+}
+
+/* START SCREEN SPECIFIC ACCESSIBILITY */
+@media (prefers-reduced-motion: reduce) {
+  .game-logo,
+  .click-button,
+  .start-button,
+  .energy-ring,
+  .button-glow,
+  .energy-core,
+  .logo-glow {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .star,
+  .asteroid,
+  .particle {
+    animation: none !important;
+  }
+}
+
+/* START SCREEN SPECIFIC FOCUS STATES */
+.click-button:focus,
+.start-button:focus {
+  outline: 2px solid #00ff88;
+  outline-offset: 4px;
+}
+
+.settings-btn:focus {
+  outline: 2px solid #00ff88;
+  outline-offset: 2px;
+}
+
+/* START SCREEN HIGH CONTRAST MODE */
+@media (prefers-contrast: high) {
+  .click-button-bg,
+  .button-bg {
+    border-width: 4px;
+    border-color: #00ff88;
+  }
+
+  .typing-text,
+  .click-button-text,
+  .button-text {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  .click-progress-bar {
+    border-width: 2px;
+  }
+}
+
+/* START SCREEN DARK MODE VARIATIONS */
+@media (prefers-color-scheme: dark) {
+  .start-screen {
+    background: radial-gradient(ellipse at center, #000000 0%, #111111 100%);
+  }
+
+  .score-preview {
+    background: rgba(0, 0, 0, 0.9);
+    border-color: rgba(0, 255, 136, 0.5);
+  }
+}
+
+/* START SCREEN PRINT STYLES */
+@media print {
+  .start-screen {
+    background: white !important;
+    color: black !important;
+  }
+
+  .game-logo {
+    filter: none !important;
+  }
+
+  .animated-elements,
+  .particles-layer,
+  .stars-layer,
+  .asteroids-layer {
+    display: none !important;
+  }
+}

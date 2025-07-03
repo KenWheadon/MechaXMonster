@@ -1,0 +1,735 @@
+// StartScreen - Extends generic Screen class with mini-clicker game
+class StartScreen extends Screen {
+  constructor(container) {
+    super(container, "start");
+
+    // StartScreen specific state
+    this.clickCount = 0;
+    this.maxClicks = 10;
+    this.gamePhase = "logo-intro"; // 'logo-intro', 'click-game', 'main-screen'
+    this.logoAnimationComplete = false;
+    this.energyLevel = 0;
+    this.isCharging = false;
+    this.typingInterval = null;
+
+    console.log("🚀 StartScreen with Mini-Clicker Game created");
+  }
+
+  // Override init to add StartScreen specific initialization
+  init() {
+    this.render();
+    this.setupEventListeners();
+    this.startAnimations();
+    this.initializeAudio();
+    this.startParticleSystem();
+    this.startLogoIntroSequence();
+    this.isActive = true;
+
+    console.log("✅ StartScreen with Mini-Clicker initialized");
+  }
+
+  // Override render method
+  render() {
+    const html = `
+            <div class="start-screen screen active">
+                <!-- Multi-layer background system -->
+                <div class="background-layer background-image" style="background-image: url('images/map-background.png');"></div>
+                <div class="background-layer nebula-layer"></div>
+                <div class="stars-layer"></div>
+                <div class="asteroids-layer"></div>
+                <div class="particles-layer"></div>
+                
+                <!-- Main content container -->
+                <div class="content-container">
+                    <!-- Logo section with dramatic intro -->
+                    <div class="title-container">
+                        <div class="logo-wrapper">
+                            <div class="energy-core"></div>
+                            <div class="logo-burst-effect"></div>
+                            <img src="images/logo.png" alt="${this.config.title}" class="game-logo logo-hidden" />
+                            <div class="logo-glow"></div>
+                            <div class="logo-particles"></div>
+                        </div>
+                        
+                        <!-- Mini-clicker game elements -->
+                        <div class="clicker-game-section hidden">
+                            <!-- Progress bar (appears after first click) -->
+                            <div class="click-progress-container hidden">
+                                <div class="click-progress-bar">
+                                    <div class="click-progress-fill"></div>
+                                    <div class="click-progress-text">
+                                        <span class="click-count">0</span>/<span class="click-max">${this.maxClicks}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Click button -->
+                            <div class="click-button-container">
+                                <button class="click-button">
+                                    <div class="click-button-bg"></div>
+                                    <div class="click-button-text">CLICK</div>
+                                    <div class="click-ripple-container"></div>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Original tagline (appears after clicker game) -->
+                        <div class="tagline-container hidden">
+                            <p class="tagline typing-text" data-text="${this.config.tagline}"></p>
+                            <p class="subtitle fade-in-text">${this.config.subtitle}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced button section (appears after clicker game) -->
+                    <div class="button-section hidden">
+                        <div class="button-container">
+                            <div class="energy-ring"></div>
+                            <button class="start-button btn btn-primary" data-action="start-mining">
+                                <div class="button-bg"></div>
+                                <div class="button-energy-fill"></div>
+                                <img src="images/btn-play.png" alt="${this.config.buttonText}" class="button-image" />
+                                <div class="button-text">START MINING</div>
+                                <div class="energy-particles"></div>
+                            </button>
+                            <div class="button-glow"></div>
+                        </div>
+                        
+                        <!-- Energy charge indicator -->
+                        <div class="energy-meter">
+                            <div class="energy-bar progress-bar">
+                                <div class="energy-fill progress-fill"></div>
+                            </div>
+                            <div class="energy-text">ENERGY: <span class="energy-value">0</span>%</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Additional UI elements (appears after clicker game) -->
+                <div class="ui-overlay hidden">
+                    <!-- Settings button -->
+                    <button class="settings-btn btn btn-secondary" title="Settings">
+                        <img src="images/icon-settings.png" alt="Settings" />
+                    </button>
+                    
+                    <!-- High score preview -->
+                    <div class="score-preview">
+                        <div class="score-label">BEST MINING RUN</div>
+                        <div class="score-value">1,247,850</div>
+                    </div>
+                    
+                    <!-- Version info -->
+                    <div class="version-info">v2.1.0</div>
+                </div>
+                
+                <!-- Loading overlay -->
+                <div class="loading-overlay hidden">
+                    <div class="loading-content">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">INITIALIZING MINING OPERATIONS...</div>
+                        <div class="loading-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="progress-percentage">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+    // Clear container and add our screen
+    this.container.innerHTML = html;
+
+    // Inject screen-specific styles
+    this.injectCSS("startscreen-styles", this.getStartScreenCSS());
+  }
+
+  // Override setupEventListeners to add StartScreen specific events
+  setupEventListeners() {
+    // Call parent method for common event listeners
+    super.setupEventListeners();
+
+    // StartScreen specific event listeners
+    const clickButton = this.container.querySelector(".click-button");
+    if (clickButton) {
+      clickButton.addEventListener("click", (e) => {
+        this.handleClickButtonClick(e);
+      });
+    }
+
+    const startButton = this.container.querySelector(".start-button");
+    if (startButton) {
+      startButton.addEventListener("click", (e) => {
+        this.handleStartClick();
+      });
+
+      startButton.addEventListener("mouseenter", () => {
+        this.startEnergyCharging();
+      });
+
+      startButton.addEventListener("mouseleave", () => {
+        this.stopEnergyCharging();
+      });
+    }
+
+    const settingsBtn = this.container.querySelector(".settings-btn");
+    if (settingsBtn) {
+      settingsBtn.addEventListener("click", (e) => {
+        this.handleSettingsClick();
+      });
+    }
+  }
+
+  // Override keyboard handling for StartScreen specific keys
+  handleKeydown(e) {
+    super.handleKeydown(e);
+
+    if (e.code === "Space") {
+      e.preventDefault();
+      if (this.gamePhase === "click-game") {
+        const clickButton = this.container.querySelector(".click-button");
+        clickButton?.click();
+      } else if (this.gamePhase === "main-screen") {
+        const startButton = this.container.querySelector(".start-button");
+        startButton?.click();
+      }
+    }
+  }
+
+  // Override initializeAudio to add StartScreen specific sounds
+  initializeAudio() {
+    super.initializeAudio();
+
+    // Add StartScreen specific sounds
+    this.audioManager.sounds = {
+      ...this.audioManager.sounds,
+      "logo-intro": null,
+      "ui-appear": null,
+      click: null,
+      "game-complete": null,
+      "background-music": null,
+      "button-click": null,
+      "energy-charge": null,
+      "energy-full": null,
+      type: null,
+    };
+
+    // Override enable to start background music after delay
+    const originalEnable = this.audioManager.enable.bind(this.audioManager);
+    this.audioManager.enable = () => {
+      originalEnable();
+      this.setManagedTimeout(() => {
+        if (this.audioManager.enabled) {
+          this.audioManager.playSound("background-music", true);
+        }
+      }, 5000);
+    };
+  }
+
+  // LOGO INTRO SEQUENCE
+  startLogoIntroSequence() {
+    console.log("🎬 Starting dramatic logo intro sequence...");
+
+    const logo = this.container.querySelector(".game-logo");
+    const energyCore = this.container.querySelector(".energy-core");
+    const logoBurst = this.container.querySelector(".logo-burst-effect");
+    const logoGlow = this.container.querySelector(".logo-glow");
+
+    if (!logo) return;
+
+    // Play intro music
+    if (this.audioManager) {
+      this.audioManager.playSound("logo-intro");
+    }
+
+    // Step 1: Dramatic logo entrance
+    this.setManagedTimeout(() => {
+      logo.classList.add("logo-intro-animation");
+      logo.classList.remove("logo-hidden");
+
+      // Activate energy core
+      this.setManagedTimeout(() => {
+        if (energyCore) energyCore.style.opacity = "1";
+      }, 500);
+
+      // Burst effect
+      this.setManagedTimeout(() => {
+        if (logoBurst) logoBurst.classList.add("logo-burst-active");
+        this.createLogoParticles();
+        this.triggerScreenShake();
+      }, 800);
+
+      // Glow activation
+      this.setManagedTimeout(() => {
+        if (logoGlow) logoGlow.classList.add("logo-glow-active");
+      }, 1200);
+    }, 200);
+
+    // Step 2: Start click game after logo settles
+    this.setManagedTimeout(() => {
+      this.startClickGame();
+    }, 3000);
+  }
+
+  createLogoParticles() {
+    const logoParticles = this.container.querySelector(".logo-particles");
+    if (!logoParticles) return;
+
+    // Create burst of particles
+    for (let i = 0; i < 12; i++) {
+      const particle = document.createElement("div");
+      particle.className = "logo-particle";
+
+      const size = Math.random() * 6 + 3;
+      const angle = (360 / 12) * i;
+      const distance = 100 + Math.random() * 50;
+
+      particle.style.width = particle.style.height = size + "px";
+      particle.style.left = "50%";
+      particle.style.top = "50%";
+
+      const radians = (angle * Math.PI) / 180;
+      const x = Math.cos(radians) * distance;
+      const y = Math.sin(radians) * distance;
+
+      particle.style.animation = `logoParticleBlast 2s ease-out forwards`;
+      particle.style.setProperty("--x", x + "px");
+      particle.style.setProperty("--y", y + "px");
+
+      logoParticles.appendChild(particle);
+
+      // Remove particle after animation
+      this.setManagedTimeout(() => {
+        if (particle.parentNode) {
+          particle.remove();
+        }
+      }, 2000);
+    }
+  }
+
+  // MINI-CLICKER GAME LOGIC
+  startClickGame() {
+    console.log("🎮 Starting mini-clicker game phase...");
+
+    this.gamePhase = "click-game";
+    const clickerSection = this.container.querySelector(
+      ".clicker-game-section"
+    );
+
+    if (clickerSection) {
+      clickerSection.classList.remove("hidden");
+      this.setManagedTimeout(() => {
+        clickerSection.classList.add("show");
+      }, 100);
+    }
+
+    // Play UI sound
+    if (this.audioManager) {
+      this.audioManager.playSound("ui-appear");
+    }
+  }
+
+  handleClickButtonClick(event) {
+    if (this.gamePhase !== "click-game") return;
+
+    this.clickCount++;
+    console.log(`🖱️ Click ${this.clickCount}/${this.maxClicks}`);
+
+    const clickButton = this.container.querySelector(".click-button");
+    const progressContainer = this.container.querySelector(
+      ".click-progress-container"
+    );
+    const progressFill = this.container.querySelector(".click-progress-fill");
+    const clickCountElement = this.container.querySelector(".click-count");
+
+    // Visual feedback
+    clickButton.classList.add("clicked");
+    this.setManagedTimeout(() => {
+      clickButton.classList.remove("clicked");
+    }, 300);
+
+    // Show progress bar on first click
+    if (this.clickCount === 1 && progressContainer) {
+      progressContainer.classList.remove("hidden");
+      this.setManagedTimeout(() => {
+        progressContainer.classList.add("show");
+      }, 100);
+    }
+
+    // Update progress bar
+    const progressPercent = (this.clickCount / this.maxClicks) * 100;
+    if (progressFill) {
+      progressFill.style.width = progressPercent + "%";
+    }
+    if (clickCountElement) {
+      clickCountElement.textContent = this.clickCount;
+    }
+
+    // Create ripple effect using parent method
+    this.createRippleEffect(clickButton, event);
+
+    // Create click particles using parent method
+    const rect = clickButton.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    this.createParticleBurst(centerX, centerY, 6);
+
+    // Screen shake effect
+    if (this.clickCount % 3 === 0) {
+      this.triggerScreenShake();
+    }
+
+    // Play click sound
+    if (this.audioManager) {
+      this.audioManager.playSound(
+        "click",
+        false,
+        0.8 + (this.clickCount / this.maxClicks) * 0.4
+      );
+    }
+
+    // Check if complete
+    if (this.clickCount >= this.maxClicks) {
+      this.setManagedTimeout(() => {
+        this.completeClickGame();
+      }, 500);
+    }
+  }
+
+  completeClickGame() {
+    console.log("🎉 Mini-clicker game completed!");
+
+    const clickerSection = this.container.querySelector(
+      ".clicker-game-section"
+    );
+
+    // Play completion sound
+    if (this.audioManager) {
+      this.audioManager.playSound("game-complete");
+    }
+
+    // Create completion effect
+    this.createCompletionEffect();
+
+    // Hide clicker game elements
+    if (clickerSection) {
+      clickerSection.style.animation =
+        "fadeOutUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards";
+    }
+
+    // Transition to main screen
+    this.setManagedTimeout(() => {
+      this.showMainScreen();
+    }, 800);
+  }
+
+  createCompletionEffect() {
+    // Create burst of completion particles
+    const button = this.container.querySelector(".click-button");
+    if (!button) return;
+
+    const rect = button.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    // Use parent method for particle burst
+    this.createParticleBurst(centerX, centerY, 20);
+
+    // Screen flash effect
+    const flash = document.createElement("div");
+    flash.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 255, 136, 0.3);
+      z-index: 1000;
+      pointer-events: none;
+    `;
+
+    document.body.appendChild(flash);
+
+    flash.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0 }], {
+      duration: 500,
+      easing: "ease-out",
+    }).onfinish = () => {
+      flash.remove();
+    };
+  }
+
+  showMainScreen() {
+    console.log("🌟 Transitioning to main screen...");
+
+    this.gamePhase = "main-screen";
+
+    // Hide clicker game section
+    const clickerSection = this.container.querySelector(
+      ".clicker-game-section"
+    );
+    if (clickerSection) {
+      clickerSection.classList.add("hidden");
+    }
+
+    // Show tagline container
+    const taglineContainer = this.container.querySelector(".tagline-container");
+    if (taglineContainer) {
+      taglineContainer.classList.remove("hidden");
+      this.setManagedTimeout(() => {
+        taglineContainer.classList.add("show");
+        this.startTypingEffect();
+      }, 200);
+    }
+
+    // Show button section
+    this.setManagedTimeout(() => {
+      const buttonSection = this.container.querySelector(".button-section");
+      if (buttonSection) {
+        buttonSection.classList.remove("hidden");
+        this.setManagedTimeout(() => {
+          buttonSection.classList.add("show");
+        }, 100);
+      }
+    }, 1000);
+
+    // Show UI overlay
+    this.setManagedTimeout(() => {
+      const uiOverlay = this.container.querySelector(".ui-overlay");
+      if (uiOverlay) {
+        uiOverlay.classList.remove("hidden");
+        this.setManagedTimeout(() => {
+          uiOverlay.classList.add("show");
+        }, 100);
+      }
+    }, 1500);
+  }
+
+  startTypingEffect() {
+    const taglineElement = this.container.querySelector(".typing-text");
+    if (!taglineElement) return;
+
+    const text =
+      taglineElement.getAttribute("data-text") || this.config.tagline;
+    let currentText = "";
+    let index = 0;
+
+    taglineElement.textContent = "";
+
+    this.typingInterval = this.setManagedInterval(() => {
+      if (index < text.length) {
+        currentText += text[index];
+        taglineElement.textContent = currentText;
+        index++;
+
+        // Play typing sound
+        if (this.audioManager) {
+          this.audioManager.playSound("type");
+        }
+      } else {
+        clearInterval(this.typingInterval);
+        // Remove cursor after typing is complete
+        this.setManagedTimeout(() => {
+          taglineElement.style.setProperty("--cursor", "none");
+        }, 2000);
+      }
+    }, 100);
+  }
+
+  startEnergyCharging() {
+    if (this.isCharging || this.gamePhase !== "main-screen") return;
+
+    this.isCharging = true;
+    const button = this.container.querySelector(".start-button");
+    const energyFill = this.container.querySelector(".energy-fill");
+    const energyValue = this.container.querySelector(".energy-value");
+    const buttonEnergyFill = this.container.querySelector(
+      ".button-energy-fill"
+    );
+
+    if (button) button.classList.add("charging");
+
+    const chargeInterval = this.setManagedInterval(() => {
+      if (!this.isCharging) {
+        clearInterval(chargeInterval);
+        return;
+      }
+
+      this.energyLevel = Math.min(this.energyLevel + 2, 100);
+
+      if (energyFill) {
+        energyFill.style.width = this.energyLevel + "%";
+      }
+      if (energyValue) {
+        energyValue.textContent = this.energyLevel;
+      }
+      if (buttonEnergyFill) {
+        buttonEnergyFill.style.setProperty("--energy", this.energyLevel + "%");
+      }
+
+      // Play charging sound periodically
+      if (this.energyLevel % 10 === 0 && this.audioManager) {
+        this.audioManager.playSound("energy-charge");
+      }
+
+      if (this.energyLevel >= 100) {
+        this.isCharging = false;
+        clearInterval(chargeInterval);
+
+        // Play full charge sound
+        if (this.audioManager) {
+          this.audioManager.playSound("energy-full");
+        }
+      }
+    }, 50);
+  }
+
+  stopEnergyCharging() {
+    if (this.gamePhase !== "main-screen") return;
+
+    this.isCharging = false;
+    const button = this.container.querySelector(".start-button");
+    if (button) button.classList.remove("charging");
+
+    // Slowly drain energy when not charging
+    const drainInterval = this.setManagedInterval(() => {
+      if (this.isCharging) {
+        clearInterval(drainInterval);
+        return;
+      }
+
+      this.energyLevel = Math.max(this.energyLevel - 1, 0);
+
+      const energyFill = this.container.querySelector(".energy-fill");
+      const energyValue = this.container.querySelector(".energy-value");
+      const buttonEnergyFill = this.container.querySelector(
+        ".button-energy-fill"
+      );
+
+      if (energyFill) {
+        energyFill.style.width = this.energyLevel + "%";
+      }
+      if (energyValue) {
+        energyValue.textContent = this.energyLevel;
+      }
+      if (buttonEnergyFill) {
+        buttonEnergyFill.style.setProperty("--energy", this.energyLevel + "%");
+      }
+
+      if (this.energyLevel <= 0) {
+        clearInterval(drainInterval);
+      }
+    }, 100);
+  }
+
+  handleStartClick() {
+    if (this.gamePhase !== "main-screen") return;
+
+    console.log("🎮 Enhanced Start Mining button clicked!");
+
+    // Check if energy is sufficient (optional requirement)
+    if (this.energyLevel < 100) {
+      this.showTemporaryMessage(
+        "⚡ Charge energy to 100% for optimal mining!",
+        "warning"
+      );
+      return;
+    }
+
+    // Play sound effect
+    if (this.audioManager) {
+      this.audioManager.playSound("button-click");
+      this.audioManager.stopSound("background-music");
+    }
+
+    // Show loading overlay
+    this.showLoadingScreen();
+
+    // Enhanced success message
+    this.setManagedTimeout(() => {
+      this.showSuccessMessage(
+        "🚀 MINING OPERATIONS INITIALIZED!\nPreparing asteroid field..."
+      );
+    }, 500);
+
+    // Simulate loading process
+    this.simulateLoading(() => {
+      console.log("🔄 Ready to transition to Mining Screen");
+      // This is where you'd call: game.showScreen('mining');
+    });
+  }
+
+  handleSettingsClick() {
+    console.log("⚙️ Settings button clicked!");
+
+    if (this.audioManager) {
+      this.audioManager.playSound("ui-hover");
+    }
+
+    // In full game, this would open settings panel
+    this.showTemporaryMessage("⚙️ Settings panel coming soon!", "info");
+  }
+
+  // Override destroy to clean up StartScreen specific elements
+  destroy() {
+    // Clear typing interval
+    if (this.typingInterval) {
+      clearInterval(this.typingInterval);
+    }
+
+    // Reset StartScreen specific state
+    this.clickCount = 0;
+    this.gamePhase = "logo-intro";
+    this.logoAnimationComplete = false;
+    this.energyLevel = 0;
+    this.isCharging = false;
+
+    // Call parent destroy method
+    super.destroy();
+
+    console.log("🗑️ StartScreen destroyed and cleaned up");
+  }
+
+  // Debug methods for testing
+  skipToClickGame() {
+    if (this.gamePhase === "logo-intro") {
+      this.startClickGame();
+    }
+  }
+
+  skipToMainScreen() {
+    if (this.gamePhase === "click-game") {
+      this.completeClickGame();
+    }
+  }
+
+  setClickCount(count) {
+    this.clickCount = Math.min(count, this.maxClicks);
+    const progressFill = this.container.querySelector(".click-progress-fill");
+    const clickCountElement = this.container.querySelector(".click-count");
+
+    if (progressFill) {
+      const progressPercent = (this.clickCount / this.maxClicks) * 100;
+      progressFill.style.width = progressPercent + "%";
+    }
+    if (clickCountElement) {
+      clickCountElement.textContent = this.clickCount;
+    }
+  }
+
+  // Get StartScreen specific CSS (this replaces the large injectStyles method)
+  getStartScreenCSS() {
+    return `
+      /* This method would return the CSS content from startscreen.css */
+      /* In a real implementation, you'd either: */
+      /* 1. Load the startscreen.css file separately, or */
+      /* 2. Return the CSS content as a string here */
+      /* For now, returning empty string since CSS is in separate file */
+      .startscreen-loaded { display: block; }
+    `;
+  }
+}
+
+// Make available globally for debug system
+window.StartScreen = StartScreen;
+
+console.log("📱 Refactored StartScreen class with Mini-Clicker Game loaded!");

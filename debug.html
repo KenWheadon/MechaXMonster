@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mecha X Monster - Debug Interface</title>
+
+    <!-- Load CSS Files -->
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/startscreen.css" />
+
     <style>
       * {
         margin: 0;
@@ -28,7 +33,8 @@
         border-radius: 10px;
         z-index: 1000;
         border: 2px solid #00ff88;
-        min-width: 200px;
+        min-width: 220px;
+        backdrop-filter: blur(10px);
       }
 
       .debug-panel h3 {
@@ -36,6 +42,7 @@
         margin-bottom: 15px;
         font-size: 16px;
         text-align: center;
+        text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
       }
 
       .debug-btn {
@@ -43,7 +50,7 @@
         width: 100%;
         margin: 8px 0;
         padding: 12px;
-        background: #333;
+        background: rgba(51, 51, 51, 0.8);
         color: white;
         border: 2px solid #555;
         border-radius: 5px;
@@ -51,17 +58,42 @@
         font-weight: bold;
         transition: all 0.3s ease;
         text-align: center;
+        backdrop-filter: blur(5px);
       }
 
       .debug-btn:hover {
-        background: #555;
+        background: rgba(85, 85, 85, 0.9);
         border-color: #00ff88;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
+      }
+
+      .debug-btn:active {
+        transform: translateY(0);
       }
 
       .debug-btn.active {
         background: #00ff88;
         color: black;
         border-color: #00ff88;
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+      }
+
+      .debug-btn.loading {
+        background: #ffaa00;
+        color: black;
+        border-color: #ffaa00;
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
       }
 
       .debug-info {
@@ -72,23 +104,61 @@
         color: #aaa;
       }
 
+      .debug-info div {
+        margin: 5px 0;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .debug-info span {
+        color: #00ff88;
+        font-weight: bold;
+      }
+
+      .debug-controls {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #555;
+      }
+
+      .debug-controls h4 {
+        color: #00ccff;
+        font-size: 12px;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+
+      .debug-mini-btn {
+        display: inline-block;
+        width: 48%;
+        margin: 2px 1%;
+        padding: 8px 4px;
+        background: rgba(51, 51, 51, 0.6);
+        color: white;
+        border: 1px solid #555;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 10px;
+        text-align: center;
+        transition: all 0.2s ease;
+      }
+
+      .debug-mini-btn:hover {
+        background: rgba(85, 85, 85, 0.8);
+        border-color: #00ccff;
+      }
+
+      .debug-mini-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
       /* Game Container */
       #game-container {
         width: 100%;
         height: 100vh;
         position: relative;
         overflow: hidden;
-      }
-
-      /* Default screen styles */
-      .screen {
-        width: 100%;
-        height: 100%;
-        display: none;
-      }
-
-      .screen.active {
-        display: block;
       }
 
       /* Placeholder screen */
@@ -98,52 +168,122 @@
         align-items: center;
         height: 100vh;
         text-align: center;
+        background: radial-gradient(
+          ellipse at center,
+          #0a0a1a 0%,
+          #000000 100%
+        );
       }
 
       .placeholder-content {
-        background: rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 0, 0.8);
         padding: 40px;
         border-radius: 15px;
         border: 2px solid #555;
+        backdrop-filter: blur(10px);
       }
 
       .placeholder-content h2 {
         color: #00ff88;
         margin-bottom: 20px;
         font-size: 2rem;
+        text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
       }
 
       .placeholder-content p {
         color: #aaa;
         font-size: 1.1rem;
+        margin-bottom: 10px;
+      }
+
+      .error-content {
+        border-color: #ff6b6b !important;
+      }
+
+      .error-content h2 {
+        color: #ff6b6b !important;
+        text-shadow: 0 0 20px rgba(255, 107, 107, 0.5) !important;
+      }
+
+      .error-content p {
+        color: #ffaaaa !important;
+      }
+
+      /* Loading indicator */
+      .loading-indicator {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.9);
+        padding: 30px;
+        border-radius: 15px;
+        border: 2px solid #00ff88;
+        z-index: 999;
+        text-align: center;
+        backdrop-filter: blur(10px);
+      }
+
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(0, 255, 136, 0.3);
+        border-top: 4px solid #00ff88;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading-text {
+        color: #00ff88;
+        font-weight: bold;
+      }
+
+      .hidden {
+        display: none !important;
       }
     </style>
   </head>
   <body>
+    <!-- Loading Indicator -->
+    <div class="loading-indicator hidden" id="loading-indicator">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Loading...</div>
+    </div>
+
     <!-- Debug Panel -->
     <div class="debug-panel">
       <h3>🐛 Debug Interface</h3>
-      <button class="debug-btn" data-screen="start" data-file="start-screen.js">
+      <button class="debug-btn" data-screen="start" data-file="StartScreen.js">
         🚀 Start Screen
       </button>
       <button
         class="debug-btn"
         data-screen="mining"
-        data-file="mining-screen.js"
+        data-file="MiningScreen.js"
       >
         ⛏️ Mining Screen
       </button>
       <button
         class="debug-btn"
         data-screen="combat"
-        data-file="combat-screen.js"
+        data-file="CombatScreen.js"
       >
         ⚔️ Combat Screen
       </button>
       <button
         class="debug-btn"
         data-screen="trading"
-        data-file="trading-screen.js"
+        data-file="TradingScreen.js"
       >
         🏪 Trading Post
       </button>
@@ -151,6 +291,23 @@
       <div class="debug-info">
         <div>Current: <span id="current-screen">None</span></div>
         <div>Status: <span id="debug-status">Ready</span></div>
+        <div>Loaded: <span id="loaded-count">0</span></div>
+      </div>
+
+      <div class="debug-controls">
+        <h4>StartScreen Controls</h4>
+        <button class="debug-mini-btn" id="skip-to-click" disabled>
+          Skip to Click
+        </button>
+        <button class="debug-mini-btn" id="skip-to-main" disabled>
+          Skip to Main
+        </button>
+        <button class="debug-mini-btn" id="debug-info-btn" disabled>
+          Debug Info
+        </button>
+        <button class="debug-mini-btn" id="reset-screen" disabled>
+          Reset Screen
+        </button>
       </div>
     </div>
 
@@ -160,30 +317,49 @@
         <div class="placeholder-content">
           <h2>Mecha X Monster</h2>
           <p>Select a screen from the debug panel to test</p>
+          <p style="font-size: 0.9rem; margin-top: 15px">
+            Make sure you have the following files:
+          </p>
+          <p style="font-size: 0.8rem; color: #666">
+            js/Screen.js, js/StartScreen.js, css/styles.css, css/startscreen.css
+          </p>
         </div>
       </div>
     </div>
 
-    <!-- Load order: Config first, then debug system -->
-    <script src="config.js"></script>
+    <!-- Load Scripts in Order -->
+    <script src="js/config.js"></script>
+    <script src="js/Screen.js"></script>
     <script>
-      // Debug System - Manages loading and switching between screens
+      // Debug System - Enhanced for refactored screen system
       class DebugSystem {
         constructor() {
           this.currentScreen = null;
           this.loadedScreens = new Map();
+          this.loadedScripts = new Set();
+          this.isLoading = false;
           this.init();
         }
 
         init() {
           this.setupEventListeners();
           this.updateStatus("Ready - Select a screen to test");
+          this.updateLoadedCount();
           console.log("🐛 Debug System initialized");
+
+          // Check if base Screen class is available
+          if (typeof Screen === "undefined") {
+            this.updateStatus("Error: Screen.js not loaded");
+            console.error("Screen.js must be loaded before debug system");
+          }
         }
 
         setupEventListeners() {
+          // Main screen buttons
           document.querySelectorAll(".debug-btn").forEach((btn) => {
             btn.addEventListener("click", async (e) => {
+              if (this.isLoading) return;
+
               const screenName = e.target.dataset.screen;
               const fileName = e.target.dataset.file;
 
@@ -191,11 +367,53 @@
               this.updateDebugButtons(e.target);
             });
           });
+
+          // Debug control buttons
+          document
+            .getElementById("skip-to-click")
+            .addEventListener("click", () => {
+              if (this.currentScreen && this.currentScreen.skipToClickGame) {
+                this.currentScreen.skipToClickGame();
+                this.updateStatus("Skipped to click game");
+              }
+            });
+
+          document
+            .getElementById("skip-to-main")
+            .addEventListener("click", () => {
+              if (this.currentScreen && this.currentScreen.skipToMainScreen) {
+                this.currentScreen.skipToMainScreen();
+                this.updateStatus("Skipped to main screen");
+              }
+            });
+
+          document
+            .getElementById("debug-info-btn")
+            .addEventListener("click", () => {
+              if (this.currentScreen && this.currentScreen.debug) {
+                this.currentScreen.debug();
+                this.updateStatus("Debug info logged to console");
+              }
+            });
+
+          document
+            .getElementById("reset-screen")
+            .addEventListener("click", () => {
+              if (this.currentScreen) {
+                this.resetCurrentScreen();
+              }
+            });
         }
 
         async loadScreen(screenName, fileName) {
           try {
+            this.isLoading = true;
+            this.showLoadingIndicator(`Loading ${screenName}...`);
             this.updateStatus(`Loading ${screenName}...`);
+
+            // Set button to loading state
+            const btn = document.querySelector(`[data-screen="${screenName}"]`);
+            if (btn) btn.classList.add("loading");
 
             // Destroy current screen if exists
             if (this.currentScreen && this.currentScreen.destroy) {
@@ -209,8 +427,9 @@
 
             // Load screen file if not already loaded
             if (!this.loadedScreens.has(screenName)) {
-              await this.loadScript(fileName);
+              await this.loadScript(`js/${fileName}`);
               this.loadedScreens.set(screenName, true);
+              this.updateLoadedCount();
             }
 
             // Create screen instance
@@ -224,6 +443,7 @@
 
               this.updateStatus(`${screenName} loaded successfully`);
               this.updateCurrentScreen(screenName);
+              this.updateDebugControls(screenName);
             } else {
               throw new Error(`Screen class ${screenClassName} not found`);
             }
@@ -231,20 +451,31 @@
             console.error(`Failed to load ${screenName}:`, error);
             this.updateStatus(`Error loading ${screenName}: ${error.message}`);
             this.showErrorScreen(screenName, error.message);
+          } finally {
+            this.isLoading = false;
+            this.hideLoadingIndicator();
+
+            // Remove loading state from buttons
+            document.querySelectorAll(".debug-btn").forEach((btn) => {
+              btn.classList.remove("loading");
+            });
           }
         }
 
         loadScript(fileName) {
           return new Promise((resolve, reject) => {
             // Check if script already exists
-            if (document.querySelector(`script[src="${fileName}"]`)) {
+            if (this.loadedScripts.has(fileName)) {
               resolve();
               return;
             }
 
             const script = document.createElement("script");
             script.src = fileName;
-            script.onload = resolve;
+            script.onload = () => {
+              this.loadedScripts.add(fileName);
+              resolve();
+            };
             script.onerror = () =>
               reject(new Error(`Failed to load ${fileName}`));
             document.head.appendChild(script);
@@ -252,6 +483,11 @@
         }
 
         getScreenClassName(screenName) {
+          // Handle special case for StartScreen
+          if (screenName === "start") {
+            return "StartScreen";
+          }
+
           // Convert kebab-case to PascalCase
           return (
             screenName
@@ -264,23 +500,72 @@
         showErrorScreen(screenName, errorMessage) {
           const container = document.getElementById("game-container");
           container.innerHTML = `
-                    <div class="screen placeholder-screen active">
-                        <div class="placeholder-content" style="border-color: #ff6b6b;">
-                            <h2 style="color: #ff6b6b;">❌ Error Loading ${screenName}</h2>
-                            <p style="color: #ffaaaa; margin-top: 15px;">${errorMessage}</p>
-                            <p style="color: #aaa; margin-top: 10px; font-size: 0.9rem;">
-                                Make sure ${screenName}-screen.js exists and exports the correct class
-                            </p>
-                        </div>
-                    </div>
-                `;
+            <div class="screen placeholder-screen active">
+              <div class="placeholder-content error-content">
+                <h2>❌ Error Loading ${screenName}</h2>
+                <p style="margin-top: 15px;">${errorMessage}</p>
+                <p style="margin-top: 10px; font-size: 0.9rem; color: #999;">
+                  Make sure js/${screenName}Screen.js exists and extends Screen class
+                </p>
+                <p style="margin-top: 5px; font-size: 0.8rem; color: #666;">
+                  Check the console for more details
+                </p>
+              </div>
+            </div>
+          `;
+        }
+
+        showLoadingIndicator(text) {
+          const indicator = document.getElementById("loading-indicator");
+          const textEl = indicator.querySelector(".loading-text");
+          textEl.textContent = text;
+          indicator.classList.remove("hidden");
+        }
+
+        hideLoadingIndicator() {
+          const indicator = document.getElementById("loading-indicator");
+          indicator.classList.add("hidden");
         }
 
         updateDebugButtons(activeBtn) {
           document.querySelectorAll(".debug-btn").forEach((btn) => {
             btn.classList.remove("active");
           });
-          activeBtn.classList.add("active");
+          if (activeBtn) {
+            activeBtn.classList.add("active");
+          }
+        }
+
+        updateDebugControls(screenName) {
+          const controls = document.querySelectorAll(".debug-mini-btn");
+
+          if (screenName === "start") {
+            // Enable StartScreen specific controls
+            controls.forEach((btn) => (btn.disabled = false));
+          } else {
+            // Disable StartScreen specific controls for other screens
+            document.getElementById("skip-to-click").disabled = true;
+            document.getElementById("skip-to-main").disabled = true;
+            document.getElementById("debug-info-btn").disabled = false;
+            document.getElementById("reset-screen").disabled = false;
+          }
+        }
+
+        resetCurrentScreen() {
+          if (this.currentScreen) {
+            const screenName =
+              document.getElementById("current-screen").textContent;
+            this.currentScreen.destroy();
+
+            // Find the active button and reload the screen
+            const activeBtn = document.querySelector(".debug-btn.active");
+            if (activeBtn) {
+              const fileName = activeBtn.dataset.file;
+              this.loadScreen(screenName.toLowerCase(), fileName);
+            }
+
+            this.updateStatus(`${screenName} reset`);
+          }
         }
 
         updateStatus(status) {
@@ -290,11 +575,60 @@
         updateCurrentScreen(screenName) {
           document.getElementById("current-screen").textContent = screenName;
         }
+
+        updateLoadedCount() {
+          document.getElementById("loaded-count").textContent =
+            this.loadedScreens.size;
+        }
+
+        // Public API for console debugging
+        getCurrentScreen() {
+          return this.currentScreen;
+        }
+
+        getLoadedScreens() {
+          return Array.from(this.loadedScreens.keys());
+        }
+
+        getDebugInfo() {
+          return {
+            currentScreen: this.currentScreen?.constructor.name || "None",
+            loadedScreens: this.getLoadedScreens(),
+            loadedScripts: Array.from(this.loadedScripts),
+            isLoading: this.isLoading,
+            screenState: this.currentScreen
+              ? {
+                  isActive: this.currentScreen.isActive,
+                  gamePhase: this.currentScreen.gamePhase,
+                  clickCount: this.currentScreen.clickCount,
+                  energyLevel: this.currentScreen.energyLevel,
+                }
+              : null,
+          };
+        }
       }
 
       // Initialize debug system when DOM is ready
       document.addEventListener("DOMContentLoaded", () => {
         window.debugSystem = new DebugSystem();
+
+        // Add console helpers
+        window.debug = {
+          system: () => window.debugSystem,
+          screen: () => window.debugSystem.getCurrentScreen(),
+          info: () => window.debugSystem.getDebugInfo(),
+          skip: {
+            toClick: () =>
+              window.debugSystem.getCurrentScreen()?.skipToClickGame(),
+            toMain: () =>
+              window.debugSystem.getCurrentScreen()?.skipToMainScreen(),
+          },
+          reset: () => window.debugSystem.resetCurrentScreen(),
+        };
+
+        console.log(
+          "🐛 Debug System loaded. Use window.debug for console access."
+        );
       });
     </script>
   </body>
