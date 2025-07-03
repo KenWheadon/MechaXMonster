@@ -21,7 +21,7 @@
   );
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(0, 255, 136, 0.3);
-  margin-top: 100px;
+  width: 96%;
 }
 
 .back-button {
@@ -61,19 +61,20 @@
   border-radius: 10px;
   padding: 15px;
   backdrop-filter: blur(10px);
+  width: 90%;
 }
 
 .currency-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 10px;
-  max-width: 500px;
 }
 
 .currency-item {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  gap: 8px;
   padding: 8px 12px;
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(0, 255, 136, 0.2);
@@ -87,8 +88,7 @@
 }
 
 .currency-icon {
-  width: 20px;
-  height: 20px;
+  width: 45%;
   filter: drop-shadow(0 0 5px rgba(0, 255, 136, 0.5));
 }
 
@@ -96,8 +96,8 @@
   color: var(--primary-color);
   font-weight: bold;
   font-family: "Courier New", monospace;
-  min-width: 40px;
   text-align: right;
+  width: 35%;
 }
 
 .currency-updated {
