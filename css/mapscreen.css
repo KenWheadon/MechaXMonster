@@ -366,8 +366,7 @@
 }
 
 .currency-icon-small {
-  width: 16px;
-  height: 16px;
+  width: 25%;
   filter: drop-shadow(0 0 3px rgba(0, 255, 136, 0.4));
 }
 
