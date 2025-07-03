@@ -81,6 +81,27 @@ h2 {
   color: #3498db;
 }
 
+/* Mining Header with Back Button */
+.mining-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.back-btn {
+  position: absolute;
+  left: 0;
+  background: var(--danger-gradient);
+  padding: 10px 20px;
+  font-size: 14px;
+}
+
+.back-btn:hover {
+  transform: scale(1.05);
+}
+
 /* Buttons */
 .btn {
   background: var(--secondary-gradient);
@@ -210,55 +231,110 @@ h2 {
   background: var(--card-background);
   border-radius: var(--border-radius);
   padding: 20px;
-}
-
-.mining-machine {
-  background: var(--mining-gradient);
-  border: 3px solid #27ae60;
-  border-radius: var(--border-radius);
-  padding: 20px;
-  margin: 15px 0;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  text-align: center;
   position: relative;
 }
 
-.mining-machine:hover {
+/* Compact Mining Machines Row */
+.mining-machines-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 15px 0;
+}
+
+.mining-machine.compact {
+  background: var(--mining-gradient);
+  border: 2px solid #27ae60;
+  border-radius: var(--border-radius-small);
+  padding: 12px;
+  transition: all var(--transition-normal);
+  text-align: center;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mining-machine.compact:hover {
   transform: scale(1.02);
-  box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+  box-shadow: 0 3px 10px rgba(46, 204, 113, 0.3);
 }
 
-.mining-machine.active {
-  animation: mining-pulse 2s infinite;
-}
-
-.mining-machine.locked {
+.mining-machine.compact.locked {
   background: var(--background-overlay);
   border-color: #95a5a6;
   cursor: not-allowed;
 }
 
-.mining-machine.locked:hover {
+.mining-machine.compact.locked:hover {
   transform: none;
   box-shadow: none;
 }
 
-@keyframes mining-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
+.machine-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.machine-header h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: white;
+}
+
+.machine-activate-btn,
+.machine-upgrade-btn,
+.machine-buy-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  margin: 2px 0;
+  min-width: 80px;
+}
+
+.machine-activate-btn {
+  background: var(--mecha-gradient);
+}
+
+.machine-upgrade-btn {
+  background: var(--secondary-gradient);
+}
+
+.machine-buy-btn {
+  background: var(--danger-gradient);
+}
+
+.machine-status {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.machine-status.inactive {
+  opacity: 0.6;
+  text-align: center;
+}
+
+.machine-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+.collect-btn {
+  padding: 8px 12px;
+  font-size: 12px;
+  margin-top: 8px;
 }
 
 .progress-bar {
   background: rgba(0, 0, 0, 0.3);
   border-radius: var(--border-radius-small);
-  height: 20px;
-  margin: 10px 0;
+  height: 15px;
+  margin: 8px 0;
   overflow: hidden;
 }
 
@@ -283,6 +359,132 @@ h2 {
   font-size: 18px;
   font-weight: bold;
   color: #f39c12;
+}
+
+/* Particle Effects */
+#particle-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-100px) rotate(180deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-200px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Geode Popup */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.popup-content {
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  padding: 30px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  border: 3px solid #f39c12;
+}
+
+.geode-popup {
+  background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+}
+
+.geode-display {
+  margin: 20px 0;
+}
+
+.geode-image {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  margin: 10px 0;
+  transition: all 0.3s ease;
+}
+
+@keyframes geodeShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px) rotate(-5deg);
+  }
+  75% {
+    transform: translateX(10px) rotate(5deg);
+  }
+}
+
+.geode-counter {
+  font-size: 18px;
+  color: #ecf0f1;
+  margin: 10px 0;
+}
+
+.geode-open-btn {
+  background: var(--secondary-gradient);
+  font-size: 18px;
+  padding: 15px 30px;
+  margin: 15px 0;
+}
+
+.geode-results {
+  margin: 20px 0;
+}
+
+.current-reward {
+  font-size: 16px;
+  font-weight: bold;
+  color: #f1c40f;
+  margin: 10px 0;
+  min-height: 25px;
+}
+
+@keyframes rewardPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.total-rewards {
+  font-size: 14px;
+  color: #bdc3c7;
+  margin: 10px 0;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--border-radius-small);
 }
 
 /* Mecha Building */
@@ -327,11 +529,23 @@ h2 {
   transition: all var(--transition-normal);
 }
 
+.part-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  margin-bottom: 5px;
+  opacity: 0.5;
+}
+
 .part-slot.filled {
   background: rgba(46, 204, 113, 0.2);
   border-color: #27ae60;
   border-style: solid;
   animation: part-glow 0.5s ease-in-out;
+}
+
+.part-slot.filled .part-icon {
+  opacity: 1;
 }
 
 @keyframes part-glow {
@@ -683,6 +897,11 @@ h2 {
     gap: 20px;
   }
 
+  .mining-machines-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
   .mine-map {
     grid-template-columns: 1fr;
   }
@@ -707,6 +926,19 @@ h2 {
 
   .game-container {
     padding: 15px;
+  }
+
+  .mining-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .back-btn {
+    position: static;
+  }
+
+  .mining-machines-row {
+    grid-template-columns: 1fr;
   }
 
   h1 {
@@ -736,6 +968,16 @@ h2 {
     min-width: 60px;
     min-height: 60px;
     padding: 15px;
+  }
+
+  .popup-content {
+    padding: 20px;
+    margin: 20px;
+  }
+
+  .geode-image {
+    width: 80px;
+    height: 80px;
   }
 }
 
@@ -773,5 +1015,21 @@ h2 {
   }
   50% {
     transform: scale(1.05);
+  }
+}
+
+/* Mining machine active state */
+.mining-machine.compact.active {
+  animation: mining-pulse 2s infinite;
+  border-color: #f39c12;
+}
+
+@keyframes mining-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(243, 156, 18, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(243, 156, 18, 0.6);
   }
 }

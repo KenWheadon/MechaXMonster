@@ -20,10 +20,18 @@ class MapScreen {
   }
 
   selectMine(mineId) {
+    console.log(`Attempting to select mine ${mineId}`);
+    console.log("Unlocked mines:", this.game.gameState.unlockedMines);
+
     if (!this.game.gameState.unlockedMines.includes(mineId)) {
       // Try to unlock the mine
       if (this.tryUnlockMine(mineId)) {
         this.updateMineSelection();
+        // After unlocking, select the mine
+        this.game.gameState.currentMine = mineId;
+        this.game.showScreen("mining-screen");
+        const config = MINE_CONFIG[mineId];
+        this.game.logMessage(`⛏️ Entering ${config.name}...`, "important");
       }
       return;
     }
@@ -47,8 +55,13 @@ class MapScreen {
 
     // Determine required currency based on mine
     const requiredCurrency = this.getUnlockCurrency(mineId);
+    const currentAmount = this.game.gameState.currencies[requiredCurrency] || 0;
 
-    if (this.game.hasCurrency(requiredCurrency, cost)) {
+    console.log(`Trying to unlock mine ${mineId}`);
+    console.log(`Required: ${cost} ${requiredCurrency}`);
+    console.log(`Current: ${currentAmount}`);
+
+    if (currentAmount >= cost) {
       this.game.spendCurrency(requiredCurrency, cost);
       this.game.unlockMine(mineId);
       this.game.logMessage(
@@ -62,7 +75,7 @@ class MapScreen {
       this.game.logMessage(
         `❌ Need ${cost} ${this.game.getCurrencyIcon(
           requiredCurrency
-        )} to unlock ${config.name}`,
+        )} to unlock ${config.name} (You have: ${currentAmount})`,
         "combat"
       );
       return false;
@@ -88,8 +101,12 @@ class MapScreen {
       if (mineElement) {
         if (this.game.gameState.unlockedMines.includes(i)) {
           mineElement.classList.remove("locked");
+          // Add onclick handler for unlocked mines
+          mineElement.onclick = () => this.selectMine(i);
         } else {
           mineElement.classList.add("locked");
+          // Add onclick handler for locked mines to attempt unlock
+          mineElement.onclick = () => this.selectMine(i);
         }
       }
     }

@@ -72,6 +72,8 @@ class Game {
         machines: i === 1 ? 1 : 0, // Start with 1 machine in mine 1
         upgradeLevel: 0,
         upgradeCost: GAME_CONFIG.UPGRADE_BASE_COST,
+        activeMachines: {}, // Track which machines are active
+        machineData: {}, // Track individual machine data
       };
     }
 
@@ -123,6 +125,33 @@ class Game {
         this.mineScreen.buyMiningMachine(machineId);
       }
     };
+
+    // New machine management functions
+    window.activateMiningMachine = (machineId) => {
+      if (this.mineScreen) {
+        this.mineScreen.activateMiningMachine(machineId);
+      }
+    };
+
+    window.upgradeMiningMachine = (machineId) => {
+      if (this.mineScreen) {
+        this.mineScreen.upgradeMiningMachine(machineId);
+      }
+    };
+
+    // Geode functions
+    window.openSingleGeode = () => {
+      if (this.mineScreen) {
+        this.mineScreen.openSingleGeode();
+      }
+    };
+
+    window.finishGeodeOpening = () => {
+      if (this.mineScreen) {
+        this.mineScreen.finishGeodeOpening();
+      }
+    };
+
     window.buildMecha = () => {
       if (this.mineScreen) {
         this.mineScreen.buildMecha();
@@ -322,46 +351,10 @@ class Game {
     return false;
   }
 
-  // Geode opening system
+  // Geode opening system - now handled by mine screen mini-game
   openGeodes(count) {
-    let partsFound = 0;
-    let bonusCurrency = 0;
-
-    for (let i = 0; i < count; i++) {
-      if (Math.random() < GAME_CONFIG.MECHA_PART_DROP_RATE) {
-        // 5% chance for mecha part
-        const randomPart =
-          MECHA_PARTS[Math.floor(Math.random() * MECHA_PARTS.length)];
-
-        if (!this.getCurrentMechaData().parts[randomPart]) {
-          this.getCurrentMechaData().parts[randomPart] = true;
-          partsFound++;
-          this.logMessage(`🎉 Found mecha part: ${randomPart}!`, "success");
-        } else {
-          // Already have this part, give bonus currency instead
-          bonusCurrency += Math.floor(Math.random() * 10) + 5;
-        }
-      } else {
-        // 95% chance for bonus currency
-        bonusCurrency += Math.floor(Math.random() * 20) + 1;
-      }
-    }
-
-    if (bonusCurrency > 0) {
-      const config = this.getCurrentMineConfig();
-      this.addCurrency(config.currency, bonusCurrency);
-      this.logMessage(
-        `💰 Bonus currency from geodes: ${bonusCurrency} ${this.getCurrencyIcon(
-          config.currency
-        )}`
-      );
-    }
-
-    if (partsFound > 0) {
-      this.mineScreen.updateMechaBuilding();
-    }
-
-    return { partsFound, bonusCurrency };
+    // This is now handled by the geode mini-game
+    return { partsFound: 0, bonusCurrency: 0 };
   }
 
   // Mecha building
@@ -493,6 +486,8 @@ class Game {
         machines: i === 1 ? 1 : 0,
         upgradeLevel: 0,
         upgradeCost: GAME_CONFIG.UPGRADE_BASE_COST,
+        activeMachines: {},
+        machineData: {},
       };
     }
 
@@ -525,6 +520,41 @@ class Game {
     this.training.clearTrainingTimers();
 
     this.logMessage("🔄 Game reset! Starting fresh adventure.", "important");
+  }
+
+  // Enhanced mine management
+  initializeMineData(mineId) {
+    if (!this.gameState.mining[mineId].activeMachines) {
+      this.gameState.mining[mineId].activeMachines = {};
+    }
+    if (!this.gameState.mining[mineId].machineData) {
+      this.gameState.mining[mineId].machineData = {};
+    }
+  }
+
+  // Get total active machines across all mines
+  getTotalActiveMachines() {
+    let total = 0;
+    for (let i = 1; i <= 5; i++) {
+      const mineData = this.gameState.mining[i];
+      if (mineData.activeMachines) {
+        total += Object.values(mineData.activeMachines).filter(
+          (active) => active
+        ).length;
+      }
+    }
+    return total;
+  }
+
+  // Debug helper
+  debugGameState() {
+    console.log("=== Game State Debug ===");
+    console.log("Current Mine:", this.gameState.currentMine);
+    console.log("Unlocked Mines:", this.gameState.unlockedMines);
+    console.log("Currencies:", this.gameState.currencies);
+    console.log("Current Mine Data:", this.getCurrentMineData());
+    console.log("Current Mecha Data:", this.getCurrentMechaData());
+    console.log("========================");
   }
 }
 
@@ -560,6 +590,9 @@ document.addEventListener("DOMContentLoaded", function () {
       window.mechaGame = new Game();
       window.mechaGame.init();
       console.log("Game initialized successfully!");
+
+      // Debug helper - remove in production
+      window.debug = () => window.mechaGame.debugGameState();
     } catch (error) {
       console.error("Error initializing game:", error);
     }
