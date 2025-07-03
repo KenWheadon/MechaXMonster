@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mecha X Monster - Debug Interface</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+        min-height: 100vh;
+        color: white;
+      }
+
+      /* Debug Panel */
+      .debug-panel {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.9);
+        padding: 20px;
+        border-radius: 10px;
+        z-index: 1000;
+        border: 2px solid #00ff88;
+        min-width: 200px;
+      }
+
+      .debug-panel h3 {
+        color: #00ff88;
+        margin-bottom: 15px;
+        font-size: 16px;
+        text-align: center;
+      }
+
+      .debug-btn {
+        display: block;
+        width: 100%;
+        margin: 8px 0;
+        padding: 12px;
+        background: #333;
+        color: white;
+        border: 2px solid #555;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        text-align: center;
+      }
+
+      .debug-btn:hover {
+        background: #555;
+        border-color: #00ff88;
+      }
+
+      .debug-btn.active {
+        background: #00ff88;
+        color: black;
+        border-color: #00ff88;
+      }
+
+      .debug-info {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #555;
+        font-size: 12px;
+        color: #aaa;
+      }
+
+      /* Game Container */
+      #game-container {
+        width: 100%;
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Default screen styles */
+      .screen {
+        width: 100%;
+        height: 100%;
+        display: none;
+      }
+
+      .screen.active {
+        display: block;
+      }
+
+      /* Placeholder screen */
+      .placeholder-screen {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        text-align: center;
+      }
+
+      .placeholder-content {
+        background: rgba(0, 0, 0, 0.7);
+        padding: 40px;
+        border-radius: 15px;
+        border: 2px solid #555;
+      }
+
+      .placeholder-content h2 {
+        color: #00ff88;
+        margin-bottom: 20px;
+        font-size: 2rem;
+      }
+
+      .placeholder-content p {
+        color: #aaa;
+        font-size: 1.1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Debug Panel -->
+    <div class="debug-panel">
+      <h3>🐛 Debug Interface</h3>
+      <button class="debug-btn" data-screen="start" data-file="start-screen.js">
+        🚀 Start Screen
+      </button>
+      <button
+        class="debug-btn"
+        data-screen="mining"
+        data-file="mining-screen.js"
+      >
+        ⛏️ Mining Screen
+      </button>
+      <button
+        class="debug-btn"
+        data-screen="combat"
+        data-file="combat-screen.js"
+      >
+        ⚔️ Combat Screen
+      </button>
+      <button
+        class="debug-btn"
+        data-screen="trading"
+        data-file="trading-screen.js"
+      >
+        🏪 Trading Post
+      </button>
+
+      <div class="debug-info">
+        <div>Current: <span id="current-screen">None</span></div>
+        <div>Status: <span id="debug-status">Ready</span></div>
+      </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="game-container">
+      <div class="screen placeholder-screen active" id="default-screen">
+        <div class="placeholder-content">
+          <h2>Mecha X Monster</h2>
+          <p>Select a screen from the debug panel to test</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load order: Config first, then debug system -->
+    <script src="config.js"></script>
+    <script>
+      // Debug System - Manages loading and switching between screens
+      class DebugSystem {
+        constructor() {
+          this.currentScreen = null;
+          this.loadedScreens = new Map();
+          this.init();
+        }
+
+        init() {
+          this.setupEventListeners();
+          this.updateStatus("Ready - Select a screen to test");
+          console.log("🐛 Debug System initialized");
+        }
+
+        setupEventListeners() {
+          document.querySelectorAll(".debug-btn").forEach((btn) => {
+            btn.addEventListener("click", async (e) => {
+              const screenName = e.target.dataset.screen;
+              const fileName = e.target.dataset.file;
+
+              await this.loadScreen(screenName, fileName);
+              this.updateDebugButtons(e.target);
+            });
+          });
+        }
+
+        async loadScreen(screenName, fileName) {
+          try {
+            this.updateStatus(`Loading ${screenName}...`);
+
+            // Destroy current screen if exists
+            if (this.currentScreen && this.currentScreen.destroy) {
+              this.currentScreen.destroy();
+            }
+
+            // Hide all screens
+            document.querySelectorAll(".screen").forEach((screen) => {
+              screen.classList.remove("active");
+            });
+
+            // Load screen file if not already loaded
+            if (!this.loadedScreens.has(screenName)) {
+              await this.loadScript(fileName);
+              this.loadedScreens.set(screenName, true);
+            }
+
+            // Create screen instance
+            const container = document.getElementById("game-container");
+
+            // Check if screen class exists
+            const screenClassName = this.getScreenClassName(screenName);
+            if (window[screenClassName]) {
+              this.currentScreen = new window[screenClassName](container);
+              this.currentScreen.init();
+
+              this.updateStatus(`${screenName} loaded successfully`);
+              this.updateCurrentScreen(screenName);
+            } else {
+              throw new Error(`Screen class ${screenClassName} not found`);
+            }
+          } catch (error) {
+            console.error(`Failed to load ${screenName}:`, error);
+            this.updateStatus(`Error loading ${screenName}: ${error.message}`);
+            this.showErrorScreen(screenName, error.message);
+          }
+        }
+
+        loadScript(fileName) {
+          return new Promise((resolve, reject) => {
+            // Check if script already exists
+            if (document.querySelector(`script[src="${fileName}"]`)) {
+              resolve();
+              return;
+            }
+
+            const script = document.createElement("script");
+            script.src = fileName;
+            script.onload = resolve;
+            script.onerror = () =>
+              reject(new Error(`Failed to load ${fileName}`));
+            document.head.appendChild(script);
+          });
+        }
+
+        getScreenClassName(screenName) {
+          // Convert kebab-case to PascalCase
+          return (
+            screenName
+              .split("-")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join("") + "Screen"
+          );
+        }
+
+        showErrorScreen(screenName, errorMessage) {
+          const container = document.getElementById("game-container");
+          container.innerHTML = `
+                    <div class="screen placeholder-screen active">
+                        <div class="placeholder-content" style="border-color: #ff6b6b;">
+                            <h2 style="color: #ff6b6b;">❌ Error Loading ${screenName}</h2>
+                            <p style="color: #ffaaaa; margin-top: 15px;">${errorMessage}</p>
+                            <p style="color: #aaa; margin-top: 10px; font-size: 0.9rem;">
+                                Make sure ${screenName}-screen.js exists and exports the correct class
+                            </p>
+                        </div>
+                    </div>
+                `;
+        }
+
+        updateDebugButtons(activeBtn) {
+          document.querySelectorAll(".debug-btn").forEach((btn) => {
+            btn.classList.remove("active");
+          });
+          activeBtn.classList.add("active");
+        }
+
+        updateStatus(status) {
+          document.getElementById("debug-status").textContent = status;
+        }
+
+        updateCurrentScreen(screenName) {
+          document.getElementById("current-screen").textContent = screenName;
+        }
+      }
+
+      // Initialize debug system when DOM is ready
+      document.addEventListener("DOMContentLoaded", () => {
+        window.debugSystem = new DebugSystem();
+      });
+    </script>
+  </body>
+</html>
