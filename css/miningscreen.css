@@ -93,7 +93,7 @@
   max-width: 350px;
 }
 
-/* Mining machines - Improved compact layout */
+/* Mining machines - Fixed layout to prevent overflow */
 .machines-container {
   display: flex;
   flex-wrap: wrap;
@@ -112,6 +112,9 @@
   backdrop-filter: blur(5px);
   width: 280px;
   min-width: 280px;
+  /* FIX: Ensure container defines its own boundaries */
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .machine-container:hover {
@@ -138,6 +141,9 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  /* FIX: Ensure main content respects container width */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .machine-visual {
@@ -174,11 +180,16 @@
   animation: machineGlowPulse 2s ease-in-out infinite;
 }
 
+/* FIX: Make machine controls respect container boundaries */
 .machine-controls {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  /* FIX: Ensure controls fit within available space */
+  width: 100%;
+  max-width: calc(100% - 75px); /* Account for visual element width + gap */
+  box-sizing: border-box;
 }
 
 .auto-mining-indicator {
@@ -211,7 +222,7 @@
   animation: indicatorBlink 1s ease-in-out infinite;
 }
 
-/* Energy bar */
+/* FIX: Energy bar respects container width */
 .energy-bar {
   position: relative;
   height: 20px;
@@ -219,6 +230,9 @@
   border: 2px solid rgba(0, 255, 136, 0.5);
   border-radius: 10px;
   overflow: hidden;
+  /* FIX: Ensure bar fits within controls container */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .energy-fill {
@@ -265,9 +279,11 @@
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
 }
 
-/* Machine button - Improved styling */
+/* FIX: Machine button respects container width */
 .machine-button {
+  /* FIX: Ensure button fits within controls container */
   width: 100%;
+  max-width: 100%;
   padding: 10px;
   background: radial-gradient(
     circle,
@@ -281,6 +297,11 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  /* FIX: Prevent button from expanding beyond container */
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .machine-button:hover:not(:disabled) {
@@ -312,6 +333,11 @@
     width: 260px;
     min-width: 260px;
   }
+  
+  /* FIX: Adjust controls max-width for smaller containers */
+  .machine-controls {
+    max-width: calc(100% - 70px);
+  }
 }
 
 @media (max-width: 768px) {
@@ -339,10 +365,95 @@
     width: 70px;
     height: 70px;
   }
+  
+  /* FIX: Adjust controls max-width for mobile */
+  .machine-controls {
+    max-width: calc(100% - 62px);
+  }
 }
 
 @media (max-width: 480px) {
+  .mining-header {
+    padding: 10px;
+  }
+
+  .mine-title h1 {
+    font-size: 1.5rem;
+  }
+
+  .currency-item {
+    padding: 6px 10px;
+  }
+
+  .currency-item img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .mining-content {
+    padding: 10px;
+    gap: 10px;
+  }
+
   .machine-container {
+    padding: 12px;
+  }
+
+  .machine-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .mecha-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .modal-content {
+    padding: 15px;
+    width: 95%;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .machine-glow,
+  .mecha-glow,
+  .geode-image,
+  .build-mecha-button,
+  .auto-mining-indicator {
+    animation: none !important;
+  }
+
+  .energy-fill::after {
+    animation: none !important;
+  }
+}
+
+/* Focus states */
+.machine-button:focus,
+.geode-button:focus,
+.build-mecha-button:focus,
+.combat-button:focus,
+.collect-results-button:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .machine-container,
+  .mecha-display,
+  .parts-inventory,
+  .combat-access {
+    border-width: 3px;
+  }
+
+  .energy-bar,
+  .parts-progress .progress-bar {
+    border-width: 2px;
+  }
+}machine-container {
     padding: 12px;
   }
 
@@ -382,6 +493,11 @@
     width: 16px;
     height: 16px;
     font-size: 0.6rem;
+  }
+  
+  /* FIX: Adjust controls max-width for smallest screens */
+  .machine-controls {
+    max-width: calc(100% - 55px);
   }
 }
 
@@ -544,9 +660,8 @@
 }
 
 .mecha-image {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
+width: 160px;
+height: 100%;
   transition: all 0.3s ease;
 }
 
@@ -1022,8 +1137,8 @@
   }
 
   .mecha-image {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 100%;
   }
 
   .modal-content {
@@ -1064,8 +1179,8 @@
   }
 
   .mecha-image {
-    width: 60px;
-    height: 60px;
+    width: 120px;
+    height: 100%;
   }
 
   .modal-content {

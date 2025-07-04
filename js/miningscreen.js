@@ -46,6 +46,7 @@ class MiningScreen extends Screen {
     this.render();
     this.cacheElements();
     this.setupEventListeners();
+    this.setupMachineEventListeners(); // FIX: Add this missing call
     this.startAnimations();
     this.initializeAudio();
     this.startParticleSystem();
