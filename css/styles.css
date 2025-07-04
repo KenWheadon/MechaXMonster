@@ -76,6 +76,7 @@
       transparent 50%
     );
   animation: nebulaDrift 45s ease-in-out infinite;
+  pointer-events: none !important;
 }
 
 @keyframes backgroundShift {
@@ -111,6 +112,7 @@
   height: 100%;
   overflow: hidden;
   z-index: 1;
+  pointer-events: none !important;
 }
 
 .star {
@@ -123,6 +125,7 @@
   );
   border-radius: 50%;
   animation: advancedTwinkle 4s infinite;
+  pointer-events: none !important;
 }
 
 @keyframes advancedTwinkle {
@@ -155,6 +158,7 @@
   height: 100%;
   overflow: hidden;
   z-index: 2;
+  pointer-events: none !important;
 }
 
 .asteroid {
@@ -164,6 +168,7 @@
   animation: enhancedFloat 8s ease-in-out infinite;
   opacity: 0.4;
   box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5);
+  pointer-events: none !important;
 }
 
 @keyframes enhancedFloat {
@@ -193,7 +198,7 @@
   height: 100%;
   overflow: hidden;
   z-index: 3;
-  pointer-events: none;
+  pointer-events: none !important;
 }
 
 .particle {
@@ -201,6 +206,7 @@
   background: var(--glow-color);
   border-radius: 50%;
   animation: particleDrift 12s linear infinite;
+  pointer-events: none !important;
 }
 
 @keyframes particleDrift {
@@ -246,6 +252,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10;
+  pointer-events: auto;
 }
 
 .btn-primary {

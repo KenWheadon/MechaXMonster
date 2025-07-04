@@ -1106,6 +1106,36 @@
   box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
 }
 
+/* FIX FOR PARTICLE LAYERS BLOCKING CLICKS */
+.stars-layer,
+.asteroids-layer,
+.particles-layer,
+.nebula-layer {
+  pointer-events: none !important;
+}
+
+/* Ensure interactive elements have proper z-index */
+.mining-header,
+.mining-content,
+.machine-container,
+.mecha-display,
+.parts-inventory,
+.combat-access,
+.geode-modal {
+  position: relative;
+  z-index: 20;
+}
+
+.machine-button,
+.build-mecha-button,
+.combat-button,
+.geode-button,
+.back-button {
+  position: relative;
+  z-index: 25;
+  pointer-events: auto;
+}
+
 /* RESPONSIVE DESIGN */
 @media (max-width: 1024px) {
   .mining-content {
