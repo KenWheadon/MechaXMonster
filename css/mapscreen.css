@@ -65,8 +65,7 @@
 }
 
 .currency-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  display: flex;
   gap: 10px;
 }
 

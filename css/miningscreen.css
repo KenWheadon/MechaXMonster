@@ -1,0 +1,993 @@
+/* MiningScreen Specific Styles */
+
+/* Mining screen base */
+.mining-screen {
+  background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0a 100%);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Header */
+.mining-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
+
+.mine-title {
+  text-align: center;
+  flex-grow: 1;
+}
+
+.mine-title h1 {
+  color: var(--primary-color);
+  font-size: 2rem;
+  margin: 0;
+  text-shadow: var(--text-shadow);
+}
+
+.mine-title p {
+  color: #aaa;
+  margin: 5px 0 0 0;
+  font-size: 0.9rem;
+}
+
+.currency-display {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.currency-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 255, 136, 0.1);
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.currency-item img {
+  width: 24px;
+  height: 24px;
+}
+
+.currency-value,
+.monster-currency-value {
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 1.1rem;
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Main content */
+.mining-content {
+  display: flex;
+  flex: 1;
+  gap: 20px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.mining-area {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.side-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 350px;
+}
+
+/* Mining machines */
+.machines-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.machine-container {
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.machine-container:hover {
+  border-color: rgba(0, 255, 136, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 255, 136, 0.2);
+}
+
+.machine-visual {
+  position: relative;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.machine-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.machine-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 136, 0.3) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.machine-glow.active {
+  opacity: 1;
+  animation: machineGlowPulse 2s ease-in-out infinite;
+}
+
+@keyframes machineGlowPulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+.auto-mining-indicator {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: rgba(0, 255, 136, 0.9);
+  color: black;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.auto-mining-indicator.active {
+  opacity: 1;
+  animation: autoMiningPulse 2s ease-in-out infinite;
+}
+
+.auto-indicator-pulse {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #00ff00;
+  border-radius: 50%;
+  margin-right: 4px;
+  animation: indicatorBlink 1s ease-in-out infinite;
+}
+
+@keyframes indicatorBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes autoMiningPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.machine-ui {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Energy bar */
+.energy-bar {
+  position: relative;
+  height: 20px;
+  background: rgba(0, 255, 136, 0.2);
+  border: 2px solid rgba(0, 255, 136, 0.5);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.energy-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff88 0%, #00ccff 100%);
+  width: 0%;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.energy-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: energyShimmer 2s ease-in-out infinite;
+}
+
+@keyframes energyShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.energy-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+/* Machine button */
+.machine-button {
+  width: 100%;
+  padding: 12px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 136, 0.3) 0%,
+    rgba(0, 100, 50, 0.5) 100%
+  );
+  border: 2px solid rgba(0, 255, 136, 0.5);
+  border-radius: 8px;
+  color: var(--primary-color);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.machine-button:hover:not(:disabled) {
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 136, 0.5) 0%,
+    rgba(0, 100, 50, 0.7) 100%
+  );
+  border-color: var(--glow-bright);
+  transform: translateY(-1px);
+}
+
+.machine-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.machine-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Geode counter */
+.geode-counter {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.geode-counter.has-geodes {
+  opacity: 1;
+}
+
+.geode-button {
+  background: rgba(255, 215, 0, 0.2);
+  border: 2px solid rgba(255, 215, 0, 0.5);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.geode-button:hover:not(:disabled) {
+  background: rgba(255, 215, 0, 0.4);
+  border-color: rgba(255, 215, 0, 0.8);
+  transform: scale(1.05);
+}
+
+.geode-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.geode-button img {
+  width: 24px;
+  height: 24px;
+}
+
+.geode-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: rgba(255, 215, 0, 0.9);
+  color: black;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+/* Machine purchase */
+.machine-purchase {
+  text-align: center;
+}
+
+.purchase-machine-button {
+  background: rgba(0, 255, 136, 0.1);
+  border: 2px dashed rgba(0, 255, 136, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.purchase-machine-button:hover:not(:disabled) {
+  border-color: rgba(0, 255, 136, 0.6);
+  background: rgba(0, 255, 136, 0.2);
+}
+
+.purchase-machine-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.purchase-cost {
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+/* Mecha display */
+.mecha-display {
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.mecha-display.has-mecha {
+  border-color: rgba(0, 255, 136, 0.6);
+  background: rgba(0, 255, 136, 0.1);
+}
+
+.mecha-container {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.mecha-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.mecha-display.has-mecha .mecha-image {
+  filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.6));
+}
+
+.mecha-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 136, 0.3) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mecha-display.has-mecha .mecha-glow {
+  opacity: 1;
+  animation: mechaGlowRotate 4s linear infinite;
+}
+
+@keyframes mechaGlowRotate {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.mecha-status {
+  margin-top: 10px;
+}
+
+.status-active {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.status-inactive {
+  color: #aaa;
+}
+
+.build-mecha-button {
+  margin-top: 15px;
+  padding: 15px 25px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 136, 0.3) 0%,
+    rgba(0, 200, 100, 0.5) 100%
+  );
+  border: 2px solid rgba(0, 255, 136, 0.6);
+  border-radius: 8px;
+  color: var(--primary-color);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: buildButtonPulse 2s ease-in-out infinite;
+}
+
+@keyframes buildButtonPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.build-mecha-button:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 136, 0.5) 0%,
+    rgba(0, 200, 100, 0.7) 100%
+  );
+  border-color: var(--glow-bright);
+  transform: translateY(-2px);
+}
+
+/* Parts inventory */
+.parts-inventory {
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.parts-inventory h3 {
+  color: var(--primary-color);
+  margin: 0 0 15px 0;
+  text-align: center;
+}
+
+.parts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.part-slot {
+  position: relative;
+  aspect-ratio: 1;
+  background: rgba(0, 255, 136, 0.1);
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.part-slot.collected {
+  border-color: rgba(0, 255, 136, 0.6);
+  background: rgba(0, 255, 136, 0.2);
+}
+
+.part-image {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  transition: all 0.3s ease;
+}
+
+.part-slot.collected .part-image {
+  filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.6));
+}
+
+.part-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 1.5rem;
+  color: #666;
+}
+
+.part-collected-indicator {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: rgba(0, 255, 136, 0.9);
+  color: black;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.parts-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.parts-progress .progress-bar {
+  height: 8px;
+  background: rgba(0, 255, 136, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.parts-progress .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff88 0%, #00ccff 100%);
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  text-align: center;
+  color: var(--primary-color);
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* Combat access */
+.combat-access {
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(255, 100, 100, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.combat-button {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 100, 100, 0.3) 0%,
+    rgba(200, 50, 50, 0.5) 100%
+  );
+  border: 2px solid rgba(255, 100, 100, 0.6);
+  border-radius: 8px;
+  color: #ff6464;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.combat-button:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 100, 100, 0.5) 0%,
+    rgba(200, 50, 50, 0.7) 100%
+  );
+  border-color: rgba(255, 100, 100, 0.8);
+  transform: translateY(-2px);
+}
+
+.combat-button img {
+  width: 24px;
+  height: 24px;
+}
+
+/* Geode modal */
+.geode-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.geode-modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: rgba(0, 0, 0, 0.9);
+  border: 2px solid rgba(0, 255, 136, 0.5);
+  border-radius: 15px;
+  padding: 30px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.close-modal-button {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close-modal-button:hover {
+  color: var(--primary-color);
+}
+
+.geode-animation {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.geode-container {
+  position: relative;
+  display: inline-block;
+}
+
+.geode-image {
+  width: 80px;
+  height: 80px;
+  animation: geodeRock 2s ease-in-out infinite;
+}
+
+@keyframes geodeRock {
+  0%,
+  100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+.geode-crack-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.5) 0%,
+    transparent 60%
+  );
+  border-radius: 50%;
+  opacity: 0;
+  animation: geodeCrack 3s ease-in-out infinite;
+}
+
+@keyframes geodeCrack {
+  0%,
+  80% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  90% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+.geode-results {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.geode-result {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 8px;
+  animation: resultAppear 0.5s ease-out;
+}
+
+@keyframes resultAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.geode-result.part {
+  border-color: rgba(0, 255, 136, 0.6);
+  background: rgba(0, 255, 136, 0.2);
+}
+
+.geode-result.currency {
+  border-color: rgba(255, 215, 0, 0.6);
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.result-icon img {
+  width: 32px;
+  height: 32px;
+}
+
+.result-text {
+  color: white;
+  font-weight: bold;
+}
+
+.collect-results-button {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 136, 0.3) 0%,
+    rgba(0, 200, 100, 0.5) 100%
+  );
+  border: 2px solid rgba(0, 255, 136, 0.6);
+  border-radius: 8px;
+  color: var(--primary-color);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.collect-results-button:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 136, 0.5) 0%,
+    rgba(0, 200, 100, 0.7) 100%
+  );
+  border-color: var(--glow-bright);
+  transform: translateY(-2px);
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .mining-content {
+    flex-direction: column;
+  }
+
+  .side-panel {
+    max-width: none;
+    flex: none;
+  }
+
+  .machines-container {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .mining-header {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+  }
+
+  .currency-display {
+    gap: 10px;
+  }
+
+  .currency-item {
+    padding: 8px 12px;
+  }
+
+  .mining-content {
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .machines-container {
+    grid-template-columns: 1fr;
+  }
+
+  .machine-container {
+    padding: 15px;
+  }
+
+  .parts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mecha-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .modal-content {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mining-header {
+    padding: 10px;
+  }
+
+  .mine-title h1 {
+    font-size: 1.5rem;
+  }
+
+  .currency-item {
+    padding: 6px 10px;
+  }
+
+  .currency-item img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .mining-content {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .machine-container {
+    padding: 12px;
+  }
+
+  .machine-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .mecha-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .modal-content {
+    padding: 15px;
+    width: 95%;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .machine-glow,
+  .mecha-glow,
+  .geode-image,
+  .build-mecha-button,
+  .auto-mining-indicator {
+    animation: none !important;
+  }
+
+  .energy-fill::after {
+    animation: none !important;
+  }
+}
+
+/* Focus states */
+.machine-button:focus,
+.geode-button:focus,
+.build-mecha-button:focus,
+.combat-button:focus,
+.collect-results-button:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .machine-container,
+  .mecha-display,
+  .parts-inventory,
+  .combat-access {
+    border-width: 3px;
+  }
+
+  .energy-bar,
+  .parts-progress .progress-bar {
+    border-width: 2px;
+  }
+}

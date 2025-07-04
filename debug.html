@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/startscreen.css" />
     <link rel="stylesheet" href="css/mapscreen.css" />
+    <link rel="stylesheet" href="css/miningscreen.css" />
 
     <style>
       * {
@@ -154,6 +155,30 @@
         cursor: not-allowed;
       }
 
+      /* Mine selector for MiningScreen */
+      .mine-selector {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #333;
+      }
+
+      .mine-selector h5 {
+        color: #00ccff;
+        font-size: 10px;
+        margin-bottom: 5px;
+        text-align: center;
+      }
+
+      .mine-selector select {
+        width: 100%;
+        padding: 5px;
+        background: rgba(51, 51, 51, 0.8);
+        color: white;
+        border: 1px solid #555;
+        border-radius: 3px;
+        font-size: 11px;
+      }
+
       /* Game Container */
       #game-container {
         width: 100%;
@@ -264,30 +289,43 @@
     <!-- Debug Panel -->
     <div class="debug-panel">
       <h3>🐛 Debug Interface</h3>
-      <button class="debug-btn" data-screen="start" data-file="StartScreen.js">
+      <button class="debug-btn" data-screen="start" data-file="startscreen.js">
         🚀 Start Screen
       </button>
-      <button class="debug-btn" data-screen="map" data-file="MapScreen.js">
+      <button class="debug-btn" data-screen="map" data-file="mapscreen.js">
         🗺️ Map Screen
       </button>
       <button
         class="debug-btn"
         data-screen="mining"
-        data-file="MiningScreen.js"
+        data-file="miningscreen.js"
       >
         ⛏️ Mining Screen
       </button>
+
+      <!-- Mine selector for MiningScreen -->
+      <div class="mine-selector" id="mine-selector" style="display: none">
+        <h5>Select Mine:</h5>
+        <select id="mine-select">
+          <option value="mine1">Mine 1 (Rock Mine)</option>
+          <option value="mine2">Mine 2 (Ice Mine)</option>
+          <option value="mine3">Mine 3 (Crystal Mine)</option>
+          <option value="mine4">Mine 4 (Gas Mine)</option>
+          <option value="mine5">Mine 5 (Rare Earth Mine)</option>
+        </select>
+      </div>
+
       <button
         class="debug-btn"
         data-screen="combat"
-        data-file="CombatScreen.js"
+        data-file="combatscreen.js"
       >
         ⚔️ Combat Screen
       </button>
       <button
         class="debug-btn"
         data-screen="trading"
-        data-file="TradingScreen.js"
+        data-file="tradingscreen.js"
       >
         🏪 Trading Post
       </button>
@@ -318,6 +356,12 @@
         <button class="debug-mini-btn" id="unlock-mines" disabled>
           Unlock All
         </button>
+        <button class="debug-mini-btn" id="add-parts" disabled>
+          Add Parts
+        </button>
+        <button class="debug-mini-btn" id="add-geodes" disabled>
+          Add Geodes
+        </button>
       </div>
     </div>
 
@@ -331,8 +375,10 @@
             Make sure you have the following files:
           </p>
           <p style="font-size: 0.8rem; color: #666">
-            js/Screen.js, js/StartScreen.js, js/MapScreen.js, css/styles.css,
-            css/startscreen.css, css/mapscreen.css
+            js/screen.js, js/startscreen.js, js/mapscreen.js,
+            js/miningscreen.js<br />
+            css/styles.css, css/startscreen.css, css/mapscreen.css,
+            css/miningscreen.css
           </p>
         </div>
       </div>
@@ -340,7 +386,7 @@
 
     <!-- Load Scripts in Order -->
     <script src="js/config.js"></script>
-    <script src="js/Screen.js"></script>
+    <script src="js/screen.js"></script>
     <script>
       // Debug System - Enhanced for refactored screen system
       class DebugSystem {
@@ -349,6 +395,7 @@
           this.loadedScreens = new Map();
           this.loadedScripts = new Set();
           this.isLoading = false;
+          this.selectedMine = "mine1"; // Default mine for MiningScreen
           this.init();
         }
 
@@ -374,10 +421,31 @@
               const screenName = e.target.dataset.screen;
               const fileName = e.target.dataset.file;
 
+              // Show mine selector for mining screen
+              if (screenName === "mining") {
+                this.showMineSelector();
+              } else {
+                this.hideMineSelector();
+              }
+
               await this.loadScreen(screenName, fileName);
               this.updateDebugButtons(e.target);
             });
           });
+
+          // Mine selector change
+          document
+            .getElementById("mine-select")
+            .addEventListener("change", (e) => {
+              this.selectedMine = e.target.value;
+              // If mining screen is currently active, reload it with new mine
+              if (
+                this.currentScreen &&
+                this.currentScreen.constructor.name === "MiningScreen"
+              ) {
+                this.loadScreen("mining", "miningscreen.js");
+              }
+            });
 
           // Debug control buttons
           document
@@ -434,6 +502,34 @@
                 this.updateStatus("All mines unlocked");
               }
             });
+
+          // MiningScreen specific controls
+          document.getElementById("add-parts").addEventListener("click", () => {
+            if (this.currentScreen && this.currentScreen.addPart) {
+              const mineConfig = GAME_CONFIG.mines[this.selectedMine];
+              const mechaType = mineConfig.mecha;
+              const partName = `${mechaType}-1`;
+              this.currentScreen.addPart(partName);
+              this.updateStatus(`Added ${partName} part`);
+            }
+          });
+
+          document
+            .getElementById("add-geodes")
+            .addEventListener("click", () => {
+              if (this.currentScreen && this.currentScreen.addGeode) {
+                this.currentScreen.addGeode("machine1");
+                this.updateStatus("Added geode to machine1");
+              }
+            });
+        }
+
+        showMineSelector() {
+          document.getElementById("mine-selector").style.display = "block";
+        }
+
+        hideMineSelector() {
+          document.getElementById("mine-selector").style.display = "none";
         }
 
         async loadScreen(screenName, fileName) {
@@ -469,7 +565,16 @@
             // Check if screen class exists
             const screenClassName = this.getScreenClassName(screenName);
             if (window[screenClassName]) {
-              this.currentScreen = new window[screenClassName](container);
+              // Special handling for MiningScreen which takes a mine parameter
+              if (screenName === "mining") {
+                this.currentScreen = new window[screenClassName](
+                  container,
+                  this.selectedMine
+                );
+              } else {
+                this.currentScreen = new window[screenClassName](container);
+              }
+
               this.currentScreen.init();
 
               this.updateStatus(`${screenName} loaded successfully`);
@@ -514,9 +619,15 @@
         }
 
         getScreenClassName(screenName) {
-          // Handle special case for StartScreen
+          // Handle special cases
           if (screenName === "start") {
             return "StartScreen";
+          }
+          if (screenName === "map") {
+            return "MapScreen";
+          }
+          if (screenName === "mining") {
+            return "MiningScreen";
           }
 
           // Convert kebab-case to PascalCase
@@ -536,7 +647,7 @@
                 <h2>❌ Error Loading ${screenName}</h2>
                 <p style="margin-top: 15px;">${errorMessage}</p>
                 <p style="margin-top: 10px; font-size: 0.9rem; color: #999;">
-                  Make sure js/${screenName}Screen.js exists and extends Screen class
+                  Make sure js/${screenName}screen.js exists and extends Screen class
                 </p>
                 <p style="margin-top: 5px; font-size: 0.8rem; color: #666;">
                   Check the console for more details
@@ -570,30 +681,32 @@
         updateDebugControls(screenName) {
           const controls = document.querySelectorAll(".debug-mini-btn");
 
+          // Reset all controls
+          controls.forEach((control) => (control.disabled = true));
+
           if (screenName === "start") {
             // Enable StartScreen specific controls
             document.getElementById("skip-to-click").disabled = false;
             document.getElementById("skip-to-main").disabled = false;
             document.getElementById("debug-info-btn").disabled = false;
             document.getElementById("reset-screen").disabled = false;
-            document.getElementById("add-currency").disabled = true;
-            document.getElementById("unlock-mines").disabled = true;
           } else if (screenName === "map") {
             // Enable MapScreen specific controls
-            document.getElementById("skip-to-click").disabled = true;
-            document.getElementById("skip-to-main").disabled = true;
             document.getElementById("debug-info-btn").disabled = false;
             document.getElementById("reset-screen").disabled = false;
             document.getElementById("add-currency").disabled = false;
             document.getElementById("unlock-mines").disabled = false;
-          } else {
-            // Generic controls for other screens
-            document.getElementById("skip-to-click").disabled = true;
-            document.getElementById("skip-to-main").disabled = true;
+          } else if (screenName === "mining") {
+            // Enable MiningScreen specific controls
             document.getElementById("debug-info-btn").disabled = false;
             document.getElementById("reset-screen").disabled = false;
-            document.getElementById("add-currency").disabled = true;
-            document.getElementById("unlock-mines").disabled = true;
+            document.getElementById("add-currency").disabled = false;
+            document.getElementById("add-parts").disabled = false;
+            document.getElementById("add-geodes").disabled = false;
+          } else {
+            // Generic controls for other screens
+            document.getElementById("debug-info-btn").disabled = false;
+            document.getElementById("reset-screen").disabled = false;
           }
         }
 
@@ -619,7 +732,11 @@
         }
 
         updateCurrentScreen(screenName) {
-          document.getElementById("current-screen").textContent = screenName;
+          const displayName =
+            screenName === "mining"
+              ? `${screenName} (${this.selectedMine})`
+              : screenName;
+          document.getElementById("current-screen").textContent = displayName;
         }
 
         updateLoadedCount() {
@@ -639,6 +756,7 @@
         getDebugInfo() {
           return {
             currentScreen: this.currentScreen?.constructor.name || "None",
+            selectedMine: this.selectedMine,
             loadedScreens: this.getLoadedScreens(),
             loadedScripts: Array.from(this.loadedScripts),
             isLoading: this.isLoading,
@@ -648,6 +766,10 @@
                   gamePhase: this.currentScreen.gamePhase,
                   clickCount: this.currentScreen.clickCount,
                   energyLevel: this.currentScreen.energyLevel,
+                  mineId: this.currentScreen.mineId,
+                  currency: this.currentScreen.currency,
+                  collectedParts: this.currentScreen.collectedParts,
+                  hasMecha: this.currentScreen.hasMecha,
                 }
               : null,
           };
@@ -683,6 +805,33 @@
               window.debugSystem
                 .getCurrentScreen()
                 ?.setCurrency(currency, amount),
+          },
+          mining: {
+            addCurrency: (amount) =>
+              window.debugSystem.getCurrentScreen()?.addCurrency(amount),
+            addPart: (partName) =>
+              window.debugSystem.getCurrentScreen()?.addPart(partName),
+            addGeode: (machineId) =>
+              window.debugSystem.getCurrentScreen()?.addGeode(machineId),
+            addAllParts: () => {
+              const screen = window.debugSystem.getCurrentScreen();
+              if (screen && screen.mineConfig) {
+                const mechaType = screen.mineConfig.mecha;
+                for (let i = 1; i <= 6; i++) {
+                  screen.addPart(`${mechaType}-${i}`);
+                }
+              }
+            },
+            fillEnergy: (machineId = "machine1") => {
+              const screen = window.debugSystem.getCurrentScreen();
+              if (screen && screen.machines) {
+                const machine = screen.machines.find((m) => m.id === machineId);
+                if (machine) {
+                  machine.energyLevel = 100;
+                  screen.updateMachineUI(machine);
+                }
+              }
+            },
           },
         };
 
