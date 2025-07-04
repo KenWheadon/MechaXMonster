@@ -235,6 +235,12 @@
   text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
 }
 
+.machine-controls-header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .geode-counter {
   position: relative;
   transition: all 0.3s ease;
@@ -296,6 +302,121 @@
   font-family: "Courier New", monospace;
   font-size: 1rem;
   font-weight: bold;
+}
+
+/* Upgrade Button */
+.upgrade-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: rgba(255, 165, 0, 0.2);
+  border: 2px solid rgba(255, 165, 0, 0.5);
+  border-radius: 20px;
+  color: #ffa500;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.upgrade-button:hover {
+  background: rgba(255, 165, 0, 0.4);
+  border-color: #ffa500;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+}
+
+.upgrade-button img {
+  width: 16px;
+  height: 16px;
+  filter: drop-shadow(0 0 5px rgba(255, 165, 0, 0.7));
+}
+
+/* Geode Drawer */
+.geode-drawer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  opacity: 0;
+}
+
+.geode-drawer.open {
+  max-height: 200px;
+  opacity: 1;
+  padding: 10px;
+}
+
+.geode-drawer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.geode-title {
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.geode-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.geode-item {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.geode-item:hover {
+  transform: scale(1.1);
+}
+
+.geode-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+}
+
+.geode-click-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-radius: 5px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.geode-item:hover .geode-click-overlay {
+  opacity: 1;
+}
+
+.no-geodes {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  font-size: 0.9rem;
 }
 
 /* Machine Main Content */
@@ -538,7 +659,9 @@
 .machine-purchase {
   display: flex;
   justify-content: center;
+  gap: 15px;
   margin-top: 20px;
+  flex-wrap: wrap;
 }
 
 .purchase-machine-button {
@@ -554,6 +677,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   flex-direction: column;
+  min-width: 150px;
 }
 
 .purchase-machine-button:disabled {
@@ -577,6 +701,7 @@
 .purchase-cost {
   font-size: 0.8rem;
   opacity: 0.8;
+  text-align: center;
 }
 
 /* SIDE PANEL */
@@ -899,8 +1024,8 @@
   filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5));
 }
 
-/* GEODE MODAL */
-.geode-modal {
+/* SLOT MACHINE MODAL */
+.slot-machine-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -914,11 +1039,11 @@
   backdrop-filter: blur(10px);
 }
 
-.geode-modal.hidden {
+.slot-machine-modal.hidden {
   display: none;
 }
 
-.modal-content {
+.slot-machine-modal .modal-content {
   background: linear-gradient(
     135deg,
     rgba(0, 0, 0, 0.9) 0%,
@@ -935,7 +1060,7 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
-.modal-header {
+.slot-machine-modal .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -944,14 +1069,14 @@
   border-bottom: 1px solid rgba(0, 255, 136, 0.3);
 }
 
-.modal-header h2 {
+.slot-machine-modal .modal-header h2 {
   color: var(--primary-color);
   margin: 0;
   font-size: 1.5rem;
   text-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
 }
 
-.close-modal-button {
+.close-slot-modal-button {
   background: none;
   border: none;
   color: #999;
@@ -966,121 +1091,121 @@
   justify-content: center;
 }
 
-.close-modal-button:hover {
+.close-slot-modal-button:hover {
   color: #fff;
   background: rgba(255, 255, 255, 0.1);
 }
 
-.geode-animation {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.geode-container {
-  position: relative;
-  display: inline-block;
-}
-
-.geode-image {
-  width: 100px;
-  height: 100px;
-  object-fit: contain;
-  filter: drop-shadow(0 10px 20px rgba(255, 215, 0, 0.5));
-  animation: geodeFloat 3s ease-in-out infinite;
-}
-
-@keyframes geodeFloat {
-  0%,
-  100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-10px) rotate(180deg);
-  }
-}
-
-.geode-crack-effect {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 215, 0, 0.5) 0%,
-    transparent 70%
-  );
-  border-radius: 50%;
-  opacity: 0;
-  animation: geodeCrack 2s ease-in-out infinite;
-}
-
-@keyframes geodeCrack {
-  0%,
-  100% {
-    opacity: 0;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.3);
-  }
-}
-
-.geode-results {
+.slot-machine-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 20px;
+  align-items: center;
 }
 
-.geode-result {
+.slot-machine {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  border: 2px solid rgba(0, 255, 136, 0.5);
+  border-radius: 15px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.slot-reels {
+  display: flex;
+  gap: 15px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.slot-reel {
+  width: 80px;
+  height: 80px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid rgba(0, 255, 136, 0.4);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 15px;
-  padding: 10px 15px;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(0, 255, 136, 0.3);
-  border-radius: 10px;
-  animation: resultAppear 0.5s ease-out;
+  justify-content: center;
 }
 
-.geode-result.part {
-  border-color: rgba(0, 255, 136, 0.6);
-  background: rgba(0, 255, 136, 0.1);
-}
-
-.geode-result.currency {
-  border-color: rgba(255, 215, 0, 0.6);
-  background: rgba(255, 215, 0, 0.1);
-}
-
-@keyframes resultAppear {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.result-icon img {
-  width: 30px;
-  height: 30px;
-  filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.5));
-}
-
-.result-text {
-  color: white;
-  font-weight: bold;
-  flex: 1;
-}
-
-.collect-results-button {
+.reel-symbols {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
   width: 100%;
+}
+
+.reel-symbol {
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--primary-color);
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+@keyframes slotSpin {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-200px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.slot-result {
   padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+
+.slot-result.success {
+  background: rgba(0, 255, 136, 0.2);
+  border: 1px solid rgba(0, 255, 136, 0.5);
+  color: var(--primary-color);
+}
+
+.slot-result.failure {
+  background: rgba(255, 0, 0, 0.2);
+  border: 1px solid rgba(255, 0, 0, 0.5);
+  color: #ff6b6b;
+}
+
+.slot-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.spin-cost {
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 1.1rem;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.spin-button {
+  padding: 12px 30px;
   background: linear-gradient(
     135deg,
     rgba(0, 255, 136, 0.8) 0%,
@@ -1090,13 +1215,13 @@
   border-radius: 25px;
   color: black;
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
 }
 
-.collect-results-button:hover {
+.spin-button:hover {
   background: linear-gradient(
     135deg,
     rgba(0, 255, 136, 1) 0%,
@@ -1121,7 +1246,7 @@
 .mecha-display,
 .parts-inventory,
 .combat-access,
-.geode-modal {
+.slot-machine-modal {
   position: relative;
   z-index: 20;
 }
@@ -1130,7 +1255,10 @@
 .build-mecha-button,
 .combat-button,
 .geode-button,
-.back-button {
+.upgrade-button,
+.back-button,
+.purchase-machine-button,
+.spin-button {
   position: relative;
   z-index: 25;
   pointer-events: auto;
@@ -1149,6 +1277,11 @@
 
   .machines-container {
     grid-template-columns: 1fr;
+  }
+
+  .machine-purchase {
+    flex-direction: column;
+    align-items: center;
   }
 }
 
@@ -1214,13 +1347,32 @@
     height: 60px;
   }
 
+  .machine-controls-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
   .parts-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .modal-content {
+  .slot-machine-modal .modal-content {
     padding: 20px;
     margin: 20px;
+  }
+
+  .slot-reels {
+    gap: 10px;
+    padding: 15px;
+  }
+
+  .slot-reel {
+    width: 60px;
+    height: 60px;
+  }
+
+  .reel-symbol {
+    font-size: 1.5rem;
   }
 }
 
@@ -1285,14 +1437,23 @@
     gap: 6px;
   }
 
-  .geode-image {
-    width: 80px;
-    height: 80px;
-  }
-
-  .modal-content {
+  .slot-machine-modal .modal-content {
     padding: 15px;
     margin: 15px;
+  }
+
+  .slot-reels {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .slot-reel {
+    width: 50px;
+    height: 50px;
+  }
+
+  .reel-symbol {
+    font-size: 1.2rem;
   }
 }
 
@@ -1301,7 +1462,8 @@
   .machine-glow,
   .mecha-glow,
   .geode-image,
-  .auto-indicator-pulse {
+  .auto-indicator-pulse,
+  .slot-reel {
     animation: none !important;
   }
 }
@@ -1311,13 +1473,17 @@
   .machine-container,
   .mecha-display,
   .parts-inventory,
-  .combat-access {
+  .combat-access,
+  .slot-machine-modal .modal-content {
     border-width: 3px;
   }
 
   .machine-button,
   .build-mecha-button,
-  .combat-button {
+  .combat-button,
+  .geode-button,
+  .upgrade-button,
+  .spin-button {
     border-width: 3px;
   }
 }

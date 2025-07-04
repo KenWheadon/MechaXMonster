@@ -360,12 +360,12 @@ const GAME_CONFIG = {
     },
   },
 
-  // Upgrade templates
+  // Upgrade templates - Updated with proper effects
   upgrades: {
     reduce_time: {
       name: "Speed Boost",
       description: "Reduce mining time by 10%",
-      effect: -0.1,
+      effect: 0.1, // 10% reduction
       type: "time_multiplier",
     },
     increase_output: {
@@ -376,8 +376,8 @@ const GAME_CONFIG = {
     },
     output_multiplier: {
       name: "Efficiency",
-      description: "+0.1x per 100 currency stored",
-      effect: 0.001,
+      description: "+0.1% per 100 currency stored",
+      effect: 0.001, // 0.1% per 100 currency
       type: "storage_multiplier",
     },
     part_drop_rate: {
@@ -411,6 +411,9 @@ const GAME_CONFIG = {
       mining_complete: "mining-complete.mp3",
       mecha_build: "mecha-build.mp3",
       combat_start: "combat-start.mp3",
+      slot_spin: "slot-spin.mp3",
+      upgrade_success: "upgrade-success.mp3",
+      geode_open: "geode-open.mp3",
     },
   },
 
@@ -427,6 +430,14 @@ const GAME_CONFIG = {
   trainingRates: {
     currencyToTraining: 0.5, // 1 currency = 0.5 training credits
     trainingToCurrency: 2.0, // 1 training credit = 2 currency
+  },
+
+  // Machine purchase costs - Updated per requirements
+  machineCosts: {
+    machine1: { shells: 0, monster_shells: 0 }, // Free
+    machine2: { shells: 25, monster_shells: 1 }, // 25 shells + 1 monster
+    machine3: { shells: 50, monster_shells: 10 }, // 50 shells + 10 monster
+    machine4: { shells: 500, monster_shells: 100 }, // 500 shells + 100 monster
   },
 };
 
@@ -487,6 +498,72 @@ const CONFIG_UTILS = {
   getRandomMonsterImage(monsterType) {
     const imageIndex = Math.floor(Math.random() * 3) + 1; // 1-3
     return this.getMonsterImagePath(monsterType, imageIndex);
+  },
+
+  // Get machine cost by index
+  getMachineCost(machineIndex) {
+    const costKey = `machine${machineIndex + 1}`;
+    return (
+      GAME_CONFIG.machineCosts[costKey] || { shells: 0, monster_shells: 0 }
+    );
+  },
+
+  // Check if upgrade is available (not at maximum)
+  canUpgrade(upgradeType, currentLevel) {
+    // Define maximum levels for each upgrade type
+    const maxLevels = {
+      reduce_time: 10, // Maximum 100% reduction (never reaches 0)
+      increase_output: 50, // Maximum +50 bonus output
+      output_multiplier: 100, // Maximum 10% multiplier
+      part_drop_rate: 95, // Maximum 95% (never reaches 100%)
+    };
+
+    const maxLevel = maxLevels[upgradeType] || 1;
+    return currentLevel < maxLevel;
+  },
+
+  // Get upgrade symbol for slot machine
+  getUpgradeSymbol(upgradeType) {
+    const symbols = {
+      reduce_time: "⚡",
+      increase_output: "💰",
+      output_multiplier: "🔧",
+      part_drop_rate: "💎",
+      nothing: "❌",
+    };
+    return symbols[upgradeType] || "❓";
+  },
+
+  // Calculate adjusted mining interval based on upgrades
+  calculateMiningInterval(baseInterval, timeReduction) {
+    const reduction = Math.min(timeReduction, 0.95); // Cap at 95% reduction
+    return Math.max(baseInterval * (1 - reduction), 100); // Minimum 100ms
+  },
+
+  // Calculate total currency output including upgrades
+  calculateCurrencyOutput(baseOutput, upgrades, storedCurrency, hasMecha) {
+    let totalOutput = baseOutput;
+
+    // Apply mecha bonus
+    if (hasMecha) {
+      totalOutput *= 2;
+    }
+
+    // Apply output bonus
+    totalOutput += upgrades.outputBonus || 0;
+
+    // Apply storage multiplier
+    const storageMultiplier =
+      (upgrades.outputMultiplier || 0) * Math.floor(storedCurrency / 100);
+    totalOutput *= 1 + storageMultiplier;
+
+    return Math.floor(totalOutput);
+  },
+
+  // Calculate geode drop rate including upgrades
+  calculateGeodeDropRate(baseDropRate, upgrades) {
+    const bonusRate = upgrades.partDropRate || 0;
+    return Math.min(baseDropRate + bonusRate, 1.0); // Cap at 100%
   },
 };
 

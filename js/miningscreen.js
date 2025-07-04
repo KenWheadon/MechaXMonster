@@ -17,7 +17,23 @@ class MiningScreen extends Screen {
         isActive: false,
         geodeCount: 0,
         isAutoMining: false,
+        upgrades: {
+          timeReduction: 0,
+          outputBonus: 0,
+          outputMultiplier: 0,
+          partDropRate: 0,
+        },
+        upgradeSpinCost: 10, // Starting cost for upgrades
+        geodeDrawerOpen: false,
       },
+    ];
+
+    // Machine costs - updated per requirements
+    this.machineCosts = [
+      { shells: 0, monster_shells: 0 }, // Machine 1 (free)
+      { shells: 25, monster_shells: 1 }, // Machine 2
+      { shells: 50, monster_shells: 10 }, // Machine 3
+      { shells: 500, monster_shells: 100 }, // Machine 4
     ];
 
     // Parts and currency state
@@ -31,6 +47,7 @@ class MiningScreen extends Screen {
     // UI state
     this.selectedMachine = null;
     this.isOpeningGeodes = false;
+    this.activeSlotMachine = null;
 
     // DOM element cache
     this.elements = {};
@@ -70,8 +87,7 @@ class MiningScreen extends Screen {
       partsGrid: this.container.querySelector(".parts-grid"),
       buildMechaButton: this.container.querySelector(".build-mecha-button"),
       mechaDisplay: this.container.querySelector(".mecha-display"),
-      geodeModal: this.container.querySelector(".geode-modal"),
-      geodeResults: this.container.querySelector(".geode-results"),
+      slotMachineModal: this.container.querySelector(".slot-machine-modal"),
       machines: {},
     };
 
@@ -89,6 +105,8 @@ class MiningScreen extends Screen {
           machineButton: container.querySelector(".machine-button"),
           geodeCounter: container.querySelector(".geode-counter"),
           geodeButton: container.querySelector(".geode-button"),
+          upgradeButton: container.querySelector(".upgrade-button"),
+          geodeDrawer: container.querySelector(".geode-drawer"),
           autoMiningIndicator: container.querySelector(
             ".auto-mining-indicator"
           ),
@@ -148,11 +166,7 @@ class MiningScreen extends Screen {
             
             <!-- Purchase additional machines -->
             <div class="machine-purchase">
-              <button class="purchase-machine-button btn btn-secondary" disabled>
-                <img src="images/icon-plus.png" alt="Add Machine" />
-                <span>Add Machine</span>
-                <div class="purchase-cost">50 Monster Currency</div>
-              </button>
+              ${this.renderMachinePurchases()}
             </div>
           </div>
 
@@ -163,7 +177,7 @@ class MiningScreen extends Screen {
               <div class="mecha-container">
                 <img src="images/mecha-${this.mineConfig.mecha}.png" alt="${
       this.mechaConfig.name
-    }" class="mecha-image" />
+    }" class="mecha-image" style="opacity: ${this.hasMecha ? 1 : 0.2};" />
                 <div class="mecha-glow"></div>
                 <div class="mecha-status">
                   ${
@@ -210,25 +224,37 @@ class MiningScreen extends Screen {
           </div>
         </div>
 
-        <!-- Geode opening modal -->
-        <div class="geode-modal hidden">
+        <!-- Slot Machine Modal -->
+        <div class="slot-machine-modal hidden">
           <div class="modal-content">
             <div class="modal-header">
-              <h2>Opening Geodes</h2>
-              <button class="close-modal-button">×</button>
+              <h2>Machine Upgrades</h2>
+              <button class="close-slot-modal-button">×</button>
             </div>
-            <div class="geode-animation">
-              <div class="geode-container">
-                <img src="images/geode-${
-                  this.mineConfig.mecha
-                }.png" alt="Geode" class="geode-image" />
-                <div class="geode-crack-effect"></div>
+            <div class="slot-machine-container">
+              <div class="slot-machine">
+                <div class="slot-reels">
+                  <div class="slot-reel" data-reel="0">
+                    <div class="reel-symbols"></div>
+                  </div>
+                  <div class="slot-reel" data-reel="1">
+                    <div class="reel-symbols"></div>
+                  </div>
+                  <div class="slot-reel" data-reel="2">
+                    <div class="reel-symbols"></div>
+                  </div>
+                </div>
+                <div class="slot-result hidden">
+                  <div class="result-text"></div>
+                </div>
+              </div>
+              <div class="slot-controls">
+                <div class="spin-cost">Cost: <span class="cost-amount">10</span> ${
+                  this.mineConfig.currency
+                }</div>
+                <button class="spin-button btn btn-primary">Spin for Upgrade</button>
               </div>
             </div>
-            <div class="geode-results"></div>
-            <button class="collect-results-button btn btn-primary hidden">
-              Collect All
-            </button>
           </div>
         </div>
 
@@ -252,17 +278,33 @@ class MiningScreen extends Screen {
       <div class="machine-container" data-machine="${machine.id}">
         <div class="machine-header">
           <div class="machine-number">Machine ${index + 1}</div>
-          <div class="geode-counter ${
-            machine.geodeCount > 0 ? "has-geodes" : ""
-          }">
-            <button class="geode-button" ${
-              machine.geodeCount > 0 ? "" : "disabled"
-            }>
-              <img src="images/geode-${
-                this.mineConfig.mecha
-              }.png" alt="Geodes" />
-              <span class="geode-count">${machine.geodeCount}</span>
+          <div class="machine-controls-header">
+            <div class="geode-counter ${
+              machine.geodeCount > 0 ? "has-geodes" : ""
+            }">
+              <button class="geode-button" ${
+                machine.geodeCount > 0 ? "" : "disabled"
+              }>
+                <img src="images/geode-${
+                  this.mineConfig.mecha
+                }.png" alt="Geodes" />
+                <span class="geode-count">${machine.geodeCount}</span>
+              </button>
+            </div>
+            <button class="upgrade-button btn btn-secondary">
+              <img src="images/icon-upgrade.png" alt="Upgrade" />
+              <span>Upgrade</span>
             </button>
+          </div>
+        </div>
+        
+        <!-- Geode Drawer -->
+        <div class="geode-drawer ${machine.geodeDrawerOpen ? "open" : ""}">
+          <div class="geode-drawer-content">
+            <div class="geode-title">Click geodes to open:</div>
+            <div class="geode-list">
+              ${this.renderGeodeList(machine)}
+            </div>
           </div>
         </div>
         
@@ -299,6 +341,54 @@ class MiningScreen extends Screen {
     `
       )
       .join("");
+  }
+
+  renderGeodeList(machine) {
+    if (machine.geodeCount === 0) {
+      return '<div class="no-geodes">No geodes collected</div>';
+    }
+
+    let geodeHtml = "";
+    for (let i = 0; i < machine.geodeCount; i++) {
+      geodeHtml += `
+        <div class="geode-item" data-geode="${i}">
+          <img src="images/geode-${this.mineConfig.mecha}.png" alt="Geode" />
+          <div class="geode-click-overlay">Click!</div>
+        </div>
+      `;
+    }
+    return geodeHtml;
+  }
+
+  renderMachinePurchases() {
+    let html = "";
+    for (let i = 1; i < 4; i++) {
+      // Machines 2, 3, 4
+      if (this.machines.length <= i) {
+        const cost = this.machineCosts[i];
+        const canAfford =
+          this.currency >= cost.shells &&
+          this.monsterCurrency >= cost.monster_shells;
+
+        html += `
+          <button class="purchase-machine-button btn btn-secondary" 
+                  data-machine-index="${i}" 
+                  ${canAfford ? "" : "disabled"}>
+            <img src="images/icon-plus.png" alt="Add Machine" />
+            <span>Add Machine ${i + 1}</span>
+            <div class="purchase-cost">
+              ${cost.shells} ${this.mineConfig.currency}
+              ${
+                cost.monster_shells > 0
+                  ? `+ ${cost.monster_shells} Monster`
+                  : ""
+              }
+            </div>
+          </button>
+        `;
+      }
+    }
+    return html;
   }
 
   renderPartsGrid() {
@@ -339,22 +429,33 @@ class MiningScreen extends Screen {
       });
     }
 
-    // Geode modal
-    const closeModalBtn = this.container.querySelector(".close-modal-button");
-    if (closeModalBtn) {
-      closeModalBtn.addEventListener("click", () => {
-        this.closeGeodeModal();
+    // Slot machine modal
+    const closeSlotModalBtn = this.container.querySelector(
+      ".close-slot-modal-button"
+    );
+    if (closeSlotModalBtn) {
+      closeSlotModalBtn.addEventListener("click", () => {
+        this.closeSlotMachineModal();
       });
     }
 
-    const collectResultsBtn = this.container.querySelector(
-      ".collect-results-button"
-    );
-    if (collectResultsBtn) {
-      collectResultsBtn.addEventListener("click", () => {
-        this.collectGeodeResults();
+    const spinButton = this.container.querySelector(".spin-button");
+    if (spinButton) {
+      spinButton.addEventListener("click", () => {
+        this.handleSlotMachineSpin();
       });
     }
+
+    // Machine purchase buttons
+    const purchaseButtons = this.container.querySelectorAll(
+      ".purchase-machine-button"
+    );
+    purchaseButtons.forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const machineIndex = parseInt(e.currentTarget.dataset.machineIndex);
+        this.handleMachinePurchase(machineIndex);
+      });
+    });
   }
 
   // Clean machine event listeners - single method only
@@ -372,8 +473,22 @@ class MiningScreen extends Screen {
             this.handleGeodeClick(machineId);
           });
         }
+
+        if (machineElements && machineElements.upgradeButton) {
+          machineElements.upgradeButton.addEventListener("click", (e) => {
+            this.handleUpgradeClick(machineId);
+          });
+        }
       }
     );
+
+    // Set up geode item click listeners
+    const geodeItems = this.container.querySelectorAll(".geode-item");
+    geodeItems.forEach((item) => {
+      item.addEventListener("click", (e) => {
+        this.handleIndividualGeodeClick(e.currentTarget);
+      });
+    });
   }
 
   // Event handlers
@@ -430,11 +545,24 @@ class MiningScreen extends Screen {
     console.log(`💎 Mining cycle completed for ${machine.id}`);
 
     // Generate currency (auto-collected)
-    const currencyGain = this.mineConfig.baseOutput * (this.hasMecha ? 2 : 1);
-    this.currency += currencyGain;
+    const baseCurrency = this.mineConfig.baseOutput * (this.hasMecha ? 2 : 1);
+    const bonusCurrency = machine.upgrades.outputBonus;
+    const multiplier =
+      1 + machine.upgrades.outputMultiplier * Math.floor(this.currency / 100);
+    const totalCurrency = Math.floor(
+      (baseCurrency + bonusCurrency) * multiplier
+    );
 
-    const dropRate = this.mineId === "mine1" ? 0.5 : 0.05;
-    if (Math.random() < dropRate) {
+    this.currency += totalCurrency;
+
+    // Check for geode drop with upgraded drop rate
+    const baseDropRate = this.mineId === "mine1" ? 0.5 : 0.05;
+    const upgradedDropRate = Math.min(
+      baseDropRate + machine.upgrades.partDropRate,
+      1.0
+    );
+
+    if (Math.random() < upgradedDropRate) {
       machine.geodeCount++;
       this.showTemporaryMessage("Geode found! 💎", "success");
     }
@@ -460,133 +588,315 @@ class MiningScreen extends Screen {
     const machine = this.machines.find((m) => m.id === machineId);
     if (!machine || machine.geodeCount === 0) return;
 
-    console.log(`💎 Opening geodes for ${machineId}`);
+    console.log(`💎 Toggling geode drawer for ${machineId}`);
 
-    // Collect geodes for opening
-    this.geodes = Array(machine.geodeCount)
-      .fill()
-      .map(() => ({
-        machineId,
-        opened: false,
-        result: null,
-      }));
-
-    machine.geodeCount = 0;
+    // Toggle drawer
+    machine.geodeDrawerOpen = !machine.geodeDrawerOpen;
     this.updateMachineUI(machine);
-
-    // Show geode modal
-    this.showGeodeModal();
   }
 
-  showGeodeModal() {
-    const modal = this.elements.geodeModal;
-    if (!modal) return;
+  handleIndividualGeodeClick(geodeElement) {
+    console.log("🎯 Individual geode clicked");
 
-    modal.classList.remove("hidden");
-    this.isOpeningGeodes = true;
+    // Get the machine this geode belongs to
+    const machineContainer = geodeElement.closest(".machine-container");
+    const machineId = machineContainer.dataset.machine;
+    const machine = this.machines.find((m) => m.id === machineId);
 
-    // Start geode opening animation
-    this.setManagedTimeout(() => {
-      this.openGeodes();
-    }, 1000);
-  }
+    if (!machine) return;
 
-  closeGeodeModal() {
-    const modal = this.elements.geodeModal;
-    if (!modal) return;
+    // Generate reward
+    const dropRate = this.mineId === "mine1" ? 0.25 : 0.05;
+    if (Math.random() < dropRate) {
+      // Sequential part drop
+      const partName = `${this.mineConfig.mecha}-${
+        (this.nextPartIndex % 6) + 1
+      }`;
 
-    modal.classList.add("hidden");
-    this.isOpeningGeodes = false;
-    this.geodes = [];
-  }
-
-  openGeodes() {
-    if (!this.elements.geodeResults) return;
-
-    this.elements.geodeResults.innerHTML = "";
-    const results = [];
-
-    this.geodes.forEach((geode, index) => {
-      // Determine result (25% mecha part, 75% bonus currency)
-      const dropRate = this.mineId === "mine1" ? 0.25 : 0.05;
-      if (Math.random() < dropRate) {
-        // Sequential part drop
-        const partName = `${this.mineConfig.mecha}-${
-          (this.nextPartIndex % 6) + 1
-        }`;
-
-        // Only give part if we don't already have it
-        if (!this.collectedParts.includes(partName)) {
-          results.push({
-            type: "part",
-            item: partName,
-            display: `Mecha Part: ${partName.toUpperCase()}`,
-          });
-          this.collectedParts.push(partName);
-        } else {
-          // Give bonus currency instead
-          const bonus = Math.floor(Math.random() * 20) + 5;
-          results.push({
-            type: "currency",
-            item: bonus,
-            display: `Bonus ${this.mineConfig.currency}: +${bonus}`,
-          });
-          this.currency += bonus;
-        }
-
-        this.nextPartIndex++;
+      // Only give part if we don't already have it
+      if (!this.collectedParts.includes(partName)) {
+        this.collectedParts.push(partName);
+        this.showTemporaryMessage(
+          `Mecha Part Found: ${partName.toUpperCase()}!`,
+          "success"
+        );
       } else {
-        // Bonus currency
+        // Give bonus currency instead
         const bonus = Math.floor(Math.random() * 20) + 5;
-        results.push({
-          type: "currency",
-          item: bonus,
-          display: `Bonus ${this.mineConfig.currency}: +${bonus}`,
-        });
         this.currency += bonus;
+        this.showTemporaryMessage(
+          `Bonus ${this.mineConfig.currency}: +${bonus}`,
+          "success"
+        );
       }
-    });
 
-    // Display results
-    results.forEach((result, index) => {
-      const resultElement = document.createElement("div");
-      resultElement.className = `geode-result ${result.type}`;
-      resultElement.innerHTML = `
-        <div class="result-icon">
-          ${
-            result.type === "part"
-              ? `<img src="images/${result.item}.png" alt="${result.item}" />`
-              : `<img src="images/currency-${this.mineConfig.currency}.png" alt="currency" />`
-          }
-        </div>
-        <div class="result-text">${result.display}</div>
-      `;
-
-      this.elements.geodeResults.appendChild(resultElement);
-    });
-
-    // Show collect button
-    const collectBtn = this.container.querySelector(".collect-results-button");
-    if (collectBtn) {
-      collectBtn.classList.remove("hidden");
+      this.nextPartIndex++;
+    } else {
+      // Bonus currency
+      const bonus = Math.floor(Math.random() * 20) + 5;
+      this.currency += bonus;
+      this.showTemporaryMessage(
+        `Bonus ${this.mineConfig.currency}: +${bonus}`,
+        "success"
+      );
     }
 
-    // Play geode opening sound
+    // Remove this geode
+    machine.geodeCount--;
+    geodeElement.remove();
+
+    // Update UI
+    this.updateMachineUI(machine);
+    this.updateCurrencyDisplay();
+    this.updatePartsDisplay();
+    this.checkMechaBuildability();
+
+    // Play collection sound
     if (this.audioManager) {
       this.audioManager.playSound("geode-open");
     }
+
+    // Close drawer if no more geodes
+    if (machine.geodeCount === 0) {
+      machine.geodeDrawerOpen = false;
+      this.updateMachineUI(machine);
+    }
   }
 
-  collectGeodeResults() {
-    this.closeGeodeModal();
-    this.updateUI();
+  handleUpgradeClick(machineId) {
+    console.log(`🔧 Upgrade clicked for ${machineId}`);
 
-    if (this.audioManager) {
-      this.audioManager.playSound("collect-items");
+    const machine = this.machines.find((m) => m.id === machineId);
+    if (!machine) return;
+
+    // Check if player can afford
+    if (this.currency < machine.upgradeSpinCost) {
+      this.showTemporaryMessage("Not enough currency for upgrade!", "warning");
+      return;
     }
 
-    // Check if we can build mecha
-    this.checkMechaBuildability();
+    this.activeSlotMachine = machineId;
+    this.showSlotMachineModal(machine);
+  }
+
+  handleMachinePurchase(machineIndex) {
+    const cost = this.machineCosts[machineIndex];
+
+    if (
+      this.currency >= cost.shells &&
+      this.monsterCurrency >= cost.monster_shells
+    ) {
+      // Deduct cost
+      this.currency -= cost.shells;
+      this.monsterCurrency -= cost.monster_shells;
+
+      // Add new machine
+      const newMachine = {
+        id: `machine${machineIndex + 1}`,
+        energyLevel: 0,
+        maxEnergy: 100,
+        isActive: false,
+        geodeCount: 0,
+        isAutoMining: false,
+        upgrades: {
+          timeReduction: 0,
+          outputBonus: 0,
+          outputMultiplier: 0,
+          partDropRate: 0,
+        },
+        upgradeSpinCost: 10,
+        geodeDrawerOpen: false,
+      };
+
+      this.machines.push(newMachine);
+
+      // Re-render and update
+      this.render();
+      this.cacheElements();
+      this.setupEventListeners();
+      this.setupMachineEventListeners();
+      this.updateUI();
+
+      this.showTemporaryMessage(
+        `Machine ${machineIndex + 1} purchased!`,
+        "success"
+      );
+    } else {
+      this.showTemporaryMessage("Not enough currency!", "warning");
+    }
+  }
+
+  showSlotMachineModal(machine) {
+    const modal =
+      this.elements.slotMachineModal ||
+      this.container.querySelector(".slot-machine-modal");
+    if (!modal) return;
+
+    // Update cost display
+    const costElement = modal.querySelector(".cost-amount");
+    if (costElement) {
+      costElement.textContent = machine.upgradeSpinCost;
+    }
+
+    // Initialize reels
+    this.initializeSlotReels();
+
+    modal.classList.remove("hidden");
+  }
+
+  closeSlotMachineModal() {
+    const modal =
+      this.elements.slotMachineModal ||
+      this.container.querySelector(".slot-machine-modal");
+    if (modal) {
+      modal.classList.add("hidden");
+    }
+    this.activeSlotMachine = null;
+  }
+
+  initializeSlotReels() {
+    const symbols = ["⚡", "💎", "🔧", "💰", "❌"];
+    const reels = this.container.querySelectorAll(".slot-reel");
+
+    reels.forEach((reel) => {
+      const symbolsContainer = reel.querySelector(".reel-symbols");
+      symbolsContainer.innerHTML = "";
+
+      // Create multiple symbols for spinning effect
+      for (let i = 0; i < 10; i++) {
+        const symbol = document.createElement("div");
+        symbol.className = "reel-symbol";
+        symbol.textContent =
+          symbols[Math.floor(Math.random() * symbols.length)];
+        symbolsContainer.appendChild(symbol);
+      }
+    });
+  }
+
+  handleSlotMachineSpin() {
+    const machine = this.machines.find((m) => m.id === this.activeSlotMachine);
+    if (!machine || this.currency < machine.upgradeSpinCost) return;
+
+    // Deduct cost
+    this.currency -= machine.upgradeSpinCost;
+    this.updateCurrencyDisplay();
+
+    // Spin animation
+    this.playSlotMachineAnimation().then((result) => {
+      this.applySlotMachineResult(machine, result);
+      // Increase cost for next spin
+      machine.upgradeSpinCost = Math.floor(machine.upgradeSpinCost * 1.5);
+    });
+  }
+
+  playSlotMachineAnimation() {
+    return new Promise((resolve) => {
+      const reels = this.container.querySelectorAll(".slot-reel");
+      const symbols = ["⚡", "💎", "🔧", "💰", "❌"];
+      const finalSymbols = [];
+
+      // Determine final result
+      const upgradeTypes = [
+        "reduce_time",
+        "increase_output",
+        "output_multiplier",
+        "part_drop_rate",
+        "nothing",
+      ];
+      const selectedUpgrade =
+        upgradeTypes[Math.floor(Math.random() * upgradeTypes.length)];
+
+      // Set symbols based on upgrade type
+      const upgradeSymbols = {
+        reduce_time: "⚡",
+        increase_output: "💰",
+        output_multiplier: "🔧",
+        part_drop_rate: "💎",
+        nothing: "❌",
+      };
+
+      // Generate final symbols (match = successful upgrade)
+      const shouldMatch = Math.random() < 0.3; // 30% chance of matching
+      if (shouldMatch) {
+        const symbol = upgradeSymbols[selectedUpgrade];
+        finalSymbols.push(symbol, symbol, symbol);
+      } else {
+        // Random non-matching symbols
+        finalSymbols.push(
+          symbols[Math.floor(Math.random() * symbols.length)],
+          symbols[Math.floor(Math.random() * symbols.length)],
+          symbols[Math.floor(Math.random() * symbols.length)]
+        );
+      }
+
+      // Animate each reel
+      reels.forEach((reel, index) => {
+        const symbolsContainer = reel.querySelector(".reel-symbols");
+
+        // Spin animation
+        symbolsContainer.style.animation = `slotSpin ${
+          1 + index * 0.5
+        }s ease-out forwards`;
+
+        setTimeout(() => {
+          // Set final symbol
+          const finalSymbol = symbolsContainer.querySelector(".reel-symbol");
+          if (finalSymbol) {
+            finalSymbol.textContent = finalSymbols[index];
+          }
+        }, (1 + index * 0.5) * 1000);
+      });
+
+      // Resolve with result after all reels stop
+      setTimeout(() => {
+        resolve({
+          symbols: finalSymbols,
+          matched: shouldMatch,
+          upgradeType: shouldMatch ? selectedUpgrade : "nothing",
+        });
+      }, 2500);
+    });
+  }
+
+  applySlotMachineResult(machine, result) {
+    const resultDiv = this.container.querySelector(".slot-result");
+    const resultText = this.container.querySelector(".result-text");
+
+    if (result.matched && result.upgradeType !== "nothing") {
+      // Apply upgrade
+      const upgrade = GAME_CONFIG.upgrades[result.upgradeType];
+
+      switch (result.upgradeType) {
+        case "reduce_time":
+          machine.upgrades.timeReduction += Math.abs(upgrade.effect);
+          break;
+        case "increase_output":
+          machine.upgrades.outputBonus += upgrade.effect;
+          break;
+        case "output_multiplier":
+          machine.upgrades.outputMultiplier += upgrade.effect;
+          break;
+        case "part_drop_rate":
+          machine.upgrades.partDropRate += upgrade.effect;
+          break;
+      }
+
+      resultText.textContent = `SUCCESS! ${upgrade.name}: ${upgrade.description}`;
+      resultDiv.className = "slot-result success";
+      this.showTemporaryMessage(`Upgrade applied: ${upgrade.name}!`, "success");
+    } else {
+      resultText.textContent = "No upgrade - Better luck next time!";
+      resultDiv.className = "slot-result failure";
+      this.showTemporaryMessage("No upgrade this time!", "warning");
+    }
+
+    resultDiv.classList.remove("hidden");
+
+    // Hide result after 3 seconds
+    setTimeout(() => {
+      resultDiv.classList.add("hidden");
+      this.closeSlotMachineModal();
+    }, 3000);
   }
 
   checkMechaBuildability() {
@@ -643,6 +953,10 @@ class MiningScreen extends Screen {
   }
 
   startAutoMining(machine) {
+    const baseInterval = 1000; // 1 second
+    const timeReduction = machine.upgrades.timeReduction;
+    const actualInterval = Math.max(baseInterval * (1 - timeReduction), 100);
+
     const interval = this.setManagedInterval(() => {
       if (machine.energyLevel < machine.maxEnergy) {
         machine.energyLevel += 1; // 1% per second
@@ -653,7 +967,7 @@ class MiningScreen extends Screen {
 
         this.updateMachineUI(machine);
       }
-    }, 1000); // Every second
+    }, actualInterval);
 
     this.autoMiningIntervals.push(interval);
   }
@@ -743,6 +1057,28 @@ class MiningScreen extends Screen {
         if (geodeButton) geodeButton.disabled = true;
       }
     }
+
+    // Update geode drawer
+    const geodeDrawer = elements.container.querySelector(".geode-drawer");
+    if (geodeDrawer) {
+      if (machine.geodeDrawerOpen) {
+        geodeDrawer.classList.add("open");
+        // Update geode list
+        const geodeList = geodeDrawer.querySelector(".geode-list");
+        if (geodeList) {
+          geodeList.innerHTML = this.renderGeodeList(machine);
+          // Re-add event listeners to new geode items
+          const geodeItems = geodeList.querySelectorAll(".geode-item");
+          geodeItems.forEach((item) => {
+            item.addEventListener("click", (e) => {
+              this.handleIndividualGeodeClick(e.currentTarget);
+            });
+          });
+        }
+      } else {
+        geodeDrawer.classList.remove("open");
+      }
+    }
   }
 
   updatePartsDisplay() {
@@ -770,6 +1106,11 @@ class MiningScreen extends Screen {
   updateMechaDisplay() {
     const mechaDisplay = this.elements.mechaDisplay;
     if (!mechaDisplay) return;
+
+    const mechaImage = mechaDisplay.querySelector(".mecha-image");
+    if (mechaImage) {
+      mechaImage.style.opacity = this.hasMecha ? "1" : "0.2";
+    }
 
     if (this.hasMecha) {
       mechaDisplay.classList.add("has-mecha");
@@ -836,6 +1177,8 @@ class MiningScreen extends Screen {
       "collect-items": null,
       "mecha-built": null,
       "auto-mining-ambient": null,
+      "slot-spin": null,
+      "upgrade-success": null,
     };
   }
 
@@ -845,6 +1188,15 @@ class MiningScreen extends Screen {
     this.updateCurrencyDisplay();
     this.showTemporaryMessage(
       `Added ${amount} ${this.mineConfig.currency}`,
+      "success"
+    );
+  }
+
+  addMonsterCurrency(amount) {
+    this.monsterCurrency += amount;
+    this.updateCurrencyDisplay();
+    this.showTemporaryMessage(
+      `Added ${amount} monster ${this.mineConfig.currency}`,
       "success"
     );
   }
@@ -876,6 +1228,7 @@ class MiningScreen extends Screen {
     // Reset MiningScreen specific state
     this.selectedMachine = null;
     this.isOpeningGeodes = false;
+    this.activeSlotMachine = null;
     this.geodes = [];
 
     // Call parent destroy method
