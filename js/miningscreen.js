@@ -38,19 +38,47 @@ class MiningScreen extends Screen {
     // Auto-mining intervals
     this.autoMiningIntervals = [];
 
+    // Debug flag
+    this.debugMode = true;
+
     console.log(`⛏️ MiningScreen created for ${mineId}`);
+  }
+
+  // Debug logging helper
+  debugLog(message, data = null) {
+    if (this.debugMode) {
+      console.log(`[DEBUG] ${message}`, data || "");
+    }
   }
 
   // Override init to add MiningScreen specific initialization
   init() {
+    this.debugLog("Starting MiningScreen initialization");
+
     this.render();
+    this.debugLog("Render completed");
+
     this.cacheElements();
+    this.debugLog("Elements cached");
+
     this.setupEventListeners();
-    this.setupMachineEventListeners(); // FIX: Add this missing call
+    this.debugLog("Basic event listeners setup");
+
+    this.setupMachineEventListeners();
+    this.debugLog("Machine event listeners setup");
+
     this.startAnimations();
+    this.debugLog("Animations started");
+
     this.initializeAudio();
+    this.debugLog("Audio initialized");
+
     this.startParticleSystem();
+    this.debugLog("Particle system started");
+
     this.updateUI();
+    this.debugLog("UI updated");
+
     this.isActive = true;
 
     console.log(`✅ MiningScreen initialized for ${this.mineId}`);
@@ -58,6 +86,8 @@ class MiningScreen extends Screen {
 
   // Cache frequently accessed DOM elements
   cacheElements() {
+    this.debugLog("Starting element caching");
+
     this.elements = {
       backButton: this.container.querySelector(".back-button"),
       currencyDisplay: this.container.querySelector(".currency-value"),
@@ -75,13 +105,23 @@ class MiningScreen extends Screen {
       machines: {},
     };
 
-    // Cache machine-specific elements
+    this.debugLog("Basic elements cached", {
+      backButton: !!this.elements.backButton,
+      currencyDisplay: !!this.elements.currencyDisplay,
+      machineContainers: this.elements.machineContainers.length,
+    });
+
+    // Cache machine-specific elements with detailed debugging
     this.machines.forEach((machine, index) => {
+      this.debugLog(`Caching elements for machine ${machine.id}`);
+
       const container = this.container.querySelector(
         `[data-machine="${machine.id}"]`
       );
+      this.debugLog(`Machine container found: ${!!container}`, container);
+
       if (container) {
-        this.elements.machines[machine.id] = {
+        const machineElements = {
           container,
           energyBar: container.querySelector(".energy-bar"),
           energyFill: container.querySelector(".energy-fill"),
@@ -93,8 +133,24 @@ class MiningScreen extends Screen {
             ".auto-mining-indicator"
           ),
         };
+
+        this.debugLog(`Machine ${machine.id} elements:`, {
+          energyBar: !!machineElements.energyBar,
+          energyFill: !!machineElements.energyFill,
+          energyText: !!machineElements.energyText,
+          machineButton: !!machineElements.machineButton,
+          geodeCounter: !!machineElements.geodeCounter,
+          geodeButton: !!machineElements.geodeButton,
+          autoMiningIndicator: !!machineElements.autoMiningIndicator,
+        });
+
+        this.elements.machines[machine.id] = machineElements;
+      } else {
+        this.debugLog(`ERROR: Container not found for machine ${machine.id}`);
       }
     });
+
+    this.debugLog("Element caching completed", this.elements);
   }
 
   // Override render method
@@ -199,9 +255,10 @@ class MiningScreen extends Screen {
             <!-- Combat access (when mecha is built) -->
             <div class="combat-access ${this.hasMecha ? "" : "hidden"}">
               <button class="combat-button btn btn-combat">
-                <img src="images/monster-${
-                  this.mineConfig.monster
-                }.png" alt="Fight Monster" />
+                <img src="images/slime-${this.mineConfig.monster.replace(
+                  "_slime",
+                  ""
+                )}-1.png" alt="Fight Monster" />
                 <span>Fight ${
                   GAME_CONFIG.monsters[this.mineConfig.monster].name
                 }</span>
@@ -290,7 +347,7 @@ class MiningScreen extends Screen {
             
             <button class="machine-button btn btn-primary" ${
               machine.isAutoMining ? "disabled" : ""
-            }>
+            } data-machine-id="${machine.id}">
               ${machine.isAutoMining ? "Auto-Mining" : "Mine"}
             </button>
           </div>
@@ -330,6 +387,9 @@ class MiningScreen extends Screen {
       this.elements.backButton.addEventListener("click", () => {
         this.handleBackClick();
       });
+      this.debugLog("Back button event listener added");
+    } else {
+      this.debugLog("ERROR: Back button not found");
     }
 
     // Build mecha button
@@ -337,6 +397,7 @@ class MiningScreen extends Screen {
       this.elements.buildMechaButton.addEventListener("click", () => {
         this.handleBuildMecha();
       });
+      this.debugLog("Build mecha button event listener added");
     }
 
     // Geode modal
@@ -345,6 +406,7 @@ class MiningScreen extends Screen {
       closeModalBtn.addEventListener("click", () => {
         this.closeGeodeModal();
       });
+      this.debugLog("Close modal button event listener added");
     }
 
     const collectResultsBtn = this.container.querySelector(
@@ -354,28 +416,119 @@ class MiningScreen extends Screen {
       collectResultsBtn.addEventListener("click", () => {
         this.collectGeodeResults();
       });
+      this.debugLog("Collect results button event listener added");
     }
   }
 
-  // Separate method for machine event listeners (called after caching)
+  // Enhanced machine event listeners with better debugging
   setupMachineEventListeners() {
-    Object.values(this.elements.machines).forEach((machineElements) => {
-      if (machineElements && machineElements.machineButton) {
-        machineElements.machineButton.addEventListener("click", (e) => {
-          const machineId =
-            e.target.closest(".machine-container").dataset.machine;
-          this.handleMachineClick(machineId);
-        });
-      }
+    this.debugLog("Setting up machine event listeners");
 
-      if (machineElements && machineElements.geodeButton) {
-        machineElements.geodeButton.addEventListener("click", (e) => {
-          const machineId =
-            e.target.closest(".machine-container").dataset.machine;
-          this.handleGeodeClick(machineId);
-        });
+    // Method 1: Try using cached elements
+    Object.entries(this.elements.machines).forEach(
+      ([machineId, machineElements]) => {
+        this.debugLog(`Setting up events for machine ${machineId}`);
+
+        if (machineElements && machineElements.machineButton) {
+          this.debugLog(
+            `Adding click listener to machine button for ${machineId}`
+          );
+
+          machineElements.machineButton.addEventListener("click", (e) => {
+            this.debugLog(`Machine button clicked for ${machineId}`, e.target);
+            this.handleMachineClick(machineId);
+          });
+        } else {
+          this.debugLog(`ERROR: Machine button not found for ${machineId}`);
+        }
+
+        if (machineElements && machineElements.geodeButton) {
+          this.debugLog(`Adding geode button listener for ${machineId}`);
+
+          machineElements.geodeButton.addEventListener("click", (e) => {
+            this.debugLog(`Geode button clicked for ${machineId}`, e.target);
+            this.handleGeodeClick(machineId);
+          });
+        } else {
+          this.debugLog(
+            `Geode button not found for ${machineId} (this may be normal)`
+          );
+        }
       }
+    );
+
+    // Method 2: Fallback using document query selectors
+    const machineButtons = this.container.querySelectorAll(".machine-button");
+    this.debugLog(
+      `Found ${machineButtons.length} machine buttons via fallback method`
+    );
+
+    machineButtons.forEach((button, index) => {
+      const machineId = button.getAttribute("data-machine-id");
+      this.debugLog(
+        `Fallback: Adding listener to button ${index}, machine ID: ${machineId}`
+      );
+
+      button.addEventListener("click", (e) => {
+        this.debugLog(`Fallback click handler triggered`, {
+          button,
+          machineId,
+          target: e.target,
+        });
+
+        if (machineId) {
+          this.handleMachineClick(machineId);
+        } else {
+          // Try to find machine ID from container
+          const container = e.target.closest(".machine-container");
+          if (container) {
+            const containerMachineId = container.getAttribute("data-machine");
+            this.debugLog(
+              `Found machine ID from container: ${containerMachineId}`
+            );
+            if (containerMachineId) {
+              this.handleMachineClick(containerMachineId);
+            }
+          }
+        }
+      });
     });
+
+    // Method 3: Event delegation as ultimate fallback
+    const machinesContainer = this.container.querySelector(
+      ".machines-container"
+    );
+    if (machinesContainer) {
+      this.debugLog("Setting up event delegation on machines container");
+
+      machinesContainer.addEventListener("click", (e) => {
+        if (
+          e.target.classList.contains("machine-button") ||
+          e.target.closest(".machine-button")
+        ) {
+          this.debugLog(
+            "Event delegation caught machine button click",
+            e.target
+          );
+
+          const button = e.target.classList.contains("machine-button")
+            ? e.target
+            : e.target.closest(".machine-button");
+          const machineId = button.getAttribute("data-machine-id");
+          const container = button.closest(".machine-container");
+          const containerMachineId = container
+            ? container.getAttribute("data-machine")
+            : null;
+
+          const finalMachineId = machineId || containerMachineId;
+          this.debugLog(`Event delegation found machine ID: ${finalMachineId}`);
+
+          if (finalMachineId) {
+            this.handleMachineClick(finalMachineId);
+          }
+        }
+      });
+    }
   }
 
   // Event handlers
@@ -398,10 +551,20 @@ class MiningScreen extends Screen {
   }
 
   handleMachineClick(machineId) {
-    const machine = this.machines.find((m) => m.id === machineId);
-    if (!machine || machine.isAutoMining) return;
+    this.debugLog(`handleMachineClick called with machineId: ${machineId}`);
 
-    console.log(`⚡ Machine ${machineId} clicked`);
+    const machine = this.machines.find((m) => m.id === machineId);
+    if (!machine) {
+      this.debugLog(`ERROR: Machine not found with ID ${machineId}`);
+      return;
+    }
+
+    if (machine.isAutoMining) {
+      this.debugLog(`Machine ${machineId} is auto-mining, ignoring click`);
+      return;
+    }
+
+    console.log(`⚡ Machine ${machineId} clicked - processing...`);
 
     // Add energy (each click = 2 seconds worth)
     const energyGain = 2; // 2% per click (representing 2 seconds)
@@ -411,11 +574,16 @@ class MiningScreen extends Screen {
     );
     machine.isActive = true;
 
+    this.debugLog(
+      `Machine ${machineId} energy increased by ${energyGain}%, now at ${machine.energyLevel}%`
+    );
+
     // Update UI
     this.updateMachineUI(machine);
 
     // Check if bar is full
     if (machine.energyLevel >= machine.maxEnergy) {
+      this.debugLog(`Machine ${machineId} energy full, completing cycle`);
       this.completeMiningCycle(machine);
     }
 
@@ -426,6 +594,14 @@ class MiningScreen extends Screen {
 
     // Visual feedback
     this.createMachineClickEffect(machineId);
+
+    // Show temporary feedback
+    this.showTemporaryMessage(
+      `Machine ${machineId.replace("machine", "")} energy: ${
+        machine.energyLevel
+      }%`,
+      "info"
+    );
   }
 
   completeMiningCycle(machine) {
@@ -866,6 +1042,12 @@ class MiningScreen extends Screen {
       machine.geodeCount++;
       this.updateMachineUI(machine);
     }
+  }
+
+  // Debug method to test machine clicks
+  testMachineClick() {
+    this.debugLog("Testing machine click...");
+    this.handleMachineClick("machine1");
   }
 
   // Override destroy to clean up MiningScreen specific elements

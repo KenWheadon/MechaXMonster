@@ -1,83 +1,167 @@
 /* MiningScreen Specific Styles */
 
-/* Mining screen base */
+/* Base mining screen */
 .mining-screen {
-  background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0a 100%);
+  background: radial-gradient(ellipse at center, #0f1419 0%, #000000 100%);
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
-/* Header */
+/* ENHANCED HEADER - Compact & Always Visible */
 .mining-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.7);
-  border-bottom: 2px solid rgba(0, 255, 136, 0.3);
-  backdrop-filter: blur(10px);
-  z-index: 10;
+  padding: 8px 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  backdrop-filter: blur(15px);
+  border-bottom: 2px solid rgba(0, 255, 136, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  height: 60px;
+  width: 100%;
+  min-height: 60px;
 }
 
-.mine-title {
-  text-align: center;
-  flex-grow: 1;
-}
-
-.mine-title h1 {
-  color: var(--primary-color);
-  font-size: 2rem;
-  margin: 0;
-  text-shadow: var(--text-shadow);
-}
-
-.mine-title p {
-  color: #aaa;
-  margin: 5px 0 0 0;
-  font-size: 0.9rem;
-}
-
-.currency-display {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-}
-
-.currency-item {
+/* Back Button - More Compact */
+.mining-header .back-button {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(0, 255, 136, 0.1);
-  padding: 10px 15px;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 255, 136, 0.3);
-}
-
-.currency-item img {
-  width: 24px;
-  height: 24px;
-}
-
-.currency-value,
-.monster-currency-value {
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid rgba(0, 255, 136, 0.6);
+  border-radius: 25px;
   color: var(--primary-color);
   font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.mining-header .back-button img {
+  width: 18px;
+  height: 18px;
+  filter: invert(1);
+}
+
+.mining-header .back-button:hover {
+  background: rgba(0, 255, 136, 0.2);
+  border-color: var(--glow-bright);
+  transform: translateX(-2px);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+}
+
+/* Mine Title - Compact */
+.mine-title {
+  text-align: center;
+  flex-grow: 1;
+  margin: 0 20px;
+}
+
+.mine-title h1 {
+  font-size: 1.4rem;
+  color: var(--primary-color);
+  text-shadow: 0 0 15px rgba(0, 255, 136, 0.7);
+  margin: 0;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.mine-title p {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin: 2px 0 0 0;
+  line-height: 1.1;
+}
+
+/* Currency Display - Prominent & Compact */
+.mining-header .currency-display {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid rgba(0, 255, 136, 0.5);
+  border-radius: 20px;
+  padding: 6px 12px;
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+}
+
+.mining-header .currency-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  min-width: 60px;
+  justify-content: center;
+}
+
+.mining-header .currency-item:hover {
+  background: rgba(0, 255, 136, 0.2);
+  border-color: rgba(0, 255, 136, 0.5);
+  transform: scale(1.05);
+}
+
+.mining-header .currency-item img {
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 0 8px rgba(0, 255, 136, 0.6));
+}
+
+.mining-header .currency-value,
+.mining-header .monster-currency-value {
+  color: var(--primary-color);
+  font-weight: bold;
+  font-family: "Courier New", monospace;
   font-size: 1.1rem;
-  min-width: 40px;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  min-width: 30px;
   text-align: right;
 }
 
-/* Main content */
-.mining-content {
-  display: flex;
-  flex: 1;
-  gap: 20px;
-  padding: 20px;
-  overflow: hidden;
+/* Currency update animation */
+.currency-updated {
+  animation: currencyUpdatePulse 0.6s ease-out;
 }
 
+@keyframes currencyUpdatePulse {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.2);
+    color: #00ff88;
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* MAIN CONTENT */
+.mining-content {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  align-items: flex-start;
+}
+
+/* Mining Area */
 .mining-area {
   flex: 2;
   display: flex;
@@ -85,35 +169,25 @@
   gap: 20px;
 }
 
-.side-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 350px;
-}
-
-/* Mining machines - Fixed layout to prevent overflow */
 .machines-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 20px;
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
 }
 
+/* Machine Container */
 .machine-container {
-  background: rgba(0, 0, 0, 0.6);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
   border: 2px solid rgba(0, 255, 136, 0.3);
-  border-radius: 12px;
-  padding: 15px;
-  position: relative;
-  transition: all 0.3s ease;
+  border-radius: 15px;
+  padding: 20px;
   backdrop-filter: blur(5px);
-  width: 280px;
-  min-width: 280px;
-  /* FIX: Ensure container defines its own boundaries */
-  box-sizing: border-box;
+  transition: all 0.3s ease;
+  position: relative;
   overflow: hidden;
 }
 
@@ -123,27 +197,112 @@
   box-shadow: 0 8px 25px rgba(0, 255, 136, 0.2);
 }
 
+.machine-container::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(0, 255, 136, 0.3),
+    transparent
+  );
+  border-radius: 15px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.machine-container:hover::before {
+  opacity: 1;
+}
+
+/* Machine Header */
 .machine-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 15px;
 }
 
 .machine-number {
-  color: var(--primary-color);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   font-weight: bold;
-  text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+  color: var(--primary-color);
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
 }
 
-.machine-main {
+.geode-counter {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.geode-counter.has-geodes {
+  animation: geodeGlow 2s ease-in-out infinite;
+}
+
+@keyframes geodeGlow {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.geode-button {
   display: flex;
   align-items: center;
-  gap: 15px;
-  /* FIX: Ensure main content respects container width */
-  width: 100%;
-  box-sizing: border-box;
+  gap: 5px;
+  padding: 6px 12px;
+  background: rgba(255, 215, 0, 0.2);
+  border: 2px solid rgba(255, 215, 0, 0.5);
+  border-radius: 20px;
+  color: #ffd700;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.geode-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(100, 100, 100, 0.2);
+  border-color: rgba(100, 100, 100, 0.3);
+  color: #666;
+}
+
+.geode-button:not(:disabled):hover {
+  background: rgba(255, 215, 0, 0.4);
+  border-color: #ffd700;
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.geode-button img {
+  width: 20px;
+  height: 20px;
+  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7));
+}
+
+.geode-count {
+  font-family: "Courier New", monospace;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* Machine Main Content */
+.machine-main {
+  display: flex;
+  gap: 20px;
+  align-items: center;
 }
 
 .machine-visual {
@@ -152,10 +311,16 @@
 }
 
 .machine-image {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 15px rgba(0, 255, 136, 0.4));
   transition: all 0.3s ease;
+}
+
+.machine-container:hover .machine-image {
+  transform: scale(1.1);
+  filter: drop-shadow(0 8px 20px rgba(0, 255, 136, 0.6));
 }
 
 .machine-glow {
@@ -163,83 +328,107 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   background: radial-gradient(
     circle,
     rgba(0, 255, 136, 0.3) 0%,
     transparent 70%
   );
   border-radius: 50%;
+  z-index: -1;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .machine-glow.active {
   opacity: 1;
-  animation: machineGlowPulse 2s ease-in-out infinite;
+  animation: machineActiveGlow 2s ease-in-out infinite;
 }
 
-/* FIX: Make machine controls respect container boundaries */
-.machine-controls {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  /* FIX: Ensure controls fit within available space */
-  width: 100%;
-  max-width: calc(100% - 75px); /* Account for visual element width + gap */
-  box-sizing: border-box;
+@keyframes machineActiveGlow {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
 }
 
+/* Auto-Mining Indicator */
 .auto-mining-indicator {
   position: absolute;
-  top: -8px;
-  right: -8px;
+  top: -5px;
+  right: -5px;
   background: rgba(0, 255, 136, 0.9);
   color: black;
-  padding: 3px 6px;
+  padding: 2px 6px;
   border-radius: 10px;
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   font-weight: bold;
   opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 10;
+  transform: scale(0.8);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 3px;
 }
 
 .auto-mining-indicator.active {
   opacity: 1;
-  animation: autoMiningPulse 2s ease-in-out infinite;
+  transform: scale(1);
 }
 
 .auto-indicator-pulse {
-  display: inline-block;
-  width: 4px;
-  height: 4px;
-  background: #00ff00;
+  width: 6px;
+  height: 6px;
+  background: black;
   border-radius: 50%;
-  margin-right: 3px;
-  animation: indicatorBlink 1s ease-in-out infinite;
+  animation: autoPulse 1.5s ease-in-out infinite;
 }
 
-/* FIX: Energy bar respects container width */
+@keyframes autoPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+}
+
+/* Machine Controls */
+.machine-controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
 .energy-bar {
   position: relative;
-  height: 20px;
-  background: rgba(0, 255, 136, 0.2);
-  border: 2px solid rgba(0, 255, 136, 0.5);
-  border-radius: 10px;
-  overflow: hidden;
-  /* FIX: Ensure bar fits within controls container */
   width: 100%;
-  box-sizing: border-box;
+  height: 25px;
+  background: rgba(0, 255, 136, 0.2);
+  border: 2px solid rgba(0, 255, 136, 0.4);
+  border-radius: 15px;
+  overflow: hidden;
 }
 
 .energy-fill {
   height: 100%;
-  background: linear-gradient(90deg, #00ff88 0%, #00ccff 100%);
+  background: linear-gradient(
+    90deg,
+    var(--primary-color) 0%,
+    var(--secondary-color) 100%
+  );
   width: 0%;
-  transition: width 0.3s ease;
+  transition: width 0.5s ease;
   position: relative;
 }
 
@@ -253,7 +442,7 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.4) 50%,
     transparent 100%
   );
   animation: energyShimmer 2s ease-in-out infinite;
@@ -274,384 +463,174 @@
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
-  font-size: 0.8rem;
-  font-weight: bold;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
-}
-
-/* FIX: Machine button respects container width */
-.machine-button {
-  /* FIX: Ensure button fits within controls container */
-  width: 100%;
-  max-width: 100%;
-  padding: 10px;
-  background: radial-gradient(
-    circle,
-    rgba(0, 255, 136, 0.3) 0%,
-    rgba(0, 100, 50, 0.5) 100%
-  );
-  border: 2px solid rgba(0, 255, 136, 0.5);
-  border-radius: 6px;
-  color: var(--primary-color);
   font-weight: bold;
   font-size: 0.9rem;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  z-index: 2;
+}
+
+.machine-button {
+  width: 100%;
+  padding: 12px 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 136, 0.8) 0%,
+    rgba(0, 200, 100, 0.8) 100%
+  );
+  border: 2px solid rgba(0, 255, 136, 0.6);
+  border-radius: 25px;
+  color: black;
+  font-weight: bold;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  /* FIX: Prevent button from expanding beyond container */
-  box-sizing: border-box;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.machine-button:hover:not(:disabled) {
-  background: radial-gradient(
-    circle,
-    rgba(0, 255, 136, 0.5) 0%,
-    rgba(0, 100, 50, 0.7) 100%
+.machine-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.machine-button:hover::before {
+  left: 100%;
+}
+
+.machine-button:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 136, 1) 0%,
+    rgba(0, 200, 100, 1) 100%
   );
   border-color: var(--glow-bright);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
 }
 
-.machine-button:active:not(:disabled) {
+.machine-button:active {
   transform: translateY(0);
 }
 
 .machine-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Responsive design updates */
-@media (max-width: 1024px) {
-  .machines-container {
-    justify-content: center;
-  }
-
-  .machine-container {
-    width: 260px;
-    min-width: 260px;
-  }
-  
-  /* FIX: Adjust controls max-width for smaller containers */
-  .machine-controls {
-    max-width: calc(100% - 70px);
-  }
-}
-
-@media (max-width: 768px) {
-  .machines-container {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .machine-container {
-    width: 100%;
-    max-width: 350px;
-    min-width: auto;
-  }
-
-  .machine-main {
-    gap: 12px;
-  }
-
-  .machine-image {
-    width: 50px;
-    height: 50px;
-  }
-
-  .machine-glow {
-    width: 70px;
-    height: 70px;
-  }
-  
-  /* FIX: Adjust controls max-width for mobile */
-  .machine-controls {
-    max-width: calc(100% - 62px);
-  }
-}
-
-@media (max-width: 480px) {
-  .mining-header {
-    padding: 10px;
-  }
-
-  .mine-title h1 {
-    font-size: 1.5rem;
-  }
-
-  .currency-item {
-    padding: 6px 10px;
-  }
-
-  .currency-item img {
-    width: 20px;
-    height: 20px;
-  }
-
-  .mining-content {
-    padding: 10px;
-    gap: 10px;
-  }
-
-  .machine-container {
-    padding: 12px;
-  }
-
-  .machine-image {
-    width: 60px;
-    height: 60px;
-  }
-
-  .mecha-image {
-    width: 60px;
-    height: 60px;
-  }
-
-  .modal-content {
-    padding: 15px;
-    width: 95%;
-  }
-}
-
-/* Accessibility */
-@media (prefers-reduced-motion: reduce) {
-  .machine-glow,
-  .mecha-glow,
-  .geode-image,
-  .build-mecha-button,
-  .auto-mining-indicator {
-    animation: none !important;
-  }
-
-  .energy-fill::after {
-    animation: none !important;
-  }
-}
-
-/* Focus states */
-.machine-button:focus,
-.geode-button:focus,
-.build-mecha-button:focus,
-.combat-button:focus,
-.collect-results-button:focus {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
-}
-
-/* High contrast mode */
-@media (prefers-contrast: high) {
-  .machine-container,
-  .mecha-display,
-  .parts-inventory,
-  .combat-access {
-    border-width: 3px;
-  }
-
-  .energy-bar,
-  .parts-progress .progress-bar {
-    border-width: 2px;
-  }
-}machine-container {
-    padding: 12px;
-  }
-
-  .machine-header {
-    margin-bottom: 10px;
-  }
-
-  .machine-number {
-    font-size: 0.8rem;
-  }
-
-  .machine-main {
-    gap: 10px;
-  }
-
-  .machine-image {
-    width: 45px;
-    height: 45px;
-  }
-
-  .machine-glow {
-    width: 60px;
-    height: 60px;
-  }
-
-  .geode-button {
-    width: 40px;
-    height: 40px;
-  }
-
-  .geode-button img {
-    width: 18px;
-    height: 18px;
-  }
-
-  .geode-count {
-    width: 16px;
-    height: 16px;
-    font-size: 0.6rem;
-  }
-  
-  /* FIX: Adjust controls max-width for smallest screens */
-  .machine-controls {
-    max-width: calc(100% - 55px);
-  }
-}
-
-/* Add missing keyframes */
-@keyframes machineGlowPulse {
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.1);
-  }
-}
-
-@keyframes indicatorBlink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.3;
-  }
-}
-
-@keyframes autoMiningPulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-/* Geode counter - Improved visibility and positioning */
-.geode-counter {
-  opacity: 1;
-  transition: all 0.3s ease;
-  transform: scale(0.9);
-}
-
-.geode-counter.has-geodes {
-  opacity: 1;
-  transform: scale(1);
-  animation: geodeGlow 2s ease-in-out infinite;
-}
-
-@keyframes geodeGlow {
-  0%,
-  100% {
-    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.3));
-  }
-  50% {
-    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
-  }
-}
-
-.geode-button {
-  background: rgba(255, 215, 0, 0.2);
-  border: 2px solid rgba(255, 215, 0, 0.5);
-  border-radius: 50%;
-  width: 45px;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.geode-button:hover:not(:disabled) {
-  background: rgba(255, 215, 0, 0.4);
-  border-color: rgba(255, 215, 0, 0.8);
-  transform: scale(1.05);
-}
-
-.geode-button:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  background: rgba(100, 100, 100, 0.2);
+  background: rgba(100, 100, 100, 0.5);
   border-color: rgba(100, 100, 100, 0.3);
+  color: #666;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-.geode-button img {
-  width: 20px;
-  height: 20px;
-}
-
-.geode-count {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: rgba(255, 215, 0, 0.9);
-  color: black;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  font-weight: bold;
-  min-width: 18px;
-}
-
-/* Machine purchase */
+/* Machine Purchase */
 .machine-purchase {
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 .purchase-machine-button {
-  background: rgba(0, 255, 136, 0.1);
-  border: 2px dashed rgba(0, 255, 136, 0.3);
-  border-radius: 12px;
-  padding: 20px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 10px;
-  transition: all 0.3s ease;
+  padding: 15px 25px;
+  background: rgba(255, 170, 0, 0.2);
+  border: 2px solid rgba(255, 170, 0, 0.5);
+  border-radius: 15px;
+  color: #ffaa00;
+  font-weight: bold;
   cursor: pointer;
-  min-width: 200px;
-}
-
-.purchase-machine-button:hover:not(:disabled) {
-  border-color: rgba(0, 255, 136, 0.6);
-  background: rgba(0, 255, 136, 0.2);
+  transition: all 0.3s ease;
+  flex-direction: column;
 }
 
 .purchase-machine-button:disabled {
-  opacity: 0.4;
+  opacity: 0.5;
   cursor: not-allowed;
+}
+
+.purchase-machine-button:not(:disabled):hover {
+  background: rgba(255, 170, 0, 0.4);
+  border-color: #ffaa00;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 170, 0, 0.3);
+}
+
+.purchase-machine-button img {
+  width: 24px;
+  height: 24px;
+  filter: invert(1);
 }
 
 .purchase-cost {
   font-size: 0.8rem;
-  color: #aaa;
+  opacity: 0.8;
 }
 
-/* Mecha display */
+/* SIDE PANEL */
+.side-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 350px;
+}
+
+/* Mecha Display */
 .mecha-display {
-  background: rgba(0, 0, 0, 0.6);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
   border: 2px solid rgba(0, 255, 136, 0.3);
-  border-radius: 12px;
+  border-radius: 15px;
   padding: 20px;
   text-align: center;
-  position: relative;
+  backdrop-filter: blur(5px);
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .mecha-display.has-mecha {
-  border-color: rgba(0, 255, 136, 0.6);
-  background: rgba(0, 255, 136, 0.1);
+  border-color: rgba(0, 255, 136, 0.8);
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+}
+
+.mecha-display::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(0, 255, 136, 0.3),
+    transparent
+  );
+  border-radius: 15px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mecha-display.has-mecha::before {
+  opacity: 1;
 }
 
 .mecha-container {
@@ -660,13 +639,26 @@
 }
 
 .mecha-image {
-width: 160px;
-height: 100%;
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 25px rgba(0, 255, 136, 0.5));
   transition: all 0.3s ease;
 }
 
 .mecha-display.has-mecha .mecha-image {
-  filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.6));
+  filter: drop-shadow(0 15px 35px rgba(0, 255, 136, 0.8));
+  animation: mechaIdleFloat 4s ease-in-out infinite;
+}
+
+@keyframes mechaIdleFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .mecha-glow {
@@ -674,29 +666,33 @@ height: 100%;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 140px;
-  height: 140px;
+  width: 150px;
+  height: 150px;
   background: radial-gradient(
     circle,
     rgba(0, 255, 136, 0.3) 0%,
     transparent 70%
   );
   border-radius: 50%;
+  z-index: -1;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .mecha-display.has-mecha .mecha-glow {
   opacity: 1;
-  animation: mechaGlowRotate 4s linear infinite;
+  animation: mechaGlow 3s ease-in-out infinite;
 }
 
-@keyframes mechaGlowRotate {
-  0% {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
+@keyframes mechaGlow {
+  0%,
   100% {
-    transform: translate(-50%, -50%) rotate(360deg);
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.2);
   }
 }
 
@@ -707,61 +703,61 @@ height: 100%;
 .status-active {
   color: var(--primary-color);
   font-weight: bold;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
 }
 
 .status-inactive {
-  color: #aaa;
+  color: #999;
+  font-weight: bold;
 }
 
 .build-mecha-button {
-  margin-top: 15px;
-  padding: 15px 25px;
+  width: 100%;
+  padding: 12px 20px;
   background: linear-gradient(
     135deg,
-    rgba(0, 255, 136, 0.3) 0%,
-    rgba(0, 200, 100, 0.5) 100%
+    rgba(0, 255, 136, 0.8) 0%,
+    rgba(0, 200, 100, 0.8) 100%
   );
   border: 2px solid rgba(0, 255, 136, 0.6);
-  border-radius: 8px;
-  color: var(--primary-color);
+  border-radius: 25px;
+  color: black;
   font-weight: bold;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  animation: buildButtonPulse 2s ease-in-out infinite;
-}
-
-@keyframes buildButtonPulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
+  text-transform: uppercase;
 }
 
 .build-mecha-button:hover {
   background: linear-gradient(
     135deg,
-    rgba(0, 255, 136, 0.5) 0%,
-    rgba(0, 200, 100, 0.7) 100%
+    rgba(0, 255, 136, 1) 0%,
+    rgba(0, 200, 100, 1) 100%
   );
-  border-color: var(--glow-bright);
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
 }
 
-/* Parts inventory */
+/* Parts Inventory */
 .parts-inventory {
-  background: rgba(0, 0, 0, 0.6);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
   border: 2px solid rgba(0, 255, 136, 0.3);
-  border-radius: 12px;
+  border-radius: 15px;
   padding: 20px;
+  backdrop-filter: blur(5px);
 }
 
 .parts-inventory h3 {
   color: var(--primary-color);
-  margin: 0 0 15px 0;
   text-align: center;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
 }
 
 .parts-grid {
@@ -774,51 +770,54 @@ height: 100%;
 .part-slot {
   position: relative;
   aspect-ratio: 1;
-  background: rgba(0, 255, 136, 0.1);
+  background: rgba(0, 0, 0, 0.6);
   border: 2px solid rgba(0, 255, 136, 0.3);
-  border-radius: 8px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
+  overflow: hidden;
 }
 
 .part-slot.collected {
-  border-color: rgba(0, 255, 136, 0.6);
-  background: rgba(0, 255, 136, 0.2);
+  border-color: rgba(0, 255, 136, 0.8);
+  background: rgba(0, 255, 136, 0.1);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
 }
 
 .part-image {
   width: 80%;
   height: 80%;
   object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.5));
   transition: all 0.3s ease;
 }
 
 .part-slot.collected .part-image {
-  filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.6));
+  filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.8));
 }
 
 .part-overlay {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
   font-size: 1.5rem;
   color: #666;
+  font-weight: bold;
 }
 
 .part-collected-indicator {
   position: absolute;
-  top: -5px;
-  right: -5px;
-  background: rgba(0, 255, 136, 0.9);
+  top: 2px;
+  right: 2px;
+  background: var(--primary-color);
   color: black;
   border-radius: 50%;
   width: 20px;
@@ -834,51 +833,50 @@ height: 100%;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  align-items: center;
 }
 
 .parts-progress .progress-bar {
-  height: 8px;
-  background: rgba(0, 255, 136, 0.2);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.parts-progress .progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #00ff88 0%, #00ccff 100%);
-  transition: width 0.3s ease;
+  height: 15px;
+  border-radius: 10px;
 }
 
 .progress-text {
-  text-align: center;
   color: var(--primary-color);
-  font-size: 0.9rem;
   font-weight: bold;
+  font-size: 0.9rem;
 }
 
-/* Combat access */
+/* Combat Access */
 .combat-access {
-  background: rgba(0, 0, 0, 0.6);
-  border: 2px solid rgba(255, 100, 100, 0.3);
-  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(139, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+  border: 2px solid rgba(255, 0, 0, 0.5);
+  border-radius: 15px;
   padding: 20px;
+  backdrop-filter: blur(5px);
   text-align: center;
 }
 
 .combat-button {
   width: 100%;
-  padding: 15px;
+  padding: 15px 20px;
   background: linear-gradient(
     135deg,
-    rgba(255, 100, 100, 0.3) 0%,
-    rgba(200, 50, 50, 0.5) 100%
+    rgba(255, 0, 0, 0.8) 0%,
+    rgba(139, 0, 0, 0.8) 100%
   );
-  border: 2px solid rgba(255, 100, 100, 0.6);
-  border-radius: 8px;
-  color: #ff6464;
+  border: 2px solid rgba(255, 0, 0, 0.6);
+  border-radius: 25px;
+  color: white;
   font-weight: bold;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -888,26 +886,27 @@ height: 100%;
 .combat-button:hover {
   background: linear-gradient(
     135deg,
-    rgba(255, 100, 100, 0.5) 0%,
-    rgba(200, 50, 50, 0.7) 100%
+    rgba(255, 0, 0, 1) 0%,
+    rgba(139, 0, 0, 1) 100%
   );
-  border-color: rgba(255, 100, 100, 0.8);
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
 }
 
 .combat-button img {
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5));
 }
 
-/* Geode modal */
+/* GEODE MODAL */
 .geode-modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -920,14 +919,20 @@ height: 100%;
 }
 
 .modal-content {
-  background: rgba(0, 0, 0, 0.9);
-  border: 2px solid rgba(0, 255, 136, 0.5);
-  border-radius: 15px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  border: 2px solid rgba(0, 255, 136, 0.6);
+  border-radius: 20px;
   padding: 30px;
   max-width: 500px;
   width: 90%;
   max-height: 80vh;
   overflow-y: auto;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
 .modal-header {
@@ -935,24 +940,35 @@ height: 100%;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(0, 255, 136, 0.3);
 }
 
 .modal-header h2 {
   color: var(--primary-color);
   margin: 0;
+  font-size: 1.5rem;
+  text-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
 }
 
 .close-modal-button {
   background: none;
   border: none;
-  color: #aaa;
-  font-size: 1.5rem;
+  color: #999;
+  font-size: 2rem;
   cursor: pointer;
   transition: color 0.3s ease;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .close-modal-button:hover {
-  color: var(--primary-color);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .geode-animation {
@@ -966,18 +982,20 @@ height: 100%;
 }
 
 .geode-image {
-  width: 80px;
-  height: 80px;
-  animation: geodeRock 2s ease-in-out infinite;
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(255, 215, 0, 0.5));
+  animation: geodeFloat 3s ease-in-out infinite;
 }
 
-@keyframes geodeRock {
+@keyframes geodeFloat {
   0%,
   100% {
-    transform: rotate(-5deg);
+    transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: rotate(5deg);
+    transform: translateY(-10px) rotate(180deg);
   }
 }
 
@@ -989,27 +1007,23 @@ height: 100%;
   height: 100%;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.5) 0%,
-    transparent 60%
+    rgba(255, 215, 0, 0.5) 0%,
+    transparent 70%
   );
   border-radius: 50%;
   opacity: 0;
-  animation: geodeCrack 3s ease-in-out infinite;
+  animation: geodeCrack 2s ease-in-out infinite;
 }
 
 @keyframes geodeCrack {
   0%,
-  80% {
+  100% {
     opacity: 0;
     transform: scale(1);
   }
-  90% {
+  50% {
     opacity: 1;
-    transform: scale(1.2);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.5);
+    transform: scale(1.3);
   }
 }
 
@@ -1024,27 +1038,16 @@ height: 100%;
   display: flex;
   align-items: center;
   gap: 15px;
-  padding: 15px;
-  background: rgba(0, 255, 136, 0.1);
+  padding: 10px 15px;
+  background: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(0, 255, 136, 0.3);
-  border-radius: 8px;
+  border-radius: 10px;
   animation: resultAppear 0.5s ease-out;
-}
-
-@keyframes resultAppear {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .geode-result.part {
   border-color: rgba(0, 255, 136, 0.6);
-  background: rgba(0, 255, 136, 0.2);
+  background: rgba(0, 255, 136, 0.1);
 }
 
 .geode-result.currency {
@@ -1052,14 +1055,27 @@ height: 100%;
   background: rgba(255, 215, 0, 0.1);
 }
 
+@keyframes resultAppear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .result-icon img {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.5));
 }
 
 .result-text {
   color: white;
   font-weight: bold;
+  flex: 1;
 }
 
 .collect-results-button {
@@ -1067,110 +1083,100 @@ height: 100%;
   padding: 15px;
   background: linear-gradient(
     135deg,
-    rgba(0, 255, 136, 0.3) 0%,
-    rgba(0, 200, 100, 0.5) 100%
+    rgba(0, 255, 136, 0.8) 0%,
+    rgba(0, 200, 100, 0.8) 100%
   );
   border: 2px solid rgba(0, 255, 136, 0.6);
-  border-radius: 8px;
-  color: var(--primary-color);
+  border-radius: 25px;
+  color: black;
   font-weight: bold;
+  font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-transform: uppercase;
 }
 
 .collect-results-button:hover {
   background: linear-gradient(
     135deg,
-    rgba(0, 255, 136, 0.5) 0%,
-    rgba(0, 200, 100, 0.7) 100%
+    rgba(0, 255, 136, 1) 0%,
+    rgba(0, 200, 100, 1) 100%
   );
-  border-color: var(--glow-bright);
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
 }
 
-/* Responsive design */
+/* RESPONSIVE DESIGN */
 @media (max-width: 1024px) {
   .mining-content {
     flex-direction: column;
+    gap: 20px;
   }
 
   .side-panel {
     max-width: none;
-    flex: none;
   }
 
   .machines-container {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 768px) {
   .mining-header {
     flex-direction: column;
-    gap: 15px;
-    padding: 15px;
-  }
-
-  .currency-display {
+    height: auto;
+    min-height: 80px;
+    padding: 10px 15px;
     gap: 10px;
   }
 
-  .currency-item {
-    padding: 8px 12px;
+  .mining-header .back-button {
+    order: -1;
+    align-self: flex-start;
   }
 
-  .mining-content {
-    padding: 15px;
-    gap: 15px;
-  }
-
-  .machines-container {
-    grid-template-columns: 1fr;
-  }
-
-  .machine-container {
-    padding: 15px;
-  }
-
-  .parts-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .mecha-image {
-    width: 120px;
-    height: 100%;
-  }
-
-  .modal-content {
-    padding: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .mining-header {
-    padding: 10px;
+  .mine-title {
+    margin: 0;
+    order: 1;
   }
 
   .mine-title h1 {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 
-  .currency-item {
-    padding: 6px 10px;
+  .mine-title p {
+    font-size: 0.7rem;
   }
 
-  .currency-item img {
+  .mining-header .currency-display {
+    order: 2;
+    align-self: stretch;
+    justify-content: center;
+  }
+
+  .mining-header .currency-item {
+    flex: 1;
+    min-width: 80px;
+  }
+
+  .mining-header .currency-item img {
     width: 20px;
     height: 20px;
   }
 
   .mining-content {
-    padding: 10px;
-    gap: 10px;
+    padding: 15px;
   }
 
   .machine-container {
-    padding: 12px;
+    padding: 15px;
+  }
+
+  .machine-main {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
   }
 
   .machine-image {
@@ -1178,43 +1184,99 @@ height: 100%;
     height: 60px;
   }
 
+  .parts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .modal-content {
+    padding: 20px;
+    margin: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mining-header {
+    padding: 8px 10px;
+  }
+
+  .mining-header .back-button {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  .mining-header .back-button img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .mine-title h1 {
+    font-size: 1rem;
+  }
+
+  .mine-title p {
+    font-size: 0.6rem;
+  }
+
+  .mining-header .currency-item {
+    padding: 3px 6px;
+    min-width: 60px;
+  }
+
+  .mining-header .currency-item img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .mining-header .currency-value,
+  .mining-header .monster-currency-value {
+    font-size: 0.9rem;
+  }
+
+  .mining-content {
+    padding: 10px;
+  }
+
+  .machine-container {
+    padding: 12px;
+  }
+
+  .machine-button {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
   .mecha-image {
-    width: 120px;
-    height: 100%;
+    width: 100px;
+    height: 100px;
+  }
+
+  .parts-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .geode-image {
+    width: 80px;
+    height: 80px;
   }
 
   .modal-content {
     padding: 15px;
-    width: 95%;
+    margin: 15px;
   }
 }
 
-/* Accessibility */
+/* ACCESSIBILITY */
 @media (prefers-reduced-motion: reduce) {
   .machine-glow,
   .mecha-glow,
   .geode-image,
-  .build-mecha-button,
-  .auto-mining-indicator {
-    animation: none !important;
-  }
-
-  .energy-fill::after {
+  .auto-indicator-pulse {
     animation: none !important;
   }
 }
 
-/* Focus states */
-.machine-button:focus,
-.geode-button:focus,
-.build-mecha-button:focus,
-.combat-button:focus,
-.collect-results-button:focus {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
-}
-
-/* High contrast mode */
+/* HIGH CONTRAST MODE */
 @media (prefers-contrast: high) {
   .machine-container,
   .mecha-display,
@@ -1223,8 +1285,24 @@ height: 100%;
     border-width: 3px;
   }
 
-  .energy-bar,
-  .parts-progress .progress-bar {
-    border-width: 2px;
+  .machine-button,
+  .build-mecha-button,
+  .combat-button {
+    border-width: 3px;
+  }
+}
+
+/* PRINT STYLES */
+@media print {
+  .mining-screen {
+    background: white !important;
+    color: black !important;
+  }
+
+  .particles-layer,
+  .stars-layer,
+  .asteroids-layer,
+  .nebula-layer {
+    display: none !important;
   }
 }

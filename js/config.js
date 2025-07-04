@@ -28,7 +28,7 @@ const GAME_CONFIG = {
     mine1: {
       name: "Rock Mine",
       mecha: "green",
-      monster: "yellow_slime",
+      monster: "yellow",
       currency: "shells",
       unlockCost: { shells: 0, monster_shells: 0 },
       baseOutput: 1,
@@ -37,7 +37,7 @@ const GAME_CONFIG = {
     mine2: {
       name: "Ice Mine",
       mecha: "yellow",
-      monster: "teal_slime",
+      monster: "teal",
       currency: "coins",
       unlockCost: { shells: 25, monster_shells: 0 },
       baseOutput: 1,
@@ -46,7 +46,7 @@ const GAME_CONFIG = {
     mine3: {
       name: "Crystal Mine",
       mecha: "red",
-      monster: "blue_slime",
+      monster: "blue",
       currency: "bars",
       unlockCost: { shells: 50, monster_shells: 1 },
       baseOutput: 1,
@@ -55,7 +55,7 @@ const GAME_CONFIG = {
     mine4: {
       name: "Gas Mine",
       mecha: "blue",
-      monster: "orange_slime",
+      monster: "orange",
       currency: "bonds",
       unlockCost: { shells: 500, monster_shells: 10 },
       baseOutput: 1,
@@ -64,7 +64,7 @@ const GAME_CONFIG = {
     mine5: {
       name: "Rare Earth Mine",
       mecha: "pink",
-      monster: "black_slime",
+      monster: "black",
       currency: "gems",
       unlockCost: { shells: 1000, monster_shells: 25 },
       baseOutput: 1,
@@ -166,10 +166,11 @@ const GAME_CONFIG = {
     },
   },
 
-  // Monster templates
+  // Monster templates - Updated to use new slime naming pattern
   monsters: {
-    yellow_slime: {
+    yellow: {
       name: "Acidic Slime",
+      imagePattern: "slime-yellow", // Will use slime-yellow-1.png, slime-yellow-2.png, etc.
       battles: [
         {
           difficulty: "easy",
@@ -203,8 +204,9 @@ const GAME_CONFIG = {
         },
       ],
     },
-    teal_slime: {
+    teal: {
       name: "Frost Slime",
+      imagePattern: "slime-teal",
       battles: [
         {
           difficulty: "easy",
@@ -238,8 +240,9 @@ const GAME_CONFIG = {
         },
       ],
     },
-    blue_slime: {
+    blue: {
       name: "Crystal Slime",
+      imagePattern: "slime-blue",
       battles: [
         {
           difficulty: "easy",
@@ -283,8 +286,9 @@ const GAME_CONFIG = {
         },
       ],
     },
-    orange_slime: {
+    orange: {
       name: "Plasma Slime",
+      imagePattern: "slime-orange",
       battles: [
         {
           difficulty: "easy",
@@ -318,8 +322,9 @@ const GAME_CONFIG = {
         },
       ],
     },
-    black_slime: {
+    black: {
       name: "Void Slime",
+      imagePattern: "slime-black",
       battles: [
         {
           difficulty: "easy",
@@ -466,6 +471,22 @@ const CONFIG_UTILS = {
   // Get upgrade by type
   getUpgrade(upgradeType) {
     return GAME_CONFIG.upgrades[upgradeType] || null;
+  },
+
+  // Get monster image path based on new naming pattern
+  getMonsterImagePath(monsterType, imageIndex = 1) {
+    const monster = GAME_CONFIG.monsters[monsterType];
+    if (!monster || !monster.imagePattern) {
+      console.error(`Monster ${monsterType} not found or missing imagePattern`);
+      return `images/slime-${monsterType}-1.png`; // fallback
+    }
+    return `images/${monster.imagePattern}-${imageIndex}.png`;
+  },
+
+  // Get random monster image for variety
+  getRandomMonsterImage(monsterType) {
+    const imageIndex = Math.floor(Math.random() * 3) + 1; // 1-3
+    return this.getMonsterImagePath(monsterType, imageIndex);
   },
 };
 
