@@ -93,22 +93,25 @@
   max-width: 350px;
 }
 
-/* Mining machines */
+/* Mining machines - Improved compact layout */
 .machines-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
   margin-bottom: 20px;
+  justify-content: flex-start;
 }
 
 .machine-container {
   background: rgba(0, 0, 0, 0.6);
   border: 2px solid rgba(0, 255, 136, 0.3);
   border-radius: 12px;
-  padding: 20px;
+  padding: 15px;
   position: relative;
   transition: all 0.3s ease;
   backdrop-filter: blur(5px);
+  width: 280px;
+  min-width: 280px;
 }
 
 .machine-container:hover {
@@ -117,15 +120,34 @@
   box-shadow: 0 8px 25px rgba(0, 255, 136, 0.2);
 }
 
+.machine-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.machine-number {
+  color: var(--primary-color);
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+}
+
+.machine-main {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
 .machine-visual {
   position: relative;
-  text-align: center;
-  margin-bottom: 15px;
+  flex-shrink: 0;
 }
 
 .machine-image {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   transition: all 0.3s ease;
 }
@@ -135,8 +157,8 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   background: radial-gradient(
     circle,
     rgba(0, 255, 136, 0.3) 0%,
@@ -152,28 +174,26 @@
   animation: machineGlowPulse 2s ease-in-out infinite;
 }
 
-@keyframes machineGlowPulse {
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.1);
-  }
+.machine-controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .auto-mining-indicator {
   position: absolute;
-  top: -10px;
-  right: -10px;
+  top: -8px;
+  right: -8px;
   background: rgba(0, 255, 136, 0.9);
   color: black;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.7rem;
+  padding: 3px 6px;
+  border-radius: 10px;
+  font-size: 0.6rem;
   font-weight: bold;
   opacity: 0;
   transition: opacity 0.3s ease;
+  z-index: 10;
 }
 
 .auto-mining-indicator.active {
@@ -183,38 +203,12 @@
 
 .auto-indicator-pulse {
   display: inline-block;
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
   background: #00ff00;
   border-radius: 50%;
-  margin-right: 4px;
+  margin-right: 3px;
   animation: indicatorBlink 1s ease-in-out infinite;
-}
-
-@keyframes indicatorBlink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.3;
-  }
-}
-
-@keyframes autoMiningPulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-.machine-ui {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 
 /* Energy bar */
@@ -271,19 +265,20 @@
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
 }
 
-/* Machine button */
+/* Machine button - Improved styling */
 .machine-button {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
   background: radial-gradient(
     circle,
     rgba(0, 255, 136, 0.3) 0%,
     rgba(0, 100, 50, 0.5) 100%
   );
   border: 2px solid rgba(0, 255, 136, 0.5);
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--primary-color);
   font-weight: bold;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -307,25 +302,149 @@
   cursor: not-allowed;
 }
 
-/* Geode counter */
+/* Responsive design updates */
+@media (max-width: 1024px) {
+  .machines-container {
+    justify-content: center;
+  }
+
+  .machine-container {
+    width: 260px;
+    min-width: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .machines-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .machine-container {
+    width: 100%;
+    max-width: 350px;
+    min-width: auto;
+  }
+
+  .machine-main {
+    gap: 12px;
+  }
+
+  .machine-image {
+    width: 50px;
+    height: 50px;
+  }
+
+  .machine-glow {
+    width: 70px;
+    height: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .machine-container {
+    padding: 12px;
+  }
+
+  .machine-header {
+    margin-bottom: 10px;
+  }
+
+  .machine-number {
+    font-size: 0.8rem;
+  }
+
+  .machine-main {
+    gap: 10px;
+  }
+
+  .machine-image {
+    width: 45px;
+    height: 45px;
+  }
+
+  .machine-glow {
+    width: 60px;
+    height: 60px;
+  }
+
+  .geode-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .geode-button img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .geode-count {
+    width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
+  }
+}
+
+/* Add missing keyframes */
+@keyframes machineGlowPulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+@keyframes indicatorBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes autoMiningPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Geode counter - Improved visibility and positioning */
 .geode-counter {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  opacity: 1;
+  transition: all 0.3s ease;
+  transform: scale(0.9);
 }
 
 .geode-counter.has-geodes {
   opacity: 1;
+  transform: scale(1);
+  animation: geodeGlow 2s ease-in-out infinite;
+}
+
+@keyframes geodeGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+  }
 }
 
 .geode-button {
   background: rgba(255, 215, 0, 0.2);
   border: 2px solid rgba(255, 215, 0, 0.5);
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -343,27 +462,30 @@
 .geode-button:disabled {
   opacity: 0.3;
   cursor: not-allowed;
+  background: rgba(100, 100, 100, 0.2);
+  border-color: rgba(100, 100, 100, 0.3);
 }
 
 .geode-button img {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 
 .geode-count {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: -8px;
+  right: -8px;
   background: rgba(255, 215, 0, 0.9);
   color: black;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.7rem;
   font-weight: bold;
+  min-width: 18px;
 }
 
 /* Machine purchase */

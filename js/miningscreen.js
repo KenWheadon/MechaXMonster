@@ -249,33 +249,8 @@ class MiningScreen extends Screen {
       .map(
         (machine, index) => `
       <div class="machine-container" data-machine="${machine.id}">
-        <div class="machine-visual">
-          <img src="images/mine-${
-            index + 1
-          }.png" alt="Mining Machine" class="machine-image" />
-          <div class="machine-glow ${machine.isActive ? "active" : ""}"></div>
-          <div class="auto-mining-indicator ${
-            machine.isAutoMining ? "active" : ""
-          }" title="Auto-Mining Active">
-            <div class="auto-indicator-pulse"></div>
-            <span>AUTO</span>
-          </div>
-        </div>
-        
-        <div class="machine-ui">
-          <div class="energy-bar">
-            <div class="energy-fill" style="width: ${
-              machine.energyLevel
-            }%"></div>
-            <div class="energy-text">${machine.energyLevel}%</div>
-          </div>
-          
-          <button class="machine-button btn btn-primary" ${
-            machine.isAutoMining ? "disabled" : ""
-          }>
-            ${machine.isAutoMining ? "Auto-Mining" : "Mine"}
-          </button>
-          
+        <div class="machine-header">
+          <div class="machine-number">Machine ${index + 1}</div>
           <div class="geode-counter ${
             machine.geodeCount > 0 ? "has-geodes" : ""
           }">
@@ -286,6 +261,36 @@ class MiningScreen extends Screen {
                 this.mineConfig.mecha
               }.png" alt="Geodes" />
               <span class="geode-count">${machine.geodeCount}</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="machine-main">
+          <div class="machine-visual">
+            <img src="images/mine-${
+              index + 1
+            }.png" alt="Mining Machine" class="machine-image" />
+            <div class="machine-glow ${machine.isActive ? "active" : ""}"></div>
+            <div class="auto-mining-indicator ${
+              machine.isAutoMining ? "active" : ""
+            }" title="Auto-Mining Active">
+              <div class="auto-indicator-pulse"></div>
+              <span>AUTO</span>
+            </div>
+          </div>
+          
+          <div class="machine-controls">
+            <div class="energy-bar">
+              <div class="energy-fill" style="width: ${
+                machine.energyLevel
+              }%"></div>
+              <div class="energy-text">${machine.energyLevel}%</div>
+            </div>
+            
+            <button class="machine-button btn btn-primary" ${
+              machine.isAutoMining ? "disabled" : ""
+            }>
+              ${machine.isAutoMining ? "Auto-Mining" : "Mine"}
             </button>
           </div>
         </div>
@@ -326,25 +331,6 @@ class MiningScreen extends Screen {
       });
     }
 
-    // Machine buttons
-    Object.values(this.elements.machines).forEach((machineElements) => {
-      if (machineElements.machineButton) {
-        machineElements.machineButton.addEventListener("click", (e) => {
-          const machineId =
-            e.target.closest(".machine-container").dataset.machine;
-          this.handleMachineClick(machineId);
-        });
-      }
-
-      if (machineElements.geodeButton) {
-        machineElements.geodeButton.addEventListener("click", (e) => {
-          const machineId =
-            e.target.closest(".machine-container").dataset.machine;
-          this.handleGeodeClick(machineId);
-        });
-      }
-    });
-
     // Build mecha button
     if (this.elements.buildMechaButton) {
       this.elements.buildMechaButton.addEventListener("click", () => {
@@ -368,6 +354,27 @@ class MiningScreen extends Screen {
         this.collectGeodeResults();
       });
     }
+  }
+
+  // Separate method for machine event listeners (called after caching)
+  setupMachineEventListeners() {
+    Object.values(this.elements.machines).forEach((machineElements) => {
+      if (machineElements && machineElements.machineButton) {
+        machineElements.machineButton.addEventListener("click", (e) => {
+          const machineId =
+            e.target.closest(".machine-container").dataset.machine;
+          this.handleMachineClick(machineId);
+        });
+      }
+
+      if (machineElements && machineElements.geodeButton) {
+        machineElements.geodeButton.addEventListener("click", (e) => {
+          const machineId =
+            e.target.closest(".machine-container").dataset.machine;
+          this.handleGeodeClick(machineId);
+        });
+      }
+    });
   }
 
   // Event handlers
@@ -686,37 +693,57 @@ class MiningScreen extends Screen {
     if (!elements) return;
 
     // Update energy bar
-    elements.energyFill.style.width = `${machine.energyLevel}%`;
-    elements.energyText.textContent = `${machine.energyLevel}%`;
+    if (elements.energyFill) {
+      elements.energyFill.style.width = `${machine.energyLevel}%`;
+    }
+    if (elements.energyText) {
+      elements.energyText.textContent = `${machine.energyLevel}%`;
+    }
 
     // Update machine glow
-    if (machine.isActive) {
-      elements.container.querySelector(".machine-glow").classList.add("active");
-    } else {
-      elements.container
-        .querySelector(".machine-glow")
-        .classList.remove("active");
+    const machineGlow = elements.container.querySelector(".machine-glow");
+    if (machineGlow) {
+      if (machine.isActive) {
+        machineGlow.classList.add("active");
+      } else {
+        machineGlow.classList.remove("active");
+      }
     }
 
     // Update auto-mining indicator
-    if (machine.isAutoMining) {
-      elements.autoMiningIndicator.classList.add("active");
-      elements.machineButton.disabled = true;
-      elements.machineButton.textContent = "Auto-Mining";
-    } else {
-      elements.autoMiningIndicator.classList.remove("active");
-      elements.machineButton.disabled = false;
-      elements.machineButton.textContent = "Mine";
+    if (elements.autoMiningIndicator) {
+      if (machine.isAutoMining) {
+        elements.autoMiningIndicator.classList.add("active");
+        if (elements.machineButton) {
+          elements.machineButton.disabled = true;
+          elements.machineButton.textContent = "Auto-Mining";
+        }
+      } else {
+        elements.autoMiningIndicator.classList.remove("active");
+        if (elements.machineButton) {
+          elements.machineButton.disabled = false;
+          elements.machineButton.textContent = "Mine";
+        }
+      }
     }
 
     // Update geode counter
-    elements.geodeCounter.textContent = machine.geodeCount;
-    if (machine.geodeCount > 0) {
-      elements.geodeCounter.classList.add("has-geodes");
-      elements.geodeButton.disabled = false;
-    } else {
-      elements.geodeCounter.classList.remove("has-geodes");
-      elements.geodeButton.disabled = true;
+    const geodeCounter = elements.container.querySelector(".geode-counter");
+    const geodeCount = elements.container.querySelector(".geode-count");
+    const geodeButton = elements.container.querySelector(".geode-button");
+
+    if (geodeCount) {
+      geodeCount.textContent = machine.geodeCount;
+    }
+
+    if (geodeCounter) {
+      if (machine.geodeCount > 0) {
+        geodeCounter.classList.add("has-geodes");
+        if (geodeButton) geodeButton.disabled = false;
+      } else {
+        geodeCounter.classList.remove("has-geodes");
+        if (geodeButton) geodeButton.disabled = true;
+      }
     }
   }
 
