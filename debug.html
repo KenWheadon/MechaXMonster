@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/startscreen.css" />
     <link rel="stylesheet" href="css/mapscreen.css" />
     <link rel="stylesheet" href="css/miningscreen.css" />
+    <link rel="stylesheet" href="css/slotmachine.css" />
 
     <style>
       * {
@@ -277,6 +278,19 @@
       .hidden {
         display: none !important;
       }
+
+      /* Debug status indicators */
+      .debug-status-good {
+        color: #00ff88 !important;
+      }
+
+      .debug-status-warning {
+        color: #ffaa00 !important;
+      }
+
+      .debug-status-error {
+        color: #ff6b6b !important;
+      }
     </style>
   </head>
   <body>
@@ -334,6 +348,7 @@
         <div>Current: <span id="current-screen">None</span></div>
         <div>Status: <span id="debug-status">Ready</span></div>
         <div>Loaded: <span id="loaded-count">0</span></div>
+        <div>Components: <span id="components-status">Not Loaded</span></div>
       </div>
 
       <div class="debug-controls">
@@ -362,6 +377,12 @@
         <button class="debug-mini-btn" id="add-geodes" disabled>
           Add Geodes
         </button>
+        <button class="debug-mini-btn" id="test-slots" disabled>
+          Test Slots
+        </button>
+        <button class="debug-mini-btn" id="build-mecha" disabled>
+          Build Mecha
+        </button>
       </div>
     </div>
 
@@ -372,30 +393,71 @@
           <h2>Mecha X Monster</h2>
           <p>Select a screen from the debug panel to test</p>
           <p style="font-size: 0.9rem; margin-top: 15px">
-            Make sure you have the following files:
+            Required files for modular mining system:
           </p>
-          <p style="font-size: 0.8rem; color: #666">
-            js/screen.js, js/startscreen.js, js/mapscreen.js,
-            js/miningscreen.js<br />
-            css/styles.css, css/startscreen.css, css/mapscreen.css,
-            css/miningscreen.css
+          <p style="font-size: 0.8rem; color: #666; line-height: 1.4">
+            <strong>JS:</strong> config.js, screen.js, SlotMachine.js,
+            MachineUpgradeSlotMachine.js,<br />
+            MachineManager.js, GeodeSystem.js, PartsInventory.js,
+            MechaBuilder.js, miningscreen.js<br />
+            <strong>CSS:</strong> styles.css, miningscreen.css, slotmachine.css
           </p>
         </div>
       </div>
     </div>
 
-    <!-- Load Scripts in Order -->
+    <!-- Load Scripts in Critical Order -->
     <script src="js/config.js"></script>
     <script src="js/screen.js"></script>
+
+    <!-- Mining Screen Components - Load in dependency order -->
+    <script src="js/SlotMachine.js"></script>
+    <script src="js/MachineUpgradeSlotMachine.js"></script>
+    <script src="js/MachineManager.js"></script>
+    <script src="js/GeodeSystem.js"></script>
+    <script src="js/PartsInventory.js"></script>
+    <script src="js/MechaBuilder.js"></script>
     <script>
-      // Debug System - Enhanced for refactored screen system
+      // Wait for all scripts to load before initializing debug system
+      function waitForComponents() {
+        return new Promise((resolve) => {
+          const checkInterval = setInterval(() => {
+            const required = [
+              "SlotMachine",
+              "MachineUpgradeSlotMachine",
+              "MachineManager",
+              "GeodeSystem",
+              "PartsInventory",
+              "MechaBuilder",
+            ];
+            const allLoaded = required.every(
+              (comp) => typeof window[comp] !== "undefined"
+            );
+
+            if (allLoaded) {
+              clearInterval(checkInterval);
+              console.log("✅ All components detected");
+              resolve();
+            }
+          }, 100);
+
+          // Timeout after 5 seconds
+          setTimeout(() => {
+            clearInterval(checkInterval);
+            console.warn("⚠️ Component loading timeout - proceeding anyway");
+            resolve();
+          }, 5000);
+        });
+      }
+      // Enhanced Debug System for Modular Mining Screen
       class DebugSystem {
         constructor() {
           this.currentScreen = null;
           this.loadedScreens = new Map();
           this.loadedScripts = new Set();
           this.isLoading = false;
-          this.selectedMine = "mine1"; // Default mine for MiningScreen
+          this.selectedMine = "mine1";
+          this.componentsLoaded = false;
           this.init();
         }
 
@@ -403,12 +465,54 @@
           this.setupEventListeners();
           this.updateStatus("Ready - Select a screen to test");
           this.updateLoadedCount();
+          this.checkComponentsLoaded();
           console.log("🐛 Debug System initialized");
 
           // Check if base Screen class is available
           if (typeof Screen === "undefined") {
-            this.updateStatus("Error: Screen.js not loaded");
+            this.updateStatus("Error: Screen.js not loaded", "error");
             console.error("Screen.js must be loaded before debug system");
+          }
+        }
+
+        checkComponentsLoaded() {
+          const requiredComponents = [
+            "SlotMachine",
+            "MachineUpgradeSlotMachine",
+            "MachineManager",
+            "GeodeSystem",
+            "PartsInventory",
+            "MechaBuilder",
+          ];
+
+          const missing = requiredComponents.filter(
+            (comp) => typeof window[comp] === "undefined"
+          );
+
+          // Additional check for SlotMachine methods
+          if (typeof window.SlotMachine !== "undefined") {
+            if (typeof window.SlotMachine.prototype.configure !== "function") {
+              missing.push("SlotMachine.configure method");
+            }
+          }
+
+          if (missing.length === 0) {
+            this.componentsLoaded = true;
+            this.updateComponentsStatus("All Loaded", "good");
+            console.log("✅ All components loaded successfully");
+          } else {
+            this.componentsLoaded = false;
+            this.updateComponentsStatus(
+              `Missing: ${missing.join(", ")}`,
+              "error"
+            );
+            console.error("❌ Missing components:", missing);
+
+            // Debug info
+            console.log("🐛 Debug info:");
+            requiredComponents.forEach((comp) => {
+              console.log(`  ${comp}:`, typeof window[comp]);
+            });
           }
         }
 
@@ -522,6 +626,34 @@
                 this.updateStatus("Added geode to machine1");
               }
             });
+
+          // New mining screen specific controls
+          document
+            .getElementById("test-slots")
+            .addEventListener("click", () => {
+              if (this.currentScreen && this.currentScreen.upgradeSlotMachine) {
+                this.currentScreen.upgradeSlotMachine.showForMachine(
+                  "machine1"
+                );
+                this.updateStatus("Opened upgrade slot machine");
+              }
+            });
+
+          document
+            .getElementById("build-mecha")
+            .addEventListener("click", () => {
+              if (this.currentScreen && this.currentScreen.mechaBuilder) {
+                // Add all required parts first
+                const mineConfig = GAME_CONFIG.mines[this.selectedMine];
+                const mechaType = mineConfig.mecha;
+                for (let i = 1; i <= 6; i++) {
+                  this.currentScreen.addPart(`${mechaType}-${i}`);
+                }
+                // Then build the mecha
+                this.currentScreen.mechaBuilder.buildMecha();
+                this.updateStatus("Built mecha with all parts");
+              }
+            });
         }
 
         showMineSelector() {
@@ -541,6 +673,25 @@
             // Set button to loading state
             const btn = document.querySelector(`[data-screen="${screenName}"]`);
             if (btn) btn.classList.add("loading");
+
+            // For mining screen, check if components are loaded
+            if (screenName === "mining" && !this.componentsLoaded) {
+              throw new Error(
+                "Mining screen components not loaded. Check console for missing files."
+              );
+            }
+
+            // Additional mining screen validation
+            if (screenName === "mining") {
+              // Test SlotMachine creation before proceeding
+              try {
+                const testContainer = document.createElement("div");
+                const testSlot = new SlotMachine(testContainer);
+                console.log("✅ SlotMachine test successful");
+              } catch (error) {
+                throw new Error(`SlotMachine test failed: ${error.message}`);
+              }
+            }
 
             // Destroy current screen if exists
             if (this.currentScreen && this.currentScreen.destroy) {
@@ -577,7 +728,7 @@
 
               this.currentScreen.init();
 
-              this.updateStatus(`${screenName} loaded successfully`);
+              this.updateStatus(`${screenName} loaded successfully`, "good");
               this.updateCurrentScreen(screenName);
               this.updateDebugControls(screenName);
             } else {
@@ -585,7 +736,10 @@
             }
           } catch (error) {
             console.error(`Failed to load ${screenName}:`, error);
-            this.updateStatus(`Error loading ${screenName}: ${error.message}`);
+            this.updateStatus(
+              `Error loading ${screenName}: ${error.message}`,
+              "error"
+            );
             this.showErrorScreen(screenName, error.message);
           } finally {
             this.isLoading = false;
@@ -620,15 +774,9 @@
 
         getScreenClassName(screenName) {
           // Handle special cases
-          if (screenName === "start") {
-            return "StartScreen";
-          }
-          if (screenName === "map") {
-            return "MapScreen";
-          }
-          if (screenName === "mining") {
-            return "MiningScreen";
-          }
+          if (screenName === "start") return "StartScreen";
+          if (screenName === "map") return "MapScreen";
+          if (screenName === "mining") return "MiningScreen";
 
           // Convert kebab-case to PascalCase
           return (
@@ -703,6 +851,8 @@
             document.getElementById("add-currency").disabled = false;
             document.getElementById("add-parts").disabled = false;
             document.getElementById("add-geodes").disabled = false;
+            document.getElementById("test-slots").disabled = false;
+            document.getElementById("build-mecha").disabled = false;
           } else {
             // Generic controls for other screens
             document.getElementById("debug-info-btn").disabled = false;
@@ -712,8 +862,9 @@
 
         resetCurrentScreen() {
           if (this.currentScreen) {
-            const screenName =
-              document.getElementById("current-screen").textContent;
+            const screenName = document
+              .getElementById("current-screen")
+              .textContent.split(" ")[0];
             this.currentScreen.destroy();
 
             // Find the active button and reload the screen
@@ -727,8 +878,23 @@
           }
         }
 
-        updateStatus(status) {
-          document.getElementById("debug-status").textContent = status;
+        updateStatus(status, type = "normal") {
+          const statusEl = document.getElementById("debug-status");
+          statusEl.textContent = status;
+
+          // Remove existing status classes
+          statusEl.classList.remove(
+            "debug-status-good",
+            "debug-status-warning",
+            "debug-status-error"
+          );
+
+          // Add appropriate class
+          if (type === "good") statusEl.classList.add("debug-status-good");
+          else if (type === "warning")
+            statusEl.classList.add("debug-status-warning");
+          else if (type === "error")
+            statusEl.classList.add("debug-status-error");
         }
 
         updateCurrentScreen(screenName) {
@@ -744,6 +910,25 @@
             this.loadedScreens.size;
         }
 
+        updateComponentsStatus(status, type = "normal") {
+          const statusEl = document.getElementById("components-status");
+          statusEl.textContent = status;
+
+          // Remove existing status classes
+          statusEl.classList.remove(
+            "debug-status-good",
+            "debug-status-warning",
+            "debug-status-error"
+          );
+
+          // Add appropriate class
+          if (type === "good") statusEl.classList.add("debug-status-good");
+          else if (type === "warning")
+            statusEl.classList.add("debug-status-warning");
+          else if (type === "error")
+            statusEl.classList.add("debug-status-error");
+        }
+
         // Public API for console debugging
         getCurrentScreen() {
           return this.currentScreen;
@@ -754,22 +939,27 @@
         }
 
         getDebugInfo() {
+          const screen = this.currentScreen;
           return {
-            currentScreen: this.currentScreen?.constructor.name || "None",
+            currentScreen: screen?.constructor.name || "None",
             selectedMine: this.selectedMine,
             loadedScreens: this.getLoadedScreens(),
             loadedScripts: Array.from(this.loadedScripts),
+            componentsLoaded: this.componentsLoaded,
             isLoading: this.isLoading,
-            screenState: this.currentScreen
+            screenState: screen
               ? {
-                  isActive: this.currentScreen.isActive,
-                  gamePhase: this.currentScreen.gamePhase,
-                  clickCount: this.currentScreen.clickCount,
-                  energyLevel: this.currentScreen.energyLevel,
-                  mineId: this.currentScreen.mineId,
-                  currency: this.currentScreen.currency,
-                  collectedParts: this.currentScreen.collectedParts,
-                  hasMecha: this.currentScreen.hasMecha,
+                  isActive: screen.isActive,
+                  gamePhase: screen.gamePhase,
+                  clickCount: screen.clickCount,
+                  energyLevel: screen.energyLevel,
+                  mineId: screen.mineId,
+                  currency: screen.currency,
+                  monsterCurrency: screen.monsterCurrency,
+                  collectedParts: screen.collectedParts,
+                  hasMecha: screen.mechaBuilder?.hasMecha,
+                  machineCount: screen.machineManager?.getAllMachines().length,
+                  geodeCount: screen.geodeSystem?.getGeodeStats().totalGeodes,
                 }
               : null,
           };
@@ -777,10 +967,15 @@
       }
 
       // Initialize debug system when DOM is ready
-      document.addEventListener("DOMContentLoaded", () => {
+      document.addEventListener("DOMContentLoaded", async () => {
+        console.log("🐛 DOM loaded, waiting for components...");
+
+        // Wait for all components to load
+        await waitForComponents();
+
         window.debugSystem = new DebugSystem();
 
-        // Add console helpers
+        // Enhanced console helpers for modular system
         window.debug = {
           system: () => window.debugSystem,
           screen: () => window.debugSystem.getCurrentScreen(),
@@ -809,6 +1004,8 @@
           mining: {
             addCurrency: (amount) =>
               window.debugSystem.getCurrentScreen()?.addCurrency(amount),
+            addMonsterCurrency: (amount) =>
+              window.debugSystem.getCurrentScreen()?.addMonsterCurrency(amount),
             addPart: (partName) =>
               window.debugSystem.getCurrentScreen()?.addPart(partName),
             addGeode: (machineId) =>
@@ -824,21 +1021,220 @@
             },
             fillEnergy: (machineId = "machine1") => {
               const screen = window.debugSystem.getCurrentScreen();
-              if (screen && screen.machines) {
-                const machine = screen.machines.find((m) => m.id === machineId);
-                if (machine) {
-                  machine.energyLevel = 100;
-                  screen.updateMachineUI(machine);
+              if (screen && screen.machineManager) {
+                screen.machineManager.addEnergy(machineId, 100);
+              }
+            },
+            openSlots: (machineId = "machine1") => {
+              const screen = window.debugSystem.getCurrentScreen();
+              if (screen && screen.upgradeSlotMachine) {
+                screen.upgradeSlotMachine.showForMachine(machineId);
+              }
+            },
+            buildMecha: () => {
+              const screen = window.debugSystem.getCurrentScreen();
+              if (screen && screen.mechaBuilder) {
+                // Add all parts first
+                const mechaType = screen.mineConfig.mecha;
+                for (let i = 1; i <= 6; i++) {
+                  screen.addPart(`${mechaType}-${i}`);
                 }
+                screen.mechaBuilder.buildMecha();
+              }
+            },
+            getStats: () => {
+              const screen = window.debugSystem.getCurrentScreen();
+              if (screen) {
+                return {
+                  currency: screen.currency,
+                  monsterCurrency: screen.monsterCurrency,
+                  parts: screen.partsInventory?.getPartStats(),
+                  geodes: screen.geodeSystem?.getGeodeStats(),
+                  machines: screen.machineManager
+                    ?.getAllMachines()
+                    .map((m) => ({
+                      id: m.id,
+                      energy: m.energyLevel,
+                      geodes: m.geodeCount,
+                      upgrades: m.upgrades,
+                      autoMining: m.isAutoMining,
+                    })),
+                  mecha: screen.mechaBuilder?.getBuildStatus(),
+                };
               }
             },
           },
         };
 
         console.log(
-          "🐛 Debug System loaded. Use window.debug for console access."
+          "🐛 Enhanced Debug System loaded. Use window.debug for console access."
         );
+        console.log("🎮 Available commands:");
+        console.log("  debug.mining.addAllParts() - Add all mecha parts");
+        console.log("  debug.mining.buildMecha() - Build mecha with all parts");
+        console.log("  debug.mining.openSlots() - Open upgrade slot machine");
+        console.log("  debug.mining.getStats() - Get detailed mining stats");
+        console.log("  validateComponents() - Check component loading status");
+
+        // Auto-run validation after a brief delay
+        setTimeout(() => {
+          if (typeof validateComponents === "function") {
+            validateComponents();
+          }
+        }, 1500);
       });
+
+      // Component Validator Function
+      function validateComponents() {
+        console.log("🔍 Component Validation Report");
+        console.log("================================");
+
+        // Check basic requirements
+        console.log("📋 Basic Requirements:");
+        console.log(
+          "  GAME_CONFIG:",
+          typeof GAME_CONFIG !== "undefined" ? "✅" : "❌"
+        );
+
+        if (typeof GAME_CONFIG !== "undefined") {
+          console.log("  GAME_CONFIG.mines:", GAME_CONFIG.mines ? "✅" : "❌");
+          console.log(
+            "  GAME_CONFIG.mechas:",
+            GAME_CONFIG.mechas ? "✅" : "❌"
+          );
+
+          // Check specific mine configs
+          const mines = ["mine1", "mine2", "mine3", "mine4", "mine5"];
+          mines.forEach((mineId) => {
+            const mineExists = GAME_CONFIG.mines && GAME_CONFIG.mines[mineId];
+            console.log(`    ${mineId}:`, mineExists ? "✅" : "❌");
+
+            if (mineExists) {
+              const mechaType = GAME_CONFIG.mines[mineId].mecha;
+              const mechaExists =
+                GAME_CONFIG.mechas && GAME_CONFIG.mechas[mechaType];
+              console.log(
+                `      mecha (${mechaType}):`,
+                mechaExists ? "✅" : "❌"
+              );
+            }
+          });
+        }
+
+        console.log("  Screen:", typeof Screen !== "undefined" ? "✅" : "❌");
+
+        // Check component classes
+        console.log("\n🏗️ Component Classes:");
+        const components = [
+          "SlotMachine",
+          "MachineUpgradeSlotMachine",
+          "MachineManager",
+          "GeodeSystem",
+          "PartsInventory",
+          "MechaBuilder",
+          "MiningScreen",
+        ];
+
+        components.forEach((comp) => {
+          const exists = typeof window[comp] !== "undefined";
+          console.log(`  ${comp}:`, exists ? "✅" : "❌");
+
+          if (exists && comp === "SlotMachine") {
+            // Check SlotMachine methods
+            const methods = ["configure", "show", "hide", "spin"];
+            methods.forEach((method) => {
+              const hasMethod =
+                typeof window[comp].prototype[method] === "function";
+              console.log(`    ${method}():`, hasMethod ? "✅" : "❌");
+            });
+          }
+
+          if (exists && comp === "MachineUpgradeSlotMachine") {
+            // Check inheritance
+            const extendsSlotMachine =
+              window[comp].prototype instanceof SlotMachine;
+            console.log(
+              `    extends SlotMachine:`,
+              extendsSlotMachine ? "✅" : "❌"
+            );
+          }
+        });
+
+        // Test SlotMachine creation
+        console.log("\n🧪 Component Tests:");
+        try {
+          const testDiv = document.createElement("div");
+          const testSlot = new SlotMachine(testDiv);
+          console.log("  SlotMachine creation: ✅");
+          console.log(
+            "  configure method accessible:",
+            typeof testSlot.configure === "function" ? "✅" : "❌"
+          );
+        } catch (error) {
+          console.log("  SlotMachine creation: ❌", error.message);
+        }
+
+        // Test MachineUpgradeSlotMachine creation
+        try {
+          const testDiv = document.createElement("div");
+
+          // Create a more complete mock mining screen
+          const mockMiningScreen = {
+            mineConfig: {
+              currency: "shells",
+              mecha: "green",
+            },
+            mechaConfig: {
+              name: "Test Mecha",
+              baseStats: { health: 100 },
+            },
+            currency: 100,
+            updateCurrencyDisplay: () => {},
+            machineManager: {
+              getMachine: () => null,
+              updateUpgradeCost: () => {},
+              applyUpgrade: () => true,
+            },
+            showTemporaryMessage: () => {},
+            audioManager: null,
+          };
+
+          const testUpgradeSlot = new MachineUpgradeSlotMachine(
+            testDiv,
+            mockMiningScreen
+          );
+          console.log("  MachineUpgradeSlotMachine creation: ✅");
+        } catch (error) {
+          console.log(
+            "  MachineUpgradeSlotMachine creation: ❌",
+            error.message
+          );
+        }
+
+        // Test MiningScreen creation
+        try {
+          if (
+            typeof MiningScreen !== "undefined" &&
+            typeof GAME_CONFIG !== "undefined"
+          ) {
+            const testDiv = document.createElement("div");
+            const testMiningScreen = new MiningScreen(testDiv, "mine1");
+            console.log("  MiningScreen creation: ✅");
+          } else {
+            console.log(
+              "  MiningScreen creation: ⏭️ (MiningScreen or GAME_CONFIG not loaded)"
+            );
+          }
+        } catch (error) {
+          console.log("  MiningScreen creation: ❌", error.message);
+        }
+
+        console.log("\n================================");
+        console.log("Validation complete!");
+      }
+
+      // Make validator available globally
+      window.validateComponents = validateComponents;
     </script>
   </body>
 </html>
