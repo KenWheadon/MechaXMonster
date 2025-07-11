@@ -1,4 +1,4 @@
-// MachineUpgradeSlotMachine - Specific implementation for machine upgrades
+// MineUpgradeSlotMachine - Updated for mine-wide upgrades instead of per-machine
 class MachineUpgradeSlotMachine extends SlotMachine {
   constructor(container, miningScreen) {
     // Verify that SlotMachine exists and is properly loaded
@@ -15,11 +15,10 @@ class MachineUpgradeSlotMachine extends SlotMachine {
     }
 
     this.miningScreen = miningScreen;
-    this.activeMachineId = null;
-    this.baseCost = 10;
-    this.costMultiplier = 1.5;
+    this.baseCost = 50; // Higher base cost for mine-wide upgrades
+    this.costMultiplier = 1.3; // Slower cost increase
 
-    // Configure upgrade-specific symbols AFTER super() call
+    // Configure mine-wide upgrade symbols
     this.configure({
       symbols: [
         {
@@ -30,6 +29,7 @@ class MachineUpgradeSlotMachine extends SlotMachine {
           upgradeType: "timeReduction",
           upgradeValue: 0.05, // 5% time reduction
           color: "#FFD700",
+          description: "Reduces mining time for all machines",
         },
         {
           name: "output_bonus",
@@ -37,8 +37,9 @@ class MachineUpgradeSlotMachine extends SlotMachine {
           image: "images/upgrade-output.png",
           weight: 30,
           upgradeType: "outputBonus",
-          upgradeValue: 1, // +1 output
+          upgradeValue: 2, // +2 output for all machines
           color: "#4CAF50",
+          description: "Increases currency output for all machines",
         },
         {
           name: "output_multiplier",
@@ -46,29 +47,42 @@ class MachineUpgradeSlotMachine extends SlotMachine {
           image: "images/upgrade-efficiency.png",
           weight: 20,
           upgradeType: "outputMultiplier",
-          upgradeValue: 0.001, // 0.1% per 100 stored
+          upgradeValue: 0.005, // 0.5% per 100 stored
           color: "#2196F3",
+          description: "Increases efficiency based on stored currency",
         },
         {
           name: "part_drop_rate",
           emoji: "💎",
           image: "images/upgrade-luck.png",
-          weight: 15,
+          weight: 20,
           upgradeType: "partDropRate",
-          upgradeValue: 0.01, // +1% drop rate
+          upgradeValue: 0.02, // +2% drop rate
           color: "#E91E63",
+          description: "Increases geode drop rate for all machines",
         },
         {
-          name: "currency_bonus",
-          emoji: "🪙",
-          image: "images/upgrade-currency.png",
-          weight: 10,
-          upgradeType: "currency",
-          upgradeValue: 100, // +100 currency
+          name: "combo_bonus",
+          emoji: "🎯",
+          image: "images/upgrade-combo.png",
+          weight: 15,
+          upgradeType: "comboBonus",
+          upgradeValue: 0.05, // +5% combo effectiveness
           color: "#FF9800",
+          description: "Increases combo bonus effectiveness",
+        },
+        {
+          name: "critical_chance",
+          emoji: "💥",
+          image: "images/upgrade-critical.png",
+          weight: 10,
+          upgradeType: "criticalChance",
+          upgradeValue: 0.02, // +2% critical hit chance
+          color: "#9C27B0",
+          description: "Increases critical hit chance in active mining",
         },
       ],
-      winChance: 0.3, // 30% win chance for upgrades
+      winChance: 0.35, // 35% win chance for mine upgrades
       useImages: true,
     });
 
@@ -80,47 +94,51 @@ class MachineUpgradeSlotMachine extends SlotMachine {
       onLose: this.handleLose.bind(this),
     });
 
-    // Track consecutive losses for achievements
+    // Track stats
+    this.totalSpins = 0;
+    this.totalWins = 0;
     this.consecutiveLosses = 0;
+    this.upgradeHistory = [];
   }
 
-  // Initialize with paytable rendering
+  // Initialize with enhanced paytable
   init() {
     super.init();
     this.cacheAdditionalElements();
-    this.renderPaytable();
+    this.renderEnhancedPaytable();
     this.updateUI();
   }
 
-  // Cache additional elements specific to upgrades
+  // Cache additional elements specific to mine upgrades
   cacheAdditionalElements() {
     this.elements = {
       ...this.elements,
       costDisplay: this.container.querySelector(".cost-amount"),
       paytable: this.container.querySelector(".slot-paytable"),
+      upgradeStats: this.container.querySelector(".upgrade-stats"),
+      mineTitle: this.container.querySelector(".modal-header h2"),
     };
   }
 
-  // Show slot machine for specific machine
-  showForMachine(machineId) {
-    this.activeMachineId = machineId;
+  // Show slot machine for mine-wide upgrades
+  showForMine() {
     this.updateUI();
     this.show();
+
+    // Update modal title
+    if (this.elements.mineTitle) {
+      this.elements.mineTitle.textContent = `${this.miningScreen.mineConfig.name} - Mine Upgrades`;
+    }
   }
 
   // Handle spin attempt
   handleSpin(slotMachine) {
-    if (!this.activeMachineId) {
-      this.miningScreen.showTemporaryMessage("No machine selected!", "warning");
-      return false;
-    }
-
     const cost = this.getCurrentCost();
 
     // Check if player can afford
     if (this.miningScreen.currency < cost) {
       this.miningScreen.showTemporaryMessage(
-        `Not enough currency! Need ${cost}`,
+        `Not enough currency! Need ${cost} ${this.miningScreen.mineConfig.currency}`,
         "warning"
       );
       return false;
@@ -130,30 +148,42 @@ class MachineUpgradeSlotMachine extends SlotMachine {
     this.miningScreen.currency -= cost;
     this.miningScreen.updateCurrencyDisplay();
 
+    // Update stats
+    this.totalSpins++;
+
     return true;
   }
 
   // Handle spin result
   handleResult(result, slotMachine) {
-    console.log("Upgrade slot result:", result);
+    console.log("Mine upgrade slot result:", result);
 
     // Update UI after result
     this.updateUI();
+    this.updateUpgradeStats();
   }
 
   // Handle winning result
   handleWin(result, slotMachine) {
     this.consecutiveLosses = 0;
+    this.totalWins++;
 
     const symbol = this.getSymbol(result.symbol);
     if (!symbol) return;
 
-    // Apply upgrade to machine
-    this.applyUpgrade(symbol);
+    // Apply mine-wide upgrade
+    this.applyMineUpgrade(symbol);
+
+    // Record upgrade history
+    this.upgradeHistory.push({
+      symbol: symbol.name,
+      timestamp: Date.now(),
+      spinNumber: this.totalSpins,
+    });
 
     // Show success message
     const upgradeName = this.getUpgradeName(symbol);
-    this.showResult(`🎉 ${upgradeName}!`, symbol.color);
+    this.showResult(`🎉 Mine Upgrade: ${upgradeName}!`, symbol.color);
 
     // Highlight paytable row
     this.highlightPaytableRow(symbol.name);
@@ -162,6 +192,9 @@ class MachineUpgradeSlotMachine extends SlotMachine {
     if (this.miningScreen.audioManager) {
       this.miningScreen.audioManager.playSound("upgrade-success");
     }
+
+    // Create mine-wide upgrade effect
+    this.createMineUpgradeEffect(symbol);
 
     // Check for achievements
     this.checkUpgradeAchievements(symbol);
@@ -173,77 +206,81 @@ class MachineUpgradeSlotMachine extends SlotMachine {
 
     this.showResult("No upgrade - try again!", "#999");
 
-    // Achievement for consecutive losses
+    // Consolation for consecutive losses
     if (this.consecutiveLosses >= 3) {
-      this.miningScreen.showTemporaryMessage("Unlucky streak! 🎰", "warning");
+      this.miningScreen.showTemporaryMessage(
+        "Bad luck streak! Next spin has better odds! 🎰",
+        "warning"
+      );
+
+      // Temporarily boost win chance
+      this.configure({
+        ...this.config,
+        winChance: Math.min(this.config.winChance + 0.1, 0.8),
+      });
+    }
+
+    if (this.consecutiveLosses >= 5) {
+      // Give small consolation prize
+      this.miningScreen.currency += Math.floor(this.getCurrentCost() * 0.3);
+      this.miningScreen.updateCurrencyDisplay();
+      this.miningScreen.showTemporaryMessage(
+        "Consolation prize: some currency back!",
+        "info"
+      );
     }
   }
 
-  // Apply upgrade to active machine
-  applyUpgrade(symbol) {
-    const machine = this.miningScreen.machineManager.getMachine(
-      this.activeMachineId
-    );
-    if (!machine) return;
+  // Apply mine-wide upgrade
+  applyMineUpgrade(symbol) {
+    const currentLevel =
+      this.miningScreen.mineUpgrades[symbol.upgradeType] || 0;
+    const newLevel = currentLevel + symbol.upgradeValue;
 
+    // Apply upgrade with caps
     switch (symbol.upgradeType) {
       case "timeReduction":
-        this.miningScreen.machineManager.applyUpgrade(
-          this.activeMachineId,
-          "timeReduction",
-          symbol.upgradeValue
-        );
+        this.miningScreen.mineUpgrades.timeReduction = Math.min(newLevel, 0.9); // Max 90% reduction
         break;
       case "outputBonus":
-        this.miningScreen.machineManager.applyUpgrade(
-          this.activeMachineId,
-          "outputBonus",
-          symbol.upgradeValue
-        );
+        this.miningScreen.mineUpgrades.outputBonus = Math.min(newLevel, 100); // Max +100 bonus
         break;
       case "outputMultiplier":
-        this.miningScreen.machineManager.applyUpgrade(
-          this.activeMachineId,
-          "outputMultiplier",
-          symbol.upgradeValue
-        );
+        this.miningScreen.mineUpgrades.outputMultiplier = Math.min(
+          newLevel,
+          0.5
+        ); // Max 50% multiplier
         break;
       case "partDropRate":
-        this.miningScreen.machineManager.applyUpgrade(
-          this.activeMachineId,
-          "partDropRate",
-          symbol.upgradeValue
-        );
+        this.miningScreen.mineUpgrades.partDropRate = Math.min(newLevel, 0.95); // Max 95% drop rate
         break;
-      case "currency":
-        this.miningScreen.currency += symbol.upgradeValue;
-        this.miningScreen.updateCurrencyDisplay();
+      case "comboBonus":
+        this.miningScreen.mineUpgrades.comboBonus = Math.min(newLevel, 1.0); // Max +100% combo effectiveness
+        break;
+      case "criticalChance":
+        this.miningScreen.mineUpgrades.criticalChance = Math.min(newLevel, 0.5); // Max 50% critical chance
         break;
     }
 
-    // Update machine upgrade cost
-    this.miningScreen.machineManager.updateUpgradeCost(this.activeMachineId);
+    // Update mining screen UI to reflect new upgrades
+    this.miningScreen.updateUI();
+
+    // Restart auto-mining with new upgrades if mecha is active
+    if (this.miningScreen.mechaBuilder.hasMecha) {
+      this.miningScreen.machineManager.stopAutoMining();
+      this.miningScreen.machineManager.startAutoMiningAll();
+    }
   }
 
-  // Get current cost based on machine upgrades
+  // Get current cost based on total upgrades
   getCurrentCost() {
-    if (!this.activeMachineId) return this.baseCost;
-
-    const machine = this.miningScreen.machineManager.getMachine(
-      this.activeMachineId
-    );
-    if (!machine) return this.baseCost;
-
-    // Calculate cost based on total upgrades applied
-    const totalUpgrades = Object.values(machine.upgrades).reduce(
-      (sum, value) => {
-        return sum + Math.floor(value * 100); // Convert percentages to counts
-      },
+    const totalUpgrades = Object.values(this.miningScreen.mineUpgrades).reduce(
+      (sum, value) => sum + Math.floor(value * 100),
       0
     );
 
     return Math.floor(
-      this.baseCost * Math.pow(this.costMultiplier, totalUpgrades)
+      this.baseCost * Math.pow(this.costMultiplier, totalUpgrades / 10)
     );
   }
 
@@ -251,6 +288,7 @@ class MachineUpgradeSlotMachine extends SlotMachine {
   updateUI() {
     this.updateCostDisplay();
     this.updateSpinButton();
+    this.updateUpgradeStats();
   }
 
   // Update cost display
@@ -268,19 +306,53 @@ class MachineUpgradeSlotMachine extends SlotMachine {
       const canAfford = this.miningScreen.currency >= this.getCurrentCost();
       this.elements.spinButton.disabled = !canAfford;
       this.elements.spinButton.textContent = canAfford
-        ? "Spin for Upgrade"
+        ? "Spin for Mine Upgrade"
         : "Not Enough Currency";
     }
   }
 
-  // Render paytable
-  renderPaytable() {
+  // Update upgrade statistics display
+  updateUpgradeStats() {
+    if (!this.elements.upgradeStats) return;
+
+    const winRate =
+      this.totalSpins > 0
+        ? ((this.totalWins / this.totalSpins) * 100).toFixed(1)
+        : 0;
+    const currentUpgrades = this.miningScreen.mineUpgrades;
+
+    this.elements.upgradeStats.innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-label">Total Spins</div>
+          <div class="stat-value">${this.totalSpins}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Win Rate</div>
+          <div class="stat-value">${winRate}%</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Total Upgrades</div>
+          <div class="stat-value">${
+            Object.values(currentUpgrades).filter((v) => v > 0).length
+          }</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Next Cost</div>
+          <div class="stat-value">${this.getCurrentCost()}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Render enhanced paytable with mine upgrade info
+  renderEnhancedPaytable() {
     if (!this.elements.paytable) return;
 
     const paytableHTML = `
       <div class="paytable-header">
-        <h4>Upgrade Paytable</h4>
-        <div class="paytable-note">Win 3 matching symbols for upgrades!</div>
+        <h4>Mine Upgrade Paytable</h4>
+        <div class="paytable-note">Win 3 matching symbols for mine-wide upgrades!</div>
       </div>
       <div class="paytable-grid">
         ${this.config.symbols
@@ -298,8 +370,16 @@ class MachineUpgradeSlotMachine extends SlotMachine {
               symbol.name
             }" class="paytable-symbol">
             </div>
-            <div class="paytable-reward" style="color: ${symbol.color}">
-              ${this.getUpgradeName(symbol)}
+            <div class="paytable-info">
+              <div class="paytable-reward" style="color: ${symbol.color}">
+                ${this.getUpgradeName(symbol)}
+              </div>
+              <div class="paytable-description">
+                ${symbol.description}
+              </div>
+              <div class="paytable-current">
+                Current: ${this.getCurrentUpgradeLevel(symbol.upgradeType)}
+              </div>
             </div>
           </div>
         `
@@ -307,21 +387,48 @@ class MachineUpgradeSlotMachine extends SlotMachine {
           .join("")}
       </div>
       <div class="paytable-footer">
-        <div class="paytable-note">Cost increases with each upgrade applied to this machine</div>
+        <div class="paytable-note">Cost increases with total mine upgrades</div>
+        <div class="paytable-note">Upgrades apply to ALL machines in this mine</div>
+      </div>
+      <div class="upgrade-stats">
+        <!-- Stats will be populated by updateUpgradeStats() -->
       </div>
     `;
 
     this.elements.paytable.innerHTML = paytableHTML;
   }
 
+  // Get current upgrade level for display
+  getCurrentUpgradeLevel(upgradeType) {
+    const currentValue = this.miningScreen.mineUpgrades[upgradeType] || 0;
+
+    switch (upgradeType) {
+      case "timeReduction":
+        return `${Math.floor(currentValue * 100)}% faster`;
+      case "outputBonus":
+        return `+${Math.floor(currentValue)} currency`;
+      case "outputMultiplier":
+        return `+${(currentValue * 100).toFixed(1)}% efficiency`;
+      case "partDropRate":
+        return `+${Math.floor(currentValue * 100)}% drop rate`;
+      case "comboBonus":
+        return `+${Math.floor(currentValue * 100)}% combo power`;
+      case "criticalChance":
+        return `${Math.floor(currentValue * 100)}% critical chance`;
+      default:
+        return "Level 0";
+    }
+  }
+
   // Get upgrade name for display
   getUpgradeName(symbol) {
     const names = {
       time_reduction: "Speed Boost (+5%)",
-      output_bonus: "Output Boost (+1)",
-      output_multiplier: "Efficiency (+0.1%)",
-      part_drop_rate: "Lucky Strike (+1%)",
-      currency_bonus: "Currency Bonus (+100)",
+      output_bonus: "Output Boost (+2)",
+      output_multiplier: "Efficiency (+0.5%)",
+      part_drop_rate: "Lucky Strike (+2%)",
+      combo_bonus: "Combo Power (+5%)",
+      critical_chance: "Critical Hit (+2%)",
     };
     return names[symbol.name] || symbol.name;
   }
@@ -345,64 +452,159 @@ class MachineUpgradeSlotMachine extends SlotMachine {
     }
   }
 
+  // Create mine upgrade effect
+  createMineUpgradeEffect(symbol) {
+    // Create screen-wide effect
+    this.miningScreen.triggerScreenShake(400);
+
+    // Create particles at all machines
+    this.miningScreen.machineManager.getAllMachines().forEach((machine) => {
+      const container = this.miningScreen.container.querySelector(
+        `[data-machine="${machine.id}"]`
+      );
+      if (container) {
+        const rect = container.getBoundingClientRect();
+        this.miningScreen.createParticleBurst(
+          rect.left + rect.width / 2,
+          rect.top + rect.height / 2,
+          8,
+          symbol.color
+        );
+      }
+    });
+
+    // Show mine-wide upgrade message
+    this.miningScreen.showTemporaryMessage(
+      `Mine Upgrade Applied to All Machines! ${symbol.emoji}`,
+      "success",
+      4000
+    );
+  }
+
   // Check for upgrade-related achievements
   checkUpgradeAchievements(symbol) {
-    // Could add achievements for specific upgrades or combinations
-    console.log(`Upgrade applied: ${symbol.name}`);
+    const upgrades = this.miningScreen.mineUpgrades;
+
+    // Check for maxed out upgrades
+    if (upgrades.timeReduction >= 0.8) {
+      this.miningScreen.showTemporaryMessage(
+        "Achievement: Speed Demon!",
+        "success"
+      );
+    }
+
+    if (upgrades.outputBonus >= 50) {
+      this.miningScreen.showTemporaryMessage(
+        "Achievement: Production Master!",
+        "success"
+      );
+    }
+
+    if (upgrades.partDropRate >= 0.5) {
+      this.miningScreen.showTemporaryMessage(
+        "Achievement: Lucky Miner!",
+        "success"
+      );
+    }
+
+    // Check for balanced upgrades
+    const nonZeroUpgrades = Object.values(upgrades).filter((v) => v > 0).length;
+    if (nonZeroUpgrades >= 6) {
+      this.miningScreen.showTemporaryMessage(
+        "Achievement: Balanced Approach!",
+        "success"
+      );
+    }
+
+    // Check for win streaks
+    if (this.totalWins >= 10) {
+      this.miningScreen.showTemporaryMessage(
+        "Achievement: Upgrade Collector!",
+        "success"
+      );
+    }
   }
 
-  // Get machine upgrade statistics
-  getMachineUpgradeStats(machineId) {
-    const machine = this.miningScreen.machineManager.getMachine(machineId);
-    if (!machine) return null;
-
-    return {
-      machineId,
-      upgrades: { ...machine.upgrades },
-      currentCost: this.getCurrentCost(),
-      totalUpgrades: Object.values(machine.upgrades).reduce(
-        (sum, value) => sum + Math.floor(value * 100),
-        0
-      ),
-    };
-  }
-
-  // Reset for new machine
-  resetForMachine(machineId) {
-    this.activeMachineId = machineId;
-    this.consecutiveLosses = 0;
-    this.updateUI();
-  }
-
-  // Override hide to clear active machine
-  hide() {
-    super.hide();
-    this.activeMachineId = null;
-  }
-
-  // Get upgrade recommendations based on machine state
-  getUpgradeRecommendations(machineId) {
-    const machine = this.miningScreen.machineManager.getMachine(machineId);
-    if (!machine) return [];
-
+  // Get upgrade recommendations
+  getUpgradeRecommendations() {
+    const upgrades = this.miningScreen.mineUpgrades;
     const recommendations = [];
 
-    // Recommend based on current upgrade levels
-    if (machine.upgrades.timeReduction < 0.5) {
+    // Recommend based on current situation
+    if (
+      this.miningScreen.activeMining.totalHits > 50 &&
+      upgrades.comboBonus < 0.3
+    ) {
+      recommendations.push("combo_bonus");
+    }
+
+    if (
+      this.miningScreen.mechaBuilder.hasMecha &&
+      upgrades.timeReduction < 0.5
+    ) {
       recommendations.push("time_reduction");
     }
-    if (machine.upgrades.outputBonus < 10) {
-      recommendations.push("output_bonus");
+
+    if (this.miningScreen.currency > 1000 && upgrades.outputMultiplier < 0.2) {
+      recommendations.push("output_multiplier");
     }
-    if (machine.upgrades.partDropRate < 0.1) {
+
+    if (upgrades.partDropRate < 0.3) {
       recommendations.push("part_drop_rate");
     }
 
     return recommendations;
+  }
+
+  // Get upgrade efficiency rating
+  getUpgradeEfficiency() {
+    const upgrades = this.miningScreen.mineUpgrades;
+    const totalSpent = this.totalSpins * (this.baseCost * 0.8); // Estimated average cost
+    const totalBenefit = Object.values(upgrades).reduce(
+      (sum, value) => sum + value * 100,
+      0
+    );
+
+    return totalSpent > 0 ? ((totalBenefit / totalSpent) * 100).toFixed(1) : 0;
+  }
+
+  // Reset upgrade stats
+  resetStats() {
+    this.totalSpins = 0;
+    this.totalWins = 0;
+    this.consecutiveLosses = 0;
+    this.upgradeHistory = [];
+    this.updateUpgradeStats();
+  }
+
+  // Export upgrade data
+  exportUpgradeData() {
+    return {
+      totalSpins: this.totalSpins,
+      totalWins: this.totalWins,
+      winRate: this.totalSpins > 0 ? this.totalWins / this.totalSpins : 0,
+      upgradeHistory: this.upgradeHistory,
+      currentUpgrades: { ...this.miningScreen.mineUpgrades },
+      efficiency: this.getUpgradeEfficiency(),
+      recommendations: this.getUpgradeRecommendations(),
+    };
+  }
+
+  // Override hide to reset consecutive losses bonus
+  hide() {
+    super.hide();
+
+    // Reset win chance if it was boosted
+    if (this.consecutiveLosses >= 3) {
+      this.configure({
+        ...this.config,
+        winChance: 0.35, // Reset to default
+      });
+    }
   }
 }
 
 // Make available globally
 window.MachineUpgradeSlotMachine = MachineUpgradeSlotMachine;
 
-console.log("🔧 MachineUpgradeSlotMachine class loaded!");
+console.log("🔧 Mine-Wide Upgrade Slot Machine class loaded!");

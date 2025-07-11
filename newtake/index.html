@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mecha vs. Slime Pachinko Battle</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Menu Screen -->
+    <div class="screen active" id="menu-screen">
+      <h1>🤖 MECHA VS SLIME<br />PACHINKO BATTLE! 🎯</h1>
+      <div class="nav-buttons">
+        <button data-action="show-level-select">Start Game</button>
+        <button data-action="show-shop">Shop</button>
+      </div>
+    </div>
+
+    <!-- Level Select Screen -->
+    <div class="screen" id="level-select-screen">
+      <h1>Choose Your Battle!</h1>
+      <div class="level-grid" id="level-grid">
+        <!-- Levels will be populated by JavaScript -->
+      </div>
+      <div class="nav-buttons">
+        <button data-action="show-menu">Back to Menu</button>
+      </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div class="screen" id="game-screen">
+      <div id="game-ui">
+        <div id="currency-display">
+          💰 Coins: <span id="currency-count">5</span>
+        </div>
+        <div id="level-info">
+          <span id="current-level">Level 1</span> -
+          <span id="current-wave">Wave 1</span>
+        </div>
+        <div class="nav-buttons">
+          <button data-action="show-level-select">Exit Battle</button>
+        </div>
+      </div>
+
+      <div id="game-area">
+        <!-- Pachinko Board -->
+        <div id="pachinko-board">
+          <div class="attack-containers" id="attack-containers">
+            <!-- Attack containers will be populated by JavaScript -->
+          </div>
+          <!-- Pegs will be populated by JavaScript -->
+        </div>
+
+        <!-- Battle Area -->
+        <div id="battle-area">
+          <div class="mecha" id="mecha">🐅</div>
+          <div class="slime" id="slime">
+            <div class="health-bar">
+              <div class="health-fill" id="slime-health"></div>
+            </div>
+            🟢
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shop Screen -->
+    <div class="screen" id="shop-screen">
+      <h1>Cosmetic Shop</h1>
+      <div id="currency-display-shop">
+        💰 Coins: <span id="currency-count-shop">5</span>
+      </div>
+      <div class="cosmetic-grid" id="cosmetic-grid">
+        <!-- Cosmetics will be populated by JavaScript -->
+      </div>
+      <div class="nav-buttons">
+        <button data-action="show-menu">Back to Menu</button>
+      </div>
+    </div>
+
+    <!-- Load JavaScript files in dependency order -->
+    <script src="config.js"></script>
+    <script src="level-select.js"></script>
+    <script src="peg-game.js"></script>
+    <script src="mecha-battle.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
