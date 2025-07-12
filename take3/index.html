@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mecha X Monster</title>
+    <meta
+      name="description"
+      content="An exciting space mining and defense game"
+    />
+    <meta name="author" content="Mecha X Monster Team" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="images/favicon.png" />
+
+    <!-- Preload critical images -->
+    <link rel="preload" href="images/logo.png" as="image" />
+    <link rel="preload" href="images/map-background.png" as="image" />
+    <link rel="preload" href="images/slime-orange-1.png" as="image" />
+    <link rel="preload" href="images/slime-teal-1.png" as="image" />
+    <link rel="preload" href="images/slime-blue-1.png" as="image" />
+    <link rel="preload" href="images/slime-yellow-1.png" as="image" />
+    <link rel="preload" href="images/slime-alien-1.png" as="image" />
+
+    <!-- CSS Files in order of importance -->
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="startscreen.css" />
+    <link rel="stylesheet" href="slimedefense.css" />
+
+    <style>
+      /* Critical CSS for initial load */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #0a0a1a 0%,
+          #1a1a2e 50%,
+          #16213e 100%
+        );
+        min-height: 100vh;
+        color: white;
+        overflow: hidden;
+      }
+
+      /* Game Container */
+      #game-container {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Loading Screen */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          #0a0a1a 0%,
+          #1a1a2e 50%,
+          #16213e 100%
+        );
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+      }
+
+      .loading-screen.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .loading-content {
+        text-align: center;
+        animation: pulse 2s infinite;
+      }
+
+      .loading-logo {
+        width: 150px;
+        height: 150px;
+        margin: 0 auto 30px;
+        background: url("images/logo.png") center/contain no-repeat;
+        filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.5));
+      }
+
+      .loading-title {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #00ff88;
+        margin-bottom: 20px;
+        text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        letter-spacing: 2px;
+      }
+
+      .loading-subtitle {
+        font-size: 1.2rem;
+        color: #aaa;
+        margin-bottom: 40px;
+        font-weight: normal;
+      }
+
+      .loading-spinner {
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgba(0, 255, 136, 0.2);
+        border-top: 4px solid #00ff88;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+
+      .loading-text {
+        font-size: 1rem;
+        color: #00ff88;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .loading-progress {
+        width: 300px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        margin: 20px auto;
+        overflow: hidden;
+      }
+
+      .loading-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #00ff88, #00cc66);
+        border-radius: 2px;
+        width: 0%;
+        transition: width 0.3s ease;
+      }
+
+      /* Error Screen */
+      .error-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        backdrop-filter: blur(10px);
+      }
+
+      .error-content {
+        background: rgba(0, 0, 0, 0.95);
+        padding: 40px;
+        border-radius: 15px;
+        border: 2px solid #ff4444;
+        text-align: center;
+        max-width: 500px;
+        color: white;
+        box-shadow: 0 0 30px rgba(255, 68, 68, 0.3);
+      }
+
+      .error-content h2 {
+        color: #ff4444;
+        font-size: 2rem;
+        margin-bottom: 20px;
+        text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+      }
+
+      .error-content p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        color: #ffaaaa;
+      }
+
+      .error-button {
+        padding: 15px 30px;
+        background: linear-gradient(135deg, #ff4444, #dd2222);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .error-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
+      }
+
+      /* Animations */
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.05);
+          opacity: 0.8;
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* No-JS fallback */
+      .no-js {
+        display: none;
+      }
+
+      .no-js .no-js-message {
+        display: block;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        background: rgba(0, 0, 0, 0.9);
+        padding: 40px;
+        border-radius: 15px;
+        border: 2px solid #ff4444;
+        color: white;
+        max-width: 400px;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .loading-title {
+          font-size: 2rem;
+        }
+
+        .loading-subtitle {
+          font-size: 1rem;
+        }
+
+        .loading-logo {
+          width: 100px;
+          height: 100px;
+        }
+
+        .loading-progress {
+          width: 250px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .loading-title {
+          font-size: 1.5rem;
+        }
+
+        .loading-content {
+          padding: 20px;
+        }
+
+        .error-content {
+          padding: 30px 20px;
+          margin: 20px;
+        }
+
+        .error-content h2 {
+          font-size: 1.5rem;
+        }
+      }
+
+      /* Accessibility */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      /* High contrast mode */
+      @media (prefers-contrast: high) {
+        .loading-screen {
+          background: #000;
+        }
+
+        .loading-title {
+          color: #fff;
+        }
+
+        .loading-subtitle {
+          color: #ccc;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- No JavaScript fallback -->
+    <noscript>
+      <div class="no-js">
+        <div class="no-js-message">
+          <h2>JavaScript Required</h2>
+          <p>
+            This game requires JavaScript to run. Please enable JavaScript in
+            your browser settings and reload the page.
+          </p>
+        </div>
+      </div>
+    </noscript>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+      <div class="loading-content">
+        <div class="loading-logo"></div>
+        <h1 class="loading-title">MECHA X MONSTER</h1>
+        <p class="loading-subtitle">Space Mining & Defense</p>
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading...</div>
+        <div class="loading-progress">
+          <div class="loading-progress-fill" id="loading-progress"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Game Container -->
+    <div id="game-container">
+      <!-- Game screens will be loaded here -->
+    </div>
+
+    <!-- Load Core Scripts First -->
+    <script src="config.js"></script>
+    <script src="screen.js"></script>
+
+    <!-- Load Screen Scripts -->
+    <script src="startscreen.js"></script>
+    <script src="slimedefensescreen.js"></script>
+
+    <!-- Load Main App Controller -->
+    <script src="app.js"></script>
+
+    <script>
+      // Enhanced loading system
+      class GameLoader {
+        constructor() {
+          this.loadedScripts = 0;
+          this.totalScripts = 0;
+          this.startTime = Date.now();
+          this.minLoadTime = 2000; // Minimum 2 seconds for branding
+          this.maxLoadTime = 10000; // Maximum 10 seconds timeout
+          this.progressBar = document.getElementById("loading-progress");
+          this.loadingScreen = document.getElementById("loading-screen");
+          this.errors = [];
+        }
+
+        updateProgress(percentage) {
+          if (this.progressBar) {
+            this.progressBar.style.width = percentage + "%";
+          }
+        }
+
+        updateLoadingText(text) {
+          const loadingText = document.querySelector(".loading-text");
+          if (loadingText) {
+            loadingText.textContent = text;
+          }
+        }
+
+        checkRequirements() {
+          const required = [
+            "GAME_CONFIG",
+            "Screen",
+            "StartScreen",
+            "SlimeDefenseScreen",
+          ];
+          const missing = [];
+
+          required.forEach((req) => {
+            if (typeof window[req] === "undefined") {
+              missing.push(req);
+            }
+          });
+
+          if (missing.length > 0) {
+            throw new Error(
+              `Missing required components: ${missing.join(", ")}`
+            );
+          }
+        }
+
+        async waitForMinimumTime() {
+          const elapsed = Date.now() - this.startTime;
+          const remaining = this.minLoadTime - elapsed;
+
+          if (remaining > 0) {
+            await new Promise((resolve) => setTimeout(resolve, remaining));
+          }
+        }
+
+        hideLoadingScreen() {
+          if (this.loadingScreen) {
+            this.loadingScreen.classList.add("hidden");
+            setTimeout(() => {
+              this.loadingScreen.remove();
+            }, 500);
+          }
+        }
+
+        showError(message) {
+          console.error("🚨 Loading Error:", message);
+
+          const errorScreen = document.createElement("div");
+          errorScreen.className = "error-screen";
+          errorScreen.innerHTML = `
+            <div class="error-content">
+              <h2>❌ Loading Failed</h2>
+              <p>${message}</p>
+              <p style="font-size: 0.9rem; color: #999; margin-top: 15px;">
+                Please check your internet connection and try again.
+              </p>
+              <button class="error-button" onclick="location.reload()">
+                Reload Game
+              </button>
+            </div>
+          `;
+
+          document.body.appendChild(errorScreen);
+          this.hideLoadingScreen();
+        }
+
+        async load() {
+          try {
+            console.log("🎮 Starting game load sequence...");
+
+            // Step 1: Check basic requirements
+            this.updateLoadingText("Checking requirements...");
+            this.updateProgress(10);
+
+            // Wait for DOM to be fully ready
+            if (document.readyState !== "complete") {
+              await new Promise((resolve) => {
+                if (document.readyState === "complete") {
+                  resolve();
+                } else {
+                  window.addEventListener("load", resolve);
+                }
+              });
+            }
+
+            // Step 2: Verify core scripts loaded
+            this.updateLoadingText("Loading core systems...");
+            this.updateProgress(30);
+
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
+            // Step 3: Check required components
+            this.updateLoadingText("Verifying components...");
+            this.updateProgress(50);
+
+            this.checkRequirements();
+
+            // Step 4: Initialize app
+            this.updateLoadingText("Initializing game...");
+            this.updateProgress(70);
+
+            // Wait for app to be ready
+            let attempts = 0;
+            const maxAttempts = 50;
+
+            while (!window.app && attempts < maxAttempts) {
+              await new Promise((resolve) => setTimeout(resolve, 100));
+              attempts++;
+            }
+
+            if (!window.app) {
+              throw new Error("App failed to initialize");
+            }
+
+            // Step 5: Final checks
+            this.updateLoadingText("Final preparations...");
+            this.updateProgress(90);
+
+            // Wait for app to be fully initialized
+            let appReady = false;
+            attempts = 0;
+
+            while (!appReady && attempts < maxAttempts) {
+              if (window.app.isInitialized) {
+                appReady = true;
+              } else {
+                await new Promise((resolve) => setTimeout(resolve, 100));
+                attempts++;
+              }
+            }
+
+            if (!appReady) {
+              throw new Error("App initialization timeout");
+            }
+
+            // Step 6: Complete
+            this.updateLoadingText("Ready to play!");
+            this.updateProgress(100);
+
+            // Wait for minimum branding time
+            await this.waitForMinimumTime();
+
+            // Hide loading screen
+            this.hideLoadingScreen();
+
+            console.log("✅ Game loaded successfully!");
+          } catch (error) {
+            console.error("❌ Game loading failed:", error);
+            this.showError(error.message || "An unexpected error occurred");
+          }
+        }
+      }
+
+      // Start loading when DOM is ready
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+          const loader = new GameLoader();
+          loader.load();
+        });
+      } else {
+        // DOM already ready
+        const loader = new GameLoader();
+        loader.load();
+      }
+
+      // Global error handling
+      window.addEventListener("error", (event) => {
+        console.error("🚨 Global Error:", event.error);
+
+        // Show error if loading screen is still visible
+        const loadingScreen = document.getElementById("loading-screen");
+        if (loadingScreen && !loadingScreen.classList.contains("hidden")) {
+          const loader = new GameLoader();
+          loader.showError("A script error occurred during loading");
+        }
+      });
+
+      // Unhandled promise rejections
+      window.addEventListener("unhandledrejection", (event) => {
+        console.error("🚨 Unhandled Promise Rejection:", event.reason);
+        event.preventDefault();
+      });
+    </script>
+  </body>
+</html>

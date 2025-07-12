@@ -1,0 +1,539 @@
+/* StartScreen Enhanced Styles with Game Options */
+
+/* Game Options Container */
+.game-options-container {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  margin-top: 40px;
+}
+
+.game-options-container.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.game-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.game-option-card {
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  border-radius: 15px;
+  padding: 25px;
+  text-align: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.game-option-card:hover {
+  border-color: rgba(0, 255, 136, 0.6);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+}
+
+.game-option-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(0, 255, 136, 0.1),
+    transparent
+  );
+  transform: rotate(45deg);
+  transition: all 0.5s ease;
+  opacity: 0;
+}
+
+.game-option-card:hover::before {
+  opacity: 1;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+.game-option-description {
+  margin-top: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.game-option-description h3 {
+  color: #00ff88;
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.game-option-description p {
+  color: #ccc;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Enhanced Button Styles */
+.button-container {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.start-button,
+.slime-defense-button {
+  width: 100%;
+  padding: 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 60px;
+}
+
+.start-button {
+  background: linear-gradient(135deg, #00ff88, #00cc66);
+  color: black;
+  box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+}
+
+.start-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 255, 136, 0.4);
+  background: linear-gradient(135deg, #00ff88, #00aa55);
+}
+
+.slime-defense-button {
+  background: linear-gradient(135deg, #ff6b6b, #ff5252);
+  color: white;
+  box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+}
+
+.slime-defense-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 107, 107, 0.4);
+  background: linear-gradient(135deg, #ff5252, #ff3030);
+}
+
+.start-button.charging,
+.slime-defense-button.charging {
+  animation: buttonCharge 2s infinite;
+}
+
+@keyframes buttonCharge {
+  0%,
+  100% {
+    box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 40px rgba(0, 255, 136, 0.6);
+  }
+}
+
+.slime-defense-button.charging {
+  animation: buttonChargeRed 2s infinite;
+}
+
+@keyframes buttonChargeRed {
+  0%,
+  100% {
+    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 40px rgba(255, 107, 107, 0.6);
+  }
+}
+
+.button-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  border-radius: inherit;
+  z-index: -1;
+}
+
+.button-text {
+  position: relative;
+  z-index: 2;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.button-image {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.button-energy-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: var(--energy, 0%);
+  height: 3px;
+  background: linear-gradient(90deg, #fff, #ffff88);
+  border-radius: 0 0 12px 12px;
+  transition: width 0.3s ease;
+  z-index: 1;
+}
+
+.energy-ring {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border: 2px solid transparent;
+  border-radius: 15px;
+  background: linear-gradient(
+    45deg,
+    rgba(0, 255, 136, 0.3),
+    transparent,
+    rgba(0, 255, 136, 0.3)
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.game-option-card:hover .energy-ring {
+  opacity: 1;
+  animation: energyRing 3s infinite;
+}
+
+@keyframes energyRing {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.button-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  border-radius: 12px;
+  background: radial-gradient(circle, rgba(0, 255, 136, 0.2), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.start-button:hover ~ .button-glow {
+  opacity: 1;
+}
+
+.slime-defense-button:hover ~ .button-glow {
+  opacity: 1;
+  background: radial-gradient(circle, rgba(255, 107, 107, 0.2), transparent);
+}
+
+.energy-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.energy-particles::before,
+.energy-particles::after {
+  content: "";
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+  opacity: 0;
+  animation: energyParticle 3s infinite;
+}
+
+.energy-particles::before {
+  top: 20%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.energy-particles::after {
+  bottom: 20%;
+  right: 20%;
+  animation-delay: 1.5s;
+}
+
+@keyframes energyParticle {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+/* Energy Meter */
+.energy-meter {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.energy-bar {
+  width: 200px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  margin: 0 auto 10px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.energy-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff88, #00cc66);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.energy-text {
+  font-size: 0.9rem;
+  color: #00ff88;
+  font-weight: bold;
+  text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+}
+
+.energy-value {
+  color: #fff;
+  font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .game-options-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 15px;
+  }
+
+  .game-option-card {
+    padding: 20px 15px;
+  }
+
+  .game-option-description h3 {
+    font-size: 1.2rem;
+  }
+
+  .game-option-description p {
+    font-size: 0.85rem;
+  }
+
+  .start-button,
+  .slime-defense-button {
+    padding: 15px;
+    font-size: 1rem;
+    min-height: 50px;
+  }
+
+  .button-text {
+    font-size: 0.9rem;
+  }
+
+  .button-image {
+    width: 20px;
+    height: 20px;
+  }
+
+  .energy-bar {
+    width: 150px;
+    height: 6px;
+  }
+
+  .energy-text {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-options-container {
+    margin-top: 20px;
+  }
+
+  .game-option-card {
+    padding: 15px 10px;
+  }
+
+  .game-option-description h3 {
+    font-size: 1.1rem;
+  }
+
+  .game-option-description p {
+    font-size: 0.8rem;
+  }
+
+  .start-button,
+  .slime-defense-button {
+    padding: 12px;
+    font-size: 0.9rem;
+    min-height: 45px;
+    gap: 8px;
+  }
+
+  .button-text {
+    font-size: 0.8rem;
+  }
+
+  .button-image {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Enhanced transitions and animations */
+.game-option-card {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.game-option-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.game-option-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover effects for better UX */
+.game-option-card:hover .game-option-description h3 {
+  color: #00ffaa;
+  text-shadow: 0 0 15px rgba(0, 255, 170, 0.7);
+}
+
+.game-option-card:hover .game-option-description p {
+  color: #fff;
+}
+
+/* Button pressed states */
+.start-button:active,
+.slime-defense-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(0, 255, 136, 0.3);
+}
+
+.slime-defense-button:active {
+  box-shadow: 0 2px 10px rgba(255, 107, 107, 0.3);
+}
+
+/* Focus states for accessibility */
+.start-button:focus,
+.slime-defense-button:focus {
+  outline: 2px solid rgba(0, 255, 136, 0.5);
+  outline-offset: 2px;
+}
+
+.slime-defense-button:focus {
+  outline-color: rgba(255, 107, 107, 0.5);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .game-option-card {
+    border-color: #00ff88;
+    background: rgba(0, 0, 0, 0.9);
+  }
+
+  .game-option-description h3 {
+    color: #00ff88;
+  }
+
+  .game-option-description p {
+    color: #fff;
+  }
+
+  .start-button {
+    background: #00ff88;
+    color: #000;
+  }
+
+  .slime-defense-button {
+    background: #ff6b6b;
+    color: #fff;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .game-option-card {
+    animation: none;
+  }
+
+  .game-option-card:hover {
+    transform: none;
+  }
+
+  .start-button:hover,
+  .slime-defense-button:hover {
+    transform: none;
+  }
+
+  .energy-ring {
+    animation: none;
+  }
+
+  .energy-particles::before,
+  .energy-particles::after {
+    animation: none;
+  }
+}
