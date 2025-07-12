@@ -10,7 +10,7 @@ const GAME_CONFIG = {
       title: "Mecha X Monster",
       tagline: "Space Mining & Defense",
       subtitle: "Defend your mining operations from alien threats",
-      buttonText: "START MINING",
+      buttonText: "START GAME",
     },
 
     "slime-defense": {
@@ -18,16 +18,6 @@ const GAME_CONFIG = {
       subtitle: "Defend against alien slime invasion",
       playerStartHP: 10,
       maxPlayerHP: 10,
-    },
-
-    map: {
-      title: "Galactic Map",
-      subtitle: "Choose your mining destination",
-    },
-
-    mining: {
-      title: "Mining Operations",
-      subtitle: "Extract valuable resources",
     },
   },
 
@@ -349,8 +339,7 @@ const GAME_CONFIG = {
         "start.title": "Mecha X Monster",
         "start.tagline": "Space Mining & Defense",
         "start.subtitle": "Defend your mining operations from alien threats",
-        "start.startMining": "START MINING",
-        "start.slimeDefense": "SLIME DEFENSE",
+        "start.startGame": "START GAME",
         "slimeDefense.title": "Slime Defense",
         "slimeDefense.gameOver": "Game Over!",
         "slimeDefense.playAgain": "Play Again",
@@ -403,10 +392,6 @@ const GameConfig = {
     return GAME_CONFIG.mechas[mechaType] || null;
   },
 
-  getMineConfig: (mineId) => {
-    return GAME_CONFIG.mines[mineId] || null;
-  },
-
   getAudioConfig: () => {
     return GAME_CONFIG.audio;
   },
@@ -434,4 +419,3 @@ window.GameConfig = GameConfig;
 console.log("🎮 Game configuration loaded successfully!");
 console.log("📊 Available slimes:", Object.keys(GAME_CONFIG.slimes));
 console.log("🤖 Available mechas:", Object.keys(GAME_CONFIG.mechas));
-console.log("⛏️ Available mines:", Object.keys(GAME_CONFIG.mines));

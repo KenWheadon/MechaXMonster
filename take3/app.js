@@ -59,13 +59,13 @@ class App {
   registerScreens() {
     this.screens.set("start", {
       className: "StartScreen",
-      file: "startscreen.js",
+      file: "js/startscreen.js",
       title: "Start Screen",
     });
 
     this.screens.set("slime-defense", {
       className: "SlimeDefenseScreen",
-      file: "slimedefensescreen.js",
+      file: "js/slimedefensescreen.js",
       title: "Slime Defense",
     });
 
@@ -110,11 +110,8 @@ class App {
       }
 
       // Handle special cases for screen construction
-      if (screenName === "mining" && options.mineId) {
-        this.currentScreen = new ScreenClass(
-          this.gameContainer,
-          options.mineId
-        );
+      if (screenName === "slime-defense") {
+        this.currentScreen = new ScreenClass(this.gameContainer);
       } else {
         this.currentScreen = new ScreenClass(this.gameContainer);
       }

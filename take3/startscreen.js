@@ -41,13 +41,14 @@ class StartScreen extends Screen {
       ),
       progressFill: this.container.querySelector(".click-progress-fill"),
       clickCountElement: this.container.querySelector(".click-count"),
-      startButton: this.container.querySelector(".start-button"),
       energyFill: this.container.querySelector(".energy-fill"),
       energyValue: this.container.querySelector(".energy-value"),
       buttonEnergyFill: this.container.querySelector(".button-energy-fill"),
       clickerSection: this.container.querySelector(".clicker-game-section"),
       taglineContainer: this.container.querySelector(".tagline-container"),
-      buttonSection: this.container.querySelector(".button-section"),
+      gameOptionsContainer: this.container.querySelector(
+        ".game-options-container"
+      ),
       uiOverlay: this.container.querySelector(".ui-overlay"),
       settingsBtn: this.container.querySelector(".settings-btn"),
       logo: this.container.querySelector(".game-logo"),
@@ -57,9 +58,6 @@ class StartScreen extends Screen {
       logoParticles: this.container.querySelector(".logo-particles"),
       taglineElement: this.container.querySelector(".typing-text"),
       slimeDefenseButton: this.container.querySelector(".slime-defense-button"),
-      gameOptionsContainer: this.container.querySelector(
-        ".game-options-container"
-      ),
     };
   }
 
@@ -127,40 +125,21 @@ class StartScreen extends Screen {
                     <!-- Enhanced game options section (appears after clicker game) -->
                     <div class="game-options-container hidden">
                         <div class="game-options-grid">
-                            <!-- Mining Mode Button -->
-                            <div class="game-option-card">
-                                <div class="button-container">
-                                    <div class="energy-ring"></div>
-                                    <button class="start-button btn btn-primary" data-action="start-mining">
-                                        <div class="button-bg"></div>
-                                        <div class="button-energy-fill"></div>
-                                        <img src="images/btn-play.png" alt="Start Mining" class="button-image" />
-                                        <div class="button-text">START MINING</div>
-                                        <div class="energy-particles"></div>
-                                    </button>
-                                    <div class="button-glow"></div>
-                                </div>
-                                <div class="game-option-description">
-                                    <h3>Mining Mode</h3>
-                                    <p>Extract resources from asteroids and build your mecha fleet</p>
-                                </div>
-                            </div>
-                            
                             <!-- Slime Defense Mode Button -->
                             <div class="game-option-card">
                                 <div class="button-container">
                                     <div class="energy-ring"></div>
-                                    <button class="slime-defense-button btn btn-secondary" data-action="slime-defense">
+                                    <button class="slime-defense-button btn btn-primary" data-action="slime-defense">
                                         <div class="button-bg"></div>
                                         <div class="button-energy-fill"></div>
-                                        <div class="button-text">SLIME DEFENSE</div>
+                                        <div class="button-text">START GAME</div>
                                         <div class="energy-particles"></div>
                                     </button>
                                     <div class="button-glow"></div>
                                 </div>
                                 <div class="game-option-description">
-                                    <h3>Defense Mode</h3>
-                                    <p>Defend your base from waves of alien slimes</p>
+                                    <h3>Slime Defense</h3>
+                                    <p>Defend your base from waves of alien slimes. Click to attack and survive as long as possible!</p>
                                 </div>
                             </div>
                         </div>
@@ -218,20 +197,6 @@ class StartScreen extends Screen {
       });
     }
 
-    if (this.elements.startButton) {
-      this.elements.startButton.addEventListener("click", (e) => {
-        this.handleStartClick();
-      });
-
-      this.elements.startButton.addEventListener("mouseenter", () => {
-        this.startEnergyCharging();
-      });
-
-      this.elements.startButton.addEventListener("mouseleave", () => {
-        this.stopEnergyCharging();
-      });
-    }
-
     if (this.elements.slimeDefenseButton) {
       this.elements.slimeDefenseButton.addEventListener("click", (e) => {
         this.handleSlimeDefenseClick();
@@ -263,15 +228,6 @@ class StartScreen extends Screen {
         this.elements.clickButton?.click();
       } else if (this.gamePhase === "main-screen") {
         // Default to slime defense for space key
-        this.elements.slimeDefenseButton?.click();
-      }
-    }
-
-    // Number keys for game mode selection
-    if (this.gamePhase === "main-screen") {
-      if (e.code === "Digit1") {
-        this.elements.startButton?.click();
-      } else if (e.code === "Digit2") {
         this.elements.slimeDefenseButton?.click();
       }
     }
@@ -597,8 +553,6 @@ class StartScreen extends Screen {
     if (this.isCharging || this.gamePhase !== "main-screen") return;
 
     this.isCharging = true;
-    if (this.elements.startButton)
-      this.elements.startButton.classList.add("charging");
     if (this.elements.slimeDefenseButton)
       this.elements.slimeDefenseButton.classList.add("charging");
 
@@ -644,8 +598,6 @@ class StartScreen extends Screen {
     if (this.gamePhase !== "main-screen") return;
 
     this.isCharging = false;
-    if (this.elements.startButton)
-      this.elements.startButton.classList.remove("charging");
     if (this.elements.slimeDefenseButton)
       this.elements.slimeDefenseButton.classList.remove("charging");
 
@@ -677,46 +629,10 @@ class StartScreen extends Screen {
     }, 100);
   }
 
-  handleStartClick() {
-    if (this.gamePhase !== "main-screen") return;
-
-    console.log("🎮 Start Mining button clicked!");
-
-    // Play sound effect
-    if (this.audioManager) {
-      this.audioManager.playSound("button-click");
-      this.audioManager.stopSound("background-music");
-    }
-
-    // Show loading overlay
-    this.showLoadingScreen();
-
-    // Success message
-    this.setManagedTimeout(() => {
-      this.showSuccessMessage(
-        "🚀 MINING OPERATIONS INITIALIZED!\nLoading mining systems..."
-      );
-    }, 500);
-
-    // Simulate loading process
-    this.simulateLoading(() => {
-      console.log("🔄 Ready to transition to Mining Screen");
-      // Transition to mining screen if app is available
-      if (window.app && window.app.goToScreen) {
-        window.app.goToScreen("mining");
-      } else {
-        this.showTemporaryMessage(
-          "⚠️ Mining screen not available yet",
-          "warning"
-        );
-      }
-    });
-  }
-
   handleSlimeDefenseClick() {
     if (this.gamePhase !== "main-screen") return;
 
-    console.log("🎯 Slime Defense button clicked!");
+    console.log("🎯 Start Game button clicked!");
 
     // Play sound effect
     if (this.audioManager) {
@@ -814,8 +730,6 @@ class StartScreen extends Screen {
   forceTransitionTo(mode) {
     if (mode === "slime-defense") {
       this.handleSlimeDefenseClick();
-    } else if (mode === "mining") {
-      this.handleStartClick();
     } else {
       console.warn(`Unknown mode: ${mode}`);
     }
